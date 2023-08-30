@@ -42,15 +42,17 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
 
   useEffect(() => {
     setFormData(defaultState)
-
-    if ((!formData.id && id) || (formData.id && id && formData.id !== id)) {
-      loadTemplate()
-    }
+    if (id) loadTemplate()
   }, [id])
 
   useEffect(() => {
     parsePreviewPayload()
   }, [formData.body])
+
+  useEffect(() => {
+    setFormData(defaultState)
+    setPreviewPayload(null)
+  }, [router.pathname])
 
   const onSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

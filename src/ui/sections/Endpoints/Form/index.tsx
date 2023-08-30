@@ -53,10 +53,12 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
   const multipleResponseTemplates = formData.multiple_responses_templates || []
 
   useEffect(() => {
-    if ((!formData.id && id) || (formData.id && id && formData.id !== id)) {
-      loadEndpoint()
-    }
+    if (id) loadEndpoint()
   }, [id])
+
+  useEffect(() => {
+    setFormData(defaultState)
+  }, [router.pathname])
 
   const onSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()

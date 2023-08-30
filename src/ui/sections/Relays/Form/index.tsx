@@ -39,12 +39,13 @@ export const RelayTemplatesForm: FC<Props> = ({ id, getList }) => {
   const [previewPayload, setPreviewPayload] = useState<Record<string, unknown> | null>(null)
 
   useEffect(() => {
-    setFormData(defaultState)
-
-    if ((!formData.id && id) || (formData.id && id && formData.id !== id)) {
-      loadRelayTemplate()
-    }
+    if (id) loadRelayTemplate()
   }, [id])
+
+  useEffect(() => {
+    setFormData(defaultState)
+    setPreviewPayload(null)
+  }, [router.pathname])
 
   useEffect(() => {
     parsePreviewPayload()

@@ -23,7 +23,6 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
   const [rawString, setRawString] = useState("")
 
   useEffect(() => {
-    if (!bodyRaw) return
     setRawString(rawString)
     rawToConstructor()
   }, [bodyRaw])
