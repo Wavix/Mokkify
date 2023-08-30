@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 
 import { config } from "@/config"
 import * as API from "@/ui/api/endpoints"
@@ -27,6 +27,8 @@ const columns = {
   response_code: "Status"
 }
 
+const REFRESH_LOGS_INTERVAL = 5_000
+
 export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
   const router = useRouter()
 
@@ -36,6 +38,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
   const [activeLog, setActiveLog] = useState<LogAttributes | null>(null)
   const [isLogsLoading, setIsLogsLoading] = useState(false)
   const [isLogLoading, setIsLogLoading] = useState(false)
+  const updateInterval = useRef<NodeJS.Timeout | null>(null)
 
   const endpointId = Number(router.query.endpointId)
   const logId = Number(router.query.logId)
@@ -46,6 +49,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     setActiveLog(null)
     setLogs(listInitial)
     getLogs()
+    startUpdateInterval()
   }, [endpointId, page, limit])
 
   useEffect(() => {
@@ -54,8 +58,14 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     getLog()
   }, [logId])
 
-  const getLogs = async () => {
-    setIsLogsLoading(true)
+  useEffect(() => {
+    return () => {
+      if (updateInterval.current) clearInterval(updateInterval.current)
+    }
+  }, [])
+
+  const getLogs = async (skeleton = true) => {
+    if (skeleton) setIsLogsLoading(true)
     const response = await API.getEndpointLogs(endpointId, { page, limit })
     if (response instanceof Error) return setIsLogsLoading(false)
     setLogs(response)
@@ -67,6 +77,11 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     const response = await API.getLogById(logId)
     setActiveLog(response)
     setIsLogLoading(false)
+  }
+
+  const startUpdateInterval = () => {
+    if (updateInterval.current) clearInterval(updateInterval.current)
+    if (page === 1) updateInterval.current = setInterval(() => getLogs(false), REFRESH_LOGS_INTERVAL)
   }
 
   if (!activeEndpoint) return <Cap />
