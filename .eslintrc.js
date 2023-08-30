@@ -22,6 +22,7 @@ module.exports = {
     "func-style": ["error", "expression"],
     "prefer-regex-literals": "off",
     "react/no-unused-prop-types": "off",
+    "react-hooks/exhaustive-deps": "off",
     "no-restricted-exports": "off",
     "no-unsafe-optional-chaining": "off",
     "react/no-unstable-nested-components": "off",

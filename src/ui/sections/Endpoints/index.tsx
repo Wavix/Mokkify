@@ -35,7 +35,7 @@ const Endpoints: NextPage = () => {
   const getEndpoints = async (skeleton = true) => {
     if (skeleton) setIsLoading(true)
     const response = await API.getEndpointsList()
-    if (response instanceof Error) return console.log("E", response)
+    if (response instanceof Error) return failureToast(response.message)
     setEndpoints(response)
     setIsLoading(false)
   }

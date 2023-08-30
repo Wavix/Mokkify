@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Sequelize, DataTypes } from "sequelize"
 
 import * as Models from "./models"
