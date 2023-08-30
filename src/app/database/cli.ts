@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { UserService } from "../services"
 
 import { dbCreate } from "./connect"
