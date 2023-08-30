@@ -1,0 +1,141 @@
+@keyframes robotMoves {
+  from {
+    transform: translateY(0px);
+  }
+  to {
+    transform: translateY(10px);
+  }
+}
+
+@keyframes gearhSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes eyesBlink {
+  10% {
+    transform: scaleY(1);
+  }
+  11% {
+    transform: scaleY(0);
+  }
+  12% {
+    transform: scaleY(0);
+  }
+  13% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes eyesMoves {
+  10% {
+    transform: translateX(0px);
+  }
+  13% {
+    transform: translateX(-16px);
+  }
+  30% {
+    transform: translateX(-16px);
+  }
+  33% {
+    transform: translateX(16px);
+  }
+  45% {
+    transform: translateX(16px);
+  }
+  47% {
+    transform: translateX(0px);
+  }
+}
+
+@keyframes antennaMoves {
+  10% {
+    transform: translateX(0px);
+  }
+  13% {
+    transform: translateX(2px);
+  }
+  30% {
+    transform: translateX(2px);
+  }
+  33% {
+    transform: translateX(-20px);
+  }
+  45% {
+    transform: translateX(-20px);
+  }
+  47% {
+    transform: translateX(0px);
+  }
+}
+
+.robotContainer {
+  max-width: 500px;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  margin: auto;
+}
+
+.robot {
+  animation: robotMoves 2s ease-in-out alternate infinite;
+  .robotArmLeft,
+  .robotArmRight,
+  .gear,
+  .gear1,
+  .robotAntenna {
+    pointer-events: none;
+  }
+
+  .gear {
+    transform-box: fill-box;
+    transform-origin: center center;
+    animation: gearhSpin 3s linear infinite;
+  }
+
+  .gear1 {
+    display: none;
+    transform-box: fill-box;
+    transform-origin: center center;
+    transform: translate(-20px, 78px);
+  }
+
+  .robotEyes {
+    circle {
+      transform-box: fill-box;
+      transform-origin: center center;
+      animation: eyesBlink 2s linear alternate infinite;
+    }
+  }
+
+  &:hover {
+    animation-play-state: paused;
+
+    .gear {
+      display: none;
+    }
+    .gear1 {
+      display: inline;
+    }
+
+    .robotAntenna {
+      animation: antennaMoves 5s linear alternate infinite;
+    }
+
+    .robotEyes {
+      transform-box: fill-box;
+      transform-origin: center center;
+      animation: eyesMoves 5s linear alternate infinite;
+    }
+
+    .robotArmRight {
+      transform-box: fill-box;
+      transform-origin: center center;
+      transform: rotateY(180deg) rotate(165deg) translate(3px, -35px);
+    }
+  }
+}

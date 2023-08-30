@@ -1,0 +1,97 @@
+.authPage {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(134deg, #9c78ff 0%, #6b46c1 69.79%, #cb0bea 100%);
+
+  .mainWindow {
+    width: 812px;
+    height: 524px;
+    flex-shrink: 0;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 3px 1px 10px -1px rgba(0, 0, 0, 0.12);
+    margin: auto;
+
+    .mainWindowContainer {
+      display: grid;
+      height: 100%;
+      grid-template-columns: 449px 1fr;
+
+      .left {
+        position: relative;
+        background-color: #553c9a;
+        border-radius: 14px 0px 0px 14px;
+        color: #fff;
+
+        .container {
+          padding: 46px;
+        }
+
+        .welcome {
+          margin-top: 118px;
+          font-size: 36px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: normal;
+        }
+
+        .welcome2 {
+          margin-top: 12px;
+          font-size: 20px;
+          font-weight: 300;
+          line-height: normal;
+          max-width: 146px;
+        }
+
+        .link {
+          position: absolute;
+          bottom: 46px;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: normal;
+        }
+
+        .lines {
+          position: absolute;
+          top: 27px;
+        }
+      }
+
+      .right {
+        .container {
+          padding: 46px 32px;
+        }
+
+        h1 {
+          font-size: 30px;
+          font-style: normal;
+          font-weight: 700;
+          line-height: normal;
+        }
+
+        .form {
+          display: flex;
+          flex-direction: column;
+          row-gap: 12px;
+          margin-top: 102px;
+
+          div:last-child {
+            margin-top: 10px;
+          }
+
+          button {
+            display: none;
+          }
+        }
+
+        .errorMessage {
+          color: red;
+          margin-top: 22px;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+@import "src/styles/palette.module.scss";
+
+.tableContext {
+  position: absolute;
+  min-width: 200px;
+  background: #fff;
+  box-shadow:
+    0 10px 20px rgb(70 93 139 / 10%),
+    0 0 2px rgb(70 93 139 / 30%);
+  border-radius: 2px;
+  z-index: 2;
+}
+
+.bottom {
+  top: 35px;
+  right: 0;
+}
+
+.left {
+  top: -34px;
+  left: -204px;
+}
+
+.contextList {
+  list-style-type: none;
+}
+
+.contextItemWrapper {
+  font-style: normal;
+  font-weight: normal;
+  font-size: 15px;
+  padding: 10px 16px;
+  line-height: 24px;
+  letter-spacing: 0.2px;
+  color: #000;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background: $light-gray;
+  }
+}

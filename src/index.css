@@ -1,0 +1,25 @@
+* {
+  font-family: "Roboto", sans-serif;
+}
+
+body {
+  font-size: 15px;
+}
+
+html,
+body,
+body > div:first-child,
+div#__next,
+div#__next > div {
+  height: 100%;
+}
+
+a {
+  color: #0bc5ea !important;
+  text-decoration: underline !important;
+}
+
+a:hover {
+  color: #0bc5ea !important;
+  text-decoration: none !important;
+}

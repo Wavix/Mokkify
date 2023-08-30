@@ -1,0 +1,26 @@
+@import "src/styles/global.module.scss";
+
+.formContentLayout {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: $block-padding;
+  grid-row-gap: $block-padding;
+}
+
+.templateBehaviorContainer {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-column-gap: 20px;
+}
+
+.relayContainer {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: $block-padding;
+  grid-row-gap: $block-padding;
+  margin-top: $block-padding;
+}
+
+.relayTargetContainer {
+  margin-top: $block-padding;
+}

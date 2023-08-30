@@ -1,0 +1,84 @@
+@import "src/styles/palette.module.scss";
+@import "src/styles/global.module.scss";
+
+$sidemenu-width: 310px;
+
+.sideMenu {
+  min-width: $sidemenu-width;
+
+  .sideMenuWrapper {
+    position: fixed;
+    top: 0;
+    display: inline-flex;
+    flex-direction: column;
+    width: $sidemenu-width;
+    height: 100%;
+    padding-top: $content-top-padding;
+    background-color: $main-purple;
+
+    .sideMenuContainer {
+      padding: 0 16px;
+    }
+
+    .sideMenuLogoWrapper {
+      padding-top: 8px;
+      padding-bottom: 48px;
+    }
+
+    .sideMenuHeader {
+      display: flex;
+      color: #fff;
+      font-size: 22px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+      padding-bottom: 14px;
+
+      .new {
+        padding-top: 3px;
+        margin-left: auto;
+        cursor: pointer;
+
+        :hover {
+          opacity: 0.9;
+        }
+      }
+    }
+
+    .sideMenuNav {
+      overflow-y: auto;
+      height: calc(100vh - 150px);
+
+      .sideMenuLink {
+        margin-bottom: 2px;
+        cursor: pointer;
+        padding: 10px 0;
+        user-select: none;
+
+        &.active {
+          background-color: #724fc5;
+        }
+
+        &:hover {
+          background-color: #724fc5;
+        }
+
+        .linkTitle {
+          color: #fff;
+          font-size: 16px;
+          font-style: normal;
+          font-weight: 400;
+          line-height: normal;
+        }
+
+        .linkDescription {
+          color: #dbd3ec;
+          font-size: 13px;
+          font-style: normal;
+          font-weight: 300;
+          line-height: normal;
+        }
+      }
+    }
+  }
+}

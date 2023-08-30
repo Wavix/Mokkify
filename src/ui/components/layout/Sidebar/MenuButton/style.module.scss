@@ -1,0 +1,40 @@
+.menuButtonWrapper {
+  display: grid;
+  justify-items: center;
+  margin-bottom: 17px;
+  cursor: pointer;
+
+  .menuButtonIconWrapper {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+
+    svg {
+      fill: #c1b6e0;
+    }
+  }
+
+  .menuButtonTitle {
+    margin-top: 2px;
+    font-size: 10px;
+    user-select: none;
+    color: #c1b6e0;
+  }
+
+  &.active {
+    .menuButtonIconWrapper {
+      background-color: #a48dd1;
+
+      svg {
+        fill: #fff;
+      }
+    }
+
+    .menuButtonTitle {
+      color: #fff;
+    }
+  }
+}

@@ -1,0 +1,44 @@
+@import "src/styles/palette.module.scss";
+
+$hightlight-color: #d4f8ff;
+
+.table {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0px;
+
+  .container {
+    display: table-row-group;
+
+    .row {
+      color: inherit;
+      display: table-row;
+      vertical-align: middle;
+      outline: 0px;
+
+      &.pointer {
+        cursor: pointer;
+      }
+
+      &:nth-child(2n) {
+        background: $light-gray;
+      }
+
+      &.active {
+        background-color: $hightlight-color;
+      }
+    }
+
+    .column {
+      font-size: 15px;
+      line-height: 1.43;
+      display: table-cell;
+      vertical-align: inherit;
+      text-align: left;
+      padding: 16px;
+      color: rgba(0, 0, 0, 0.87);
+      white-space: nowrap;
+    }
+  }
+}

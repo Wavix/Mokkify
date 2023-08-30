@@ -1,0 +1,93 @@
+@import "src/styles/global.module.scss";
+@import "src/styles/palette.module.scss";
+
+$highlight-bg-color: #ebebeb;
+$highlight-color: #000;
+
+.paginatorContainer {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  .paginatorItemsContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    width: fit-content;
+    margin: 26px 0 20px;
+  }
+
+  .perPageTitle {
+    position: absolute;
+    font-size: 13px;
+    font-weight: 500;
+    top: -16px;
+  }
+
+  .paginatorItem {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    padding: 0 15px;
+    height: 40px;
+    background: #fff;
+    margin-right: 1px;
+    user-select: none;
+    cursor: pointer;
+    color: #000;
+
+    &:hover {
+      background: $highlight-bg-color;
+      color: $highlight-color;
+
+      svg {
+        fill: $highlight-color;
+      }
+    }
+  }
+
+  .paginatorItemTransparent {
+    background: initial;
+    cursor: default;
+
+    &:hover {
+      background: initial;
+    }
+  }
+
+  .paginatorItemActive {
+    background: $highlight-bg-color;
+    color: $highlight-color;
+  }
+
+  .navIcon {
+    width: 10px;
+    height: 13px;
+    fill: #000;
+  }
+
+  .navPrevious {
+    padding: 0 16px;
+    margin-right: 8px;
+    transform: rotate(180deg);
+  }
+
+  .navNext {
+    padding: 0 16px;
+    margin-left: 8px;
+  }
+
+  .empty {
+    display: block;
+    width: 0;
+    height: 0;
+    visibility: hidden;
+  }
+}

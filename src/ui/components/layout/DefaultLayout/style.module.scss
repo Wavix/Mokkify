@@ -1,0 +1,6 @@
+@import "src/styles/global.module.scss";
+
+.mainLayout {
+  padding-left: $sidebar-width;
+  min-height: 100%;
+}

@@ -1,0 +1,18 @@
+.input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid #553c9a;
+  border-radius: 0;
+  padding: 13px 0;
+  font-family: Helvetica Neue;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  outline: none;
+
+  &.password {
+    font-family: Verdana;
+    letter-spacing: 0.125em;
+  }
+}

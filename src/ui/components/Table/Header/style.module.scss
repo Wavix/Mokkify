@@ -1,0 +1,23 @@
+.tableHeader {
+  display: table-header-group;
+  white-space: nowrap;
+
+  .container {
+    color: inherit;
+    display: table-row;
+    vertical-align: middle;
+    outline: 0px;
+  }
+
+  .head {
+    font-weight: 500;
+    font-size: 15px;
+    display: table-cell;
+    vertical-align: inherit;
+    border-bottom: 1px solid rgb(224, 224, 224);
+    text-align: left;
+    padding: 16px;
+    color: rgba(0, 0, 0, 0.87);
+    white-space: nowrap;
+  }
+}

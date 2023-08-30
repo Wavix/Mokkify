@@ -1,0 +1,24 @@
+.addAction {
+  display: grid;
+  margin-top: 30px;
+  margin-bottom: 20px;
+  width: 95px;
+  grid-template-columns: auto 1fr;
+  grid-column-gap: 7px;
+  cursor: pointer;
+
+  .addActionTitle {
+    font-weight: 600;
+    user-select: none;
+  }
+}
+
+.hint {
+  margin: 10px 0 20px 0;
+}
+
+.actions {
+  display: flex;
+  column-gap: 12px;
+  margin-bottom: 20px;
+}

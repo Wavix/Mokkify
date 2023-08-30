@@ -1,0 +1,45 @@
+.contextButtonWrapper {
+  position: relative;
+}
+
+.button {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+
+  &:focus {
+    outline: none;
+  }
+
+  &:hover {
+    background-color: #8d78c8;
+
+    svg {
+      fill: #fff;
+    }
+  }
+
+  &.active {
+    background-color: #8d78c8;
+    svg {
+      fill: #fff;
+    }
+  }
+
+  svg {
+    fill: #8d78c8;
+  }
+}
+
+.contextIcon {
+  width: 4px;
+  height: 16px;
+  fill: orange;
+  opacity: 0.5;
+}

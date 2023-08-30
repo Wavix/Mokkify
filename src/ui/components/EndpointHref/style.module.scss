@@ -1,0 +1,12 @@
+@import "src/styles/palette.module.scss";
+
+.endpointHref {
+  display: grid;
+  grid-template-columns: auto auto 20px;
+  grid-column-gap: 10px;
+  max-width: fit-content;
+
+  .copyIcon {
+    cursor: pointer;
+  }
+}

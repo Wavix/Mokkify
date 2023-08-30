@@ -1,0 +1,27 @@
+@import "src/styles/global.module.scss";
+
+.sectionWrapper {
+  display: flex;
+  flex-flow: column;
+  flex: auto;
+  padding: $content-top-padding $block-padding $block-padding $block-padding;
+  color: #000;
+  min-height: 100%;
+
+  .sectionHeader {
+    color: #000;
+    font-size: 34px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: normal;
+  }
+
+  .sectionDescription {
+    min-height: 22px;
+  }
+
+  .sectionContent {
+    flex: 1 1 auto;
+    padding-top: 24px;
+  }
+}

@@ -1,0 +1,17 @@
+.multiSelect {
+  height: var(--chakra-sizes-10);
+
+  > div:first-of-type {
+    border-color: var(--chakra-colors-gray-200);
+    min-height: var(--chakra-sizes-10);
+
+    &:focus-within {
+      border-color: #9f7aea !important;
+      box-shadow: 0 0 0 1px #9f7aea !important;
+    }
+
+    &:hover {
+      border-color: var(--chakra-colors-gray-300);
+    }
+  }
+}

@@ -1,0 +1,14 @@
+@import "src/styles/global.module.scss";
+@import "src/styles/palette.module.scss";
+
+.objectRow {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 24px;
+  grid-column-gap: $block-padding;
+  margin-bottom: $block-padding;
+  align-items: center;
+
+  svg {
+    color: $main-purple;
+  }
+}

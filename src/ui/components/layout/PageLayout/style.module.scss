@@ -1,0 +1,8 @@
+@import "src/styles/palette.module.scss";
+
+.pageLayout {
+  display: flex;
+  width: 100%;
+  min-height: 100%;
+  background-color: #f5f6fa;
+}

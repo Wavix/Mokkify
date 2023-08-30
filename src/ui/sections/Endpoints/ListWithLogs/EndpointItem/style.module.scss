@@ -1,0 +1,5 @@
+.linkWrapper {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-column-gap: 12px;
+}

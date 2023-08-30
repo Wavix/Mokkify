@@ -1,0 +1,26 @@
+@import "src/styles/palette.module.scss";
+
+.controllButton {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-column-gap: 7px;
+  align-items: center;
+  width: fit-content;
+  height: 26px;
+  background-color: $main-purple;
+  border-radius: 4px;
+  cursor: pointer;
+  padding: 0 12px;
+  user-select: none;
+
+  &:hover {
+    background-color: $dark-purple;
+  }
+
+  .title {
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+  }
+}

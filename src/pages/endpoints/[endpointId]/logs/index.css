@@ -1,0 +1,24 @@
+.urls-wrapper {
+    display: grid;
+    grid-template-columns: 50px 1fr;
+    grid-column-gap: 8px;
+    cursor: pointer;
+}
+
+.urls-border {
+    position: relative;
+}
+
+.urls-border::after {
+    position: absolute;
+    content: "";
+    left: 100%;
+    height: calc(100vh - 72px);
+    top: -17px;
+    width: 1px;
+    background-color: grey;
+}
+
+.cursorPointer {
+    cursor: pointer;
+}

@@ -1,0 +1,22 @@
+@import "src/styles/palette.module.scss";
+
+.categoryBlock {
+  .title {
+    color: $main-purple;
+    font-size: 13px;
+    font-weight: 500;
+    padding-bottom: 2px;
+    text-transform: uppercase;
+    border-bottom: 1px solid $main-purple;
+  }
+
+  .content {
+    padding: 10px 0 20px 0;
+  }
+
+  &:nth-last-of-type(2) {
+    .content {
+      padding-bottom: 0;
+    }
+  }
+}

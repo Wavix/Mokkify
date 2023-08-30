@@ -1,0 +1,16 @@
+@import "./src/styles/palette.module.scss";
+@import "./src/styles/global.module.scss";
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
+  width: $sidebar-width;
+  height: 100%;
+  padding-top: $content-top-padding;
+  background-color: $dark-purple;
+}

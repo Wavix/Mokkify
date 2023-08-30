@@ -1,0 +1,7 @@
+@import "src/styles/global.module.scss";
+
+.endpointsContentLayout {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  grid-column-gap: $block-padding;
+}

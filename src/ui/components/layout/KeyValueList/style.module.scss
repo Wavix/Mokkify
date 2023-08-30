@@ -1,0 +1,86 @@
+@import "src/styles/palette.module.scss";
+
+.keyValueList {
+  &.tenNinety {
+    div {
+      grid-template-columns: 10% 1fr;
+    }
+  }
+
+  &.twentyEighty {
+    div {
+      grid-template-columns: 20% 1fr;
+    }
+  }
+
+  &.thirtySeventy {
+    div {
+      grid-template-columns: 30% 1fr;
+    }
+  }
+
+  &.fortySixty {
+    div {
+      grid-template-columns: 40% 1fr;
+    }
+  }
+
+  &.fiftyFifty {
+    div {
+      grid-template-columns: 50% 1fr;
+    }
+  }
+
+  &.sixtyForty {
+    div {
+      grid-template-columns: 60% 1fr;
+    }
+  }
+
+  &.seventyThirty {
+    div {
+      grid-template-columns: 70% 1fr;
+    }
+  }
+
+  &.eightyTwenty {
+    div {
+      grid-template-columns: 80% 1fr;
+    }
+  }
+
+  &.ninetyTen {
+    div {
+      grid-template-columns: 90% 1fr;
+    }
+  }
+
+  .keyValueListRow {
+    display: grid;
+    background-color: $light-gray;
+
+    .column {
+      padding-top: 6px;
+      padding-bottom: 6px;
+      min-height: 25px;
+      padding-left: 22px;
+      line-height: 1.2;
+      overflow-y: auto;
+
+      &:nth-child(1) {
+        font-weight: 500;
+        font-style: normal;
+        line-height: normal;
+      }
+    }
+
+    &:nth-child(2n) {
+      background: #fff;
+    }
+
+    :nth-child(2n) {
+      padding-left: 0;
+      padding-right: 22px;
+    }
+  }
+}

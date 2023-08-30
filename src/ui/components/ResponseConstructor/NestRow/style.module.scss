@@ -1,0 +1,30 @@
+@import "src/styles/palette.module.scss";
+@import "src/styles/global.module.scss";
+
+.objectNested {
+  border-left: 1px #d5d5d5 solid;
+  margin-bottom: 20px;
+
+  .header {
+    background-color: $light-gray;
+    padding-left: 30px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    height: 58px;
+    align-content: center;
+  }
+
+  .deleteButton {
+    align-self: center;
+    margin-left: $block-padding;
+
+    svg {
+      color: $main-purple;
+    }
+  }
+
+  .container {
+    padding-top: $block-padding;
+    padding-left: 30px;
+  }
+}
