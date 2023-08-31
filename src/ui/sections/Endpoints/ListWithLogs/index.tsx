@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from "react"
 
 import { config } from "@/config"
 import * as API from "@/ui/api/endpoints"
-import { listInitial } from "@/ui/api/helpers"
+import { listInitial, buildQueryString } from "@/ui/api/helpers"
 import { EndpointHref, Card, Table, Skeleton, Pagination, usePagination } from "@/ui/components"
 import { SectionWrapper } from "@/ui/components/layout"
 
@@ -79,6 +79,15 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     setIsLogLoading(false)
   }
 
+  const getQueryString = (): string => {
+    const query = {
+      page: logs.pagination.current_page || listInitial.pagination.current_page,
+      limit: logs.pagination.limit || listInitial.pagination.limit
+    }
+
+    return buildQueryString(query)
+  }
+
   const startUpdateInterval = () => {
     if (updateInterval.current) clearInterval(updateInterval.current)
     if (page === 1) updateInterval.current = setInterval(() => getLogs(false), REFRESH_LOGS_INTERVAL)
@@ -103,7 +112,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
                     <Table.Row
                       key={log.id}
                       onClick={() =>
-                        router.push(`/endpoints/${endpointId}/logs/${log.id}`, undefined, {
+                        router.push(`/endpoints/${endpointId}/logs/${log.id}${getQueryString()}`, undefined, {
                           scroll: false,
                           shallow: true
                         })
