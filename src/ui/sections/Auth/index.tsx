@@ -1,3 +1,4 @@
+import Head from "next/head"
 import { useState, useContext } from "react"
 
 import { LoginContext } from "@/ui//LoginContext"
@@ -38,7 +39,9 @@ const Auth: NextPage = () => {
 
   return (
     <>
-      <title>Mokkify - Welcome!</title>
+      <Head>
+        <title>Mokkify - Welcome!</title>
+      </Head>
       <div className={style.authPage}>
         <div className={style.mainWindow}>
           <div className={style.mainWindowContainer}>

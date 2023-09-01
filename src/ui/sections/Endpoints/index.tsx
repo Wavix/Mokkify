@@ -1,3 +1,4 @@
+import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useState, useEffect } from "react"
 
@@ -65,6 +66,9 @@ const Endpoints: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <title>{activeEndpoint ? `Endpoints - ${activeEndpoint.title}` : "Endpoints"}</title>
+      </Head>
       <SideMenu.Body header="Endpoints" onNew={() => router.push("/endpoints/create", undefined, { shallow: true })}>
         <SideMenu.Nav>
           {isLoading && <SideMenu.Skeleton />}

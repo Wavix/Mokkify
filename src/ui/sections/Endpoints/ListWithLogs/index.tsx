@@ -5,10 +5,9 @@ import { useEffect, useState, useRef } from "react"
 import { config } from "@/config"
 import * as API from "@/ui/api/endpoints"
 import { listInitial, buildQueryString } from "@/ui/api/helpers"
-import { EndpointHref, Card, Table, Skeleton, Pagination, usePagination } from "@/ui/components"
+import { EndpointHref, Card, Table, Skeleton, Pagination, usePagination, Cap } from "@/ui/components"
 import { SectionWrapper } from "@/ui/components/layout"
 
-import { Cap } from "./Cap"
 import { Details } from "./Details"
 import style from "./style.module.scss"
 
@@ -93,7 +92,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     if (page === 1) updateInterval.current = setInterval(() => getLogs(false), REFRESH_LOGS_INTERVAL)
   }
 
-  if (!activeEndpoint) return <Cap />
+  if (!activeEndpoint) return <Cap title="Endpoints requests" description="Select endpoint to see the request logs" />
 
   return (
     <>

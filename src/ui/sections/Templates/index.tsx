@@ -1,9 +1,11 @@
+import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useState, useEffect } from "react"
 
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as templatesApi from "@/ui/api/templates"
+import { Cap } from "@/ui/components"
 import { SideMenu } from "@/ui/components/layout"
 
 import { TemplatesForm } from "./Form"
@@ -68,12 +70,15 @@ const Templates: NextPage = () => {
       case "/templates/[templateId]/edit":
         return <TemplatesForm id={templateId} getList={getTemplates} />
       default:
-        return null
+        return <Cap title="Response templates" description="Select template to start editing or create a new one" />
     }
   }
 
   return (
     <>
+      <Head>
+        <title>Tamplates</title>
+      </Head>
       <SideMenu.Body header="Templates" onNew={() => router.push("/templates/create", undefined, { shallow: true })}>
         {isLoading && <SideMenu.Skeleton />}
         <SideMenu.Nav>

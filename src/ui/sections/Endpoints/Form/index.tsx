@@ -1,3 +1,4 @@
+import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 
@@ -136,7 +137,9 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
 
   return (
     <>
-      <title>{pageTitle}</title>
+      <Head>
+        <title>{pageTitle}</title>
+      </Head>
       <SectionWrapper title={pageTitle}>
         <Card.Container>
           {isLoading && <Skeleton />}

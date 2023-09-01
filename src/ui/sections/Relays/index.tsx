@@ -1,9 +1,11 @@
+import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useState, useEffect } from "react"
 
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as relaysApi from "@/ui/api/relays"
+import { Cap } from "@/ui/components"
 import { SideMenu } from "@/ui/components/layout"
 
 import { RelayTemplatesForm } from "./Form"
@@ -68,12 +70,15 @@ const Relays: NextPage = () => {
       case "/relays/[relayId]/edit":
         return <RelayTemplatesForm id={relayId} getList={getRelays} />
       default:
-        return null
+        return <Cap title="Relays" description="Select relay to start editing or create a new one" />
     }
   }
 
   return (
     <>
+      <Head>
+        <title>Relays</title>
+      </Head>
       <SideMenu.Body header="Relays" onNew={() => router.push("/relays/create", undefined, { shallow: true })}>
         {isLoading && <SideMenu.Skeleton />}
         <SideMenu.Nav>

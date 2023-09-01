@@ -5,11 +5,16 @@ import style from "./style.module.scss"
 
 import type { FC } from "react"
 
-export const Cap: FC = () => {
+interface Props {
+  title: string
+  description: string
+}
+
+export const Cap: FC<Props> = ({ title, description }) => {
   return (
     <>
       <title>Endpoints</title>
-      <SectionWrapper title="Endpoints requests" description="Select endpoint to see the log">
+      <SectionWrapper title={title} description={description}>
         <div className={style.robotContainer}>
           <Robot />
         </div>
