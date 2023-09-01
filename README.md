@@ -8,13 +8,11 @@ Welcome to **Mokkify** - a RestAPI mocking service built with Next.js. Mokkify p
 
 ## Features
 
-- RestAPI mocking
-
-- Flexible response builder and templates
-
-- Relay request support with external hooks
-
-- Intuitive interface
+- 🔁 RestAPI mocking
+- 🧩 Flexible response builder and templates
+- 🔄 Relay request support with external hooks
+- 🔮 Intuitive interface
+- 🔐 Authorization
 
 ## Requirements
 - Sqlite3
