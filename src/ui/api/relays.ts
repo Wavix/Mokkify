@@ -1,16 +1,18 @@
+import { getAuthToken } from "./helpers"
+
 import type {
   RelayPayloadTemplateAttributes,
   RelayPayloadTemplateCreationAttributes
 } from "@/app/database/interfaces/relay-payload-template.interface"
 
 export const getRelaysList = async (): Promise<Array<RelayPayloadTemplateAttributes> & ApiResponseError> => {
-  const response = await fetch("/backend/relay")
+  const response = await fetch("/backend/relay", { headers: { Authorization: getAuthToken() } })
   const data = await response.json()
   return data?.relays || []
 }
 
 export const getRelayTemplateById = async (id: number): Promise<RelayPayloadTemplateAttributes & ApiResponseError> => {
-  const response = await fetch(`/backend/relay/${id}`)
+  const response = await fetch(`/backend/relay/${id}`, { headers: { Authorization: getAuthToken() } })
   const data = await response.json()
   return data.relay ? data.relay : data
 }
@@ -21,7 +23,8 @@ export const createRelayTemplate = async (
   const response = await fetch("/backend/relay", {
     headers: {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": getAuthToken()
     },
     method: "POST",
     body: JSON.stringify(payload)
@@ -37,7 +40,8 @@ export const updateRelayTemplate = async (
   const response = await fetch(`/backend/relay/${id}`, {
     headers: {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": getAuthToken()
     },
     method: "PUT",
     body: JSON.stringify(payload)
@@ -48,6 +52,7 @@ export const updateRelayTemplate = async (
 
 export const deleteRelayTemplate = async (id: number): Promise<ApiResponseBasic> => {
   const response = await fetch(`/backend/relay/${id}`, {
+    headers: { Authorization: getAuthToken() },
     method: "DELETE"
   })
   const data = await response.json()
@@ -58,7 +63,8 @@ export const duplicateRelayTemplate = async (RelayTemplateId: number): Promise<A
   const response = await fetch(`/backend/relay/${RelayTemplateId}/duplicate`, {
     headers: {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": getAuthToken()
     },
     method: "POST"
   })

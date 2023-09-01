@@ -1,16 +1,18 @@
+import { getAuthToken } from "./helpers"
+
 import type {
   ResponseTemplateAttributes,
   ResponseTemplateCreationAttributes
 } from "@/app/database/interfaces/response-template.interface"
 
 export const getTemplatesList = async (): Promise<Array<ResponseTemplateAttributes> & ApiResponseError> => {
-  const response = await fetch("/backend/template")
+  const response = await fetch("/backend/template", { headers: { Authorization: getAuthToken() } })
   const data = await response.json()
   return data?.templates || []
 }
 
 export const getTemplateById = async (id: number): Promise<ResponseTemplateAttributes & ApiResponseError> => {
-  const response = await fetch(`/backend/template/${id}`)
+  const response = await fetch(`/backend/template/${id}`, { headers: { Authorization: getAuthToken() } })
   const data = await response.json()
   return data.template ? data.template : data
 }
@@ -21,7 +23,8 @@ export const createTemplate = async (
   const response = await fetch("/backend/template", {
     headers: {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": getAuthToken()
     },
     method: "POST",
     body: JSON.stringify(payload)
@@ -37,7 +40,8 @@ export const updateTemplate = async (
   const response = await fetch(`/backend/template/${id}`, {
     headers: {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": getAuthToken()
     },
     method: "PUT",
     body: JSON.stringify(payload)
@@ -48,6 +52,7 @@ export const updateTemplate = async (
 
 export const deleteTemplate = async (id: number): Promise<ApiResponseBasic> => {
   const response = await fetch(`/backend/template/${id}`, {
+    headers: { Authorization: getAuthToken() },
     method: "DELETE"
   })
   const data = await response.json()
@@ -58,7 +63,8 @@ export const duplicateTemplate = async (templateId: number): Promise<ApiResponse
   const response = await fetch(`/backend/template/${templateId}/duplicate`, {
     headers: {
       "Accept": "application/json",
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      "Authorization": getAuthToken()
     },
     method: "POST"
   })
