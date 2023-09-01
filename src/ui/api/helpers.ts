@@ -15,3 +15,8 @@ export const buildQueryString = (obj: { [key: string]: any }) => {
   )
   return `?${keyValuePairs.join("&")}`
 }
+
+export const getAuthToken = (): string => {
+  const token = localStorage.getItem("auth_jwt")
+  return token ? `Bearer ${token}` : ""
+}

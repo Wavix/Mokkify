@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt"
-import jwt from "jsonwebtoken"
+import { SignJWT, jwtVerify } from "jose"
 
 import { DB } from "../database"
+
+import { config } from "@/config"
 
 import type { UserCreationAttributes } from "@/app/database/interfaces/user.interface"
 
@@ -16,7 +18,6 @@ export interface UserResponseWithToken extends UserResponse {
 
 export class UserService {
   private saltRounds = 10
-  private secretKey = "jfklwefjiefj34859834759lsdkfldkfmldskmfldksfmd"
 
   public async addUser(login: string, password: string): Promise<UserCreationAttributes | Error> {
     try {
@@ -38,11 +39,12 @@ export class UserService {
 
       const isPasswordMatch = await bcrypt.compare(password, user.password)
       if (!isPasswordMatch) throw new Error("Wrong login or password")
+      const token = await this.generateToken({ id: user.id, login: user.login })
 
       return {
         id: user.id,
         login: user.login,
-        token: this.generateToken({ id: user.id, login: user.login })
+        token
       }
     } catch {
       throw new Error("Wrong login or password")
@@ -51,7 +53,7 @@ export class UserService {
 
   public async checkToken(token: string): Promise<UserResponse | Error> {
     try {
-      const payload = jwt.verify(token, this.secretKey) as UserResponse
+      const { payload } = await jwtVerify(token, new TextEncoder().encode(config.jwtSecret))
       const user = await DB.models.User.findOne({ where: { id: payload.id } })
       if (!user) throw new Error("User not found")
 
@@ -69,6 +71,8 @@ export class UserService {
   }
 
   private generateToken = (payload: UserResponse) => {
-    return jwt.sign(payload, this.secretKey, { expiresIn: "90d" })
+    return new SignJWT({ ...payload })
+      .setProtectedHeader({ alg: "HS256", typ: "JWT" })
+      .sign(new TextEncoder().encode(config.jwtSecret))
   }
 }
