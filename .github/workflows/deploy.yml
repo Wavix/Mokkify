@@ -1,7 +1,7 @@
 name: Deploy Mokkify
 on:
   push:
-    branches: [infra/deploy-demo]
+    branches: [master]
 jobs:
   build:
     runs-on: ubuntu-latest
