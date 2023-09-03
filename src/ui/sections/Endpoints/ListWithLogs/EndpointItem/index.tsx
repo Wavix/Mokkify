@@ -1,7 +1,6 @@
 import { useDisclosure } from "@chakra-ui/react"
 
-import { MethodBadge, ContextButton, ModalWindow } from "@/ui/components"
-import { SideMenu } from "@/ui/components/layout"
+import { MethodBadge, ContextButton, ModalWindow, SideMenu } from "@/ui/components"
 
 import style from "./style.module.scss"
 

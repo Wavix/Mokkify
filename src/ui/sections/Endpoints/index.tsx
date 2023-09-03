@@ -5,7 +5,7 @@ import React, { useState, useEffect } from "react"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as API from "@/ui/api/endpoints"
-import { SideMenu } from "@/ui/components/layout"
+import { SideMenu } from "@/ui/components"
 
 import { EndpointsForm } from "./Form"
 import { ListWithLogs } from "./ListWithLogs"

@@ -1,7 +1,3 @@
 export { DefaultLayout } from "./DefaultLayout"
 export { PageLayout } from "./PageLayout"
-export { Sidebar } from "./Sidebar"
-export { SideMenu } from "./SideMenu"
 export { SectionWrapper } from "./SectionWrapper"
-export { Sticky } from "./Sticky"
-export { KeyValueList } from "./KeyValueList"

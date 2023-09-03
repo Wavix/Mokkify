@@ -1,4 +1,5 @@
-import { Sidebar, PageLayout } from "@/ui/components/layout"
+import { Sidebar } from "@/ui/components"
+import { PageLayout } from "@/ui/components/layout"
 
 import style from "./style.module.scss"
 

@@ -1,7 +1,7 @@
 import { useRouter } from "next/router"
 import { useContext } from "react"
 
-import { LoginContext } from "@/ui//LoginContext"
+import { LoginContext } from "@/ui/LoginContext"
 
 import { MenuButton } from "./MenuButton"
 import { HomeIcon, TemplatesIcon, LogoutIcon, RelayIcon } from "./icons"
@@ -30,7 +30,12 @@ export const Sidebar: FC = () => {
 
   return (
     <div className={style.sidebar}>
-      <MenuButton title="Home" icon={<HomeIcon />} href="/endpoints" active={currentSection === Section.Endpoints} />
+      <MenuButton
+        title="Endpoints"
+        icon={<HomeIcon />}
+        href="/endpoints"
+        active={currentSection === Section.Endpoints}
+      />
       <MenuButton
         title="Templates"
         icon={<TemplatesIcon />}

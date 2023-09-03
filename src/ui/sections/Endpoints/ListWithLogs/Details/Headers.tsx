@@ -1,5 +1,4 @@
-import { Card } from "@/ui/components"
-import { KeyValueList } from "@/ui/components/layout"
+import { Card, KeyValueList } from "@/ui/components"
 
 import type { LogAttributes } from "@/app/database/interfaces/log.interface"
 import type { FC } from "react"

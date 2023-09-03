@@ -1,8 +1,7 @@
 import dayjs from "dayjs"
 
 import { config } from "@/config"
-import { Card, MethodBadge } from "@/ui/components"
-import { KeyValueList } from "@/ui/components/layout"
+import { Card, MethodBadge, KeyValueList } from "@/ui/components"
 
 import type { LogAttributes } from "@/app/database/interfaces/log.interface"
 import type { FC } from "react"
