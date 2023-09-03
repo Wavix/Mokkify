@@ -1,0 +1,27 @@
+name: Deploy Mokkify Demo
+on:
+  push:
+    branches: [infra/deploy-demo]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [16.x]
+    env:
+      SSH_KEY: ${{secrets.SSH_KEY}}
+    steps:
+      - uses: actions/checkout@master
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "npm"
+      - run: npm i
+      - run: npm run build
+      - run: mkdir ~/.ssh
+      - run: echo "$SSH_KEY" >> ~/.ssh/github-action
+      - run: chmod 400 ~/.ssh/github-action
+      - run: echo -e "Host vps\n\tUser ice\n\tHostname iceg.dev\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
+      - run: rsync -re ssh ./.next/ vps:/home/ice/mokkify-demo/.next
+      - run: ssh vps "pm2 restart mokkify"
