@@ -6,16 +6,18 @@ import style from "./style.module.scss"
 
 import type { FC } from "react"
 
+type OptionValue = string | number | null | boolean
+
 interface Option {
   label: string
-  value: string | number | null
+  value: OptionValue
 }
 
-type Value = number | string | null | undefined
+type Value = OptionValue | undefined
 type MultiValue = Array<Value>
 
 interface Props {
-  title: string
+  title?: string
   hint?: string
   value: Value | MultiValue
   isMulti?: boolean
@@ -28,7 +30,9 @@ interface Props {
 export const Select: FC<Props> = ({ title, hint, value, options, isMulti, disabled, onChange, onChangeMulti }) => {
   const getValue = () => {
     if (isMulti)
-      return options.filter((option: Option) => (value as Array<number | string | null>).includes(option.value))
+      return options.filter((option: Option) =>
+        (value as Array<number | string | null | boolean>).includes(option.value)
+      )
     return options.find((option: Option) => option.value === value)
   }
 
@@ -45,7 +49,7 @@ export const Select: FC<Props> = ({ title, hint, value, options, isMulti, disabl
 
   return (
     <div>
-      <HintLabel value={title} hint={hint} />
+      {title && <HintLabel value={title} hint={hint} />}
       <ReactSelect
         value={getValue()}
         isDisabled={disabled}

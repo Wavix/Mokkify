@@ -5,7 +5,7 @@ import { HintLabel } from "../HintLabel"
 import type { FC } from "react"
 
 interface Props {
-  title: string
+  title?: string
   hint?: string
   value?: string | number
   type?: string
@@ -29,7 +29,7 @@ export const Input: FC<Props> = ({
 }) => {
   return (
     <div>
-      <HintLabel value={title} hint={hint} />
+      {title && <HintLabel value={title} hint={hint} />}
       <ChakraInput
         onChange={onChange ? e => onChange(e.target.value) : undefined}
         value={value}
