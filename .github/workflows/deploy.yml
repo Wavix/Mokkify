@@ -22,6 +22,6 @@ jobs:
       - run: mkdir ~/.ssh
       - run: echo "$SSH_KEY" >> ~/.ssh/github-action
       - run: chmod 400 ~/.ssh/github-action
-      - run: echo -e "Host vps\n\tUser ice\n\tHostname iceg.dev\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
+      - run: echo -e "Host vps\n\tUser ice\n\tHostname mokkify.dev\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
       - run: rsync -re ssh ./.next/ vps:/home/ice/mokkify-demo/mokkify/.next
       - run: ssh vps "pm2 restart mokkify-demo"
