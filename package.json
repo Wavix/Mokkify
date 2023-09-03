@@ -68,6 +68,12 @@
     "sequelize-cli": "^6.6.1",
     "simple-pre-commit": "^1.2.1"
   },
+  "overrides": {
+    "react-json-view": {
+      "react": "$react",
+      "react-dom": "$react-dom"
+    }
+  },
   "simple-pre-commit": "npx lint-staged",
   "lint-staged": {
     "*.{ts,js}": [
