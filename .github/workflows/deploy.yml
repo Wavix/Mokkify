@@ -1,4 +1,4 @@
-name: Deploy Mokkify Demo
+name: Deploy Mokkify
 on:
   push:
     branches: [infra/deploy-demo]
