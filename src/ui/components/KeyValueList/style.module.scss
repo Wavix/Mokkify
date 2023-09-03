@@ -64,6 +64,7 @@
       padding-bottom: 6px;
       min-height: 25px;
       padding-left: 22px;
+
       line-height: 1.2;
       overflow-y: auto;
 
@@ -71,6 +72,10 @@
         font-weight: 500;
         font-style: normal;
         line-height: normal;
+      }
+
+      &:nth-child(2) {
+        align-self: center;
       }
     }
 
