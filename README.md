@@ -1,3 +1,6 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub package.json version](https://img.shields.io/github/package-json/v/icevl/mokkify)
+![GitHub last commit](https://img.shields.io/github/last-commit/icevl/mokkify)
 
 
 # Mokkify
