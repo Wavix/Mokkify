@@ -9,8 +9,6 @@ Welcome to **Mokkify** - a RestAPI mocking service built with Next.js. Mokkify p
 
 [Demo](https://demo.mokkify.dev) admin / admin
 
-[Example screenshot](https://i.imgur.com/KszL9Hb.png)
-
 ## Features
 
 - 🔁 RestAPI mocking
@@ -19,6 +17,8 @@ Welcome to **Mokkify** - a RestAPI mocking service built with Next.js. Mokkify p
 - 🔄 Relay request support with external hooks
 - 🔮 Intuitive interface
 - 🔐 Authorization
+
+![Interface example](https://i.imgur.com/KszL9Hb.png)
 
 ## Requirements
 - Sqlite3
