@@ -22,8 +22,16 @@ export const MethodBadge: FC<Props> = ({ method }) => {
         return "green"
 
       case "PATCH":
-      case "PUT":
         return "teal"
+
+      case "PUT":
+        return "orange"
+
+      case "HEAD":
+        return "purple"
+
+      case "OPTIONS":
+        return "blue"
 
       default:
         return ""
@@ -35,7 +43,9 @@ export const MethodBadge: FC<Props> = ({ method }) => {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      borderRadius="3px"
+      fontWeight={600}
+      borderRadius="4px"
+      userSelect="none"
       width="56px"
       height="24px"
       variant="solid"
