@@ -44,7 +44,8 @@ export const constructorToString = (arr: Array<ResponseConstructorItem>, rootPar
     .filter((element: ResponseConstructorItem) => element.parentUUID === rootParentUUID)
     .forEach((element: ResponseConstructorItem) => {
       if (element.type === FieldOption.Array) {
-        jsonObject[element.key] = constructorToString(arr, element.uuid)
+        const array = constructorToString(arr, element.uuid)
+        jsonObject[element.key] = Array.isArray(array) ? array : []
         return
       }
 
