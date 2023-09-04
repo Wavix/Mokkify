@@ -9,11 +9,22 @@ export const objectToConstructor = (
   parentUUID: string | null = null,
   output: Array<ResponseConstructorItem> = []
 ) => {
+  const parrent = output.find(item => item.uuid === parentUUID)
+
   Object.entries(obj).forEach(([key, value]) => {
     const uuid = uuidv4()
 
+    if (parrent?.type === FieldOption.Array) {
+      output.push({ uuid, parentUUID, key, type: FieldOption.ArrayElement })
+      objectToConstructor(value, uuid, output)
+      return
+    }
+
     if (typeof value === "object" && !Array.isArray(value) && value !== null) {
       output.push({ uuid, parentUUID, key })
+      objectToConstructor(value, uuid, output)
+    } else if (typeof value === "object" && Array.isArray(value)) {
+      output.push({ uuid, parentUUID, key, type: FieldOption.Array })
       objectToConstructor(value, uuid, output)
     } else {
       const type = getContentType(value)
