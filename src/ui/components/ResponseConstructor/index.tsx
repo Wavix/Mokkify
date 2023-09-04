@@ -3,11 +3,10 @@ import { v4 as uuidv4 } from "uuid"
 
 import { BlockQuote } from "@/ui/components"
 
+import { ArrayRow } from "./ArrayRow"
 import { AttributeRow } from "./AttributeRow"
 import { ControlButton } from "./ControlButton"
 import { NestRow } from "./NestRow"
-import { ArrayRow } from "./ArrayRow"
-
 import { objectToConstructor, constructorToString, removeAttributeWithChildren } from "./helpers"
 import style from "./style.module.scss"
 import { FieldOption } from "./types"
