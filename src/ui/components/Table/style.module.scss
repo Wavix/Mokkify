@@ -40,5 +40,18 @@ $hightlight-color: #d4f8ff;
       color: rgba(0, 0, 0, 0.87);
       white-space: nowrap;
     }
+
+    .capWrapper {
+      position: relative;
+      height: 50px;
+
+      td {
+        position: absolute;
+        top: 30px;
+        left: 50%;
+        color: #585858;
+        transform: translate(-50%, -50%);
+      }
+    }
   }
 }

@@ -107,6 +107,10 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
             {!isLogsLoading && (
               <Card.Container noPadding>
                 <Table.Container columns={columns}>
+                  {!isLogLoading && !logs.items?.length && (
+                    <Table.Cap text="There are no requests to display. make the first request" />
+                  )}
+
                   {logs?.items?.map(log => (
                     <Table.Row
                       key={log.id}

@@ -17,6 +17,10 @@ interface RowProps {
   onClick?: () => void
 }
 
+interface CapProps {
+  text?: string
+}
+
 interface ChildrenProps {
   children: ReactNode
 }
@@ -37,8 +41,15 @@ const Row: FC<RowProps> = ({ isActive, children, onClick }) => (
 )
 const Column: FC<ChildrenProps> = ({ children }) => <td className={style.column}>{children}</td>
 
+const Cap: FC<CapProps> = ({ text }) => (
+  <tr className={style.capWrapper}>
+    <td>{text || "No data to display"}</td>
+  </tr>
+)
+
 export const Table = {
   Container,
   Row,
-  Column
+  Column,
+  Cap
 }

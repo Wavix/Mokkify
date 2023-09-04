@@ -1,5 +1,6 @@
 import { DeleteIcon } from "@chakra-ui/icons"
-import { Input } from "@chakra-ui/input"
+
+import { Input } from "@/ui/components/Form"
 
 import style from "./style.module.scss"
 
@@ -17,14 +18,7 @@ export const NestRow: FC<Props> = ({ item, children, onDelete, onUpdate }) => {
   return (
     <div className={style.objectNested}>
       <div className={style.header}>
-        <Input
-          onChange={e => onUpdate(item.uuid, "key", e.target.value)}
-          value={item.key}
-          color="black"
-          _placeholder={{ color: "grey" }}
-          focusBorderColor="purple.400"
-          placeholder="key"
-        />
+        <Input onChange={value => onUpdate(item.uuid, "key", value)} value={item.key} placeholder="key" />
 
         <div className={style.deleteButton}>
           <DeleteIcon _hover={{ cursor: "pointer" }} fontSize="19px" onClick={() => onDelete(item.uuid)} />
