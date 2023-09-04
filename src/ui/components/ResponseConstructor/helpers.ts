@@ -27,11 +27,22 @@ export const objectToConstructor = (
 
 export const constructorToString = (arr: Array<ResponseConstructorItem>, rootParentUUID: string | null = null) => {
   if (!arr) return
-  const jsonObject: any = {}
+  let jsonObject: any = {}
 
   arr
     .filter((element: ResponseConstructorItem) => element.parentUUID === rootParentUUID)
     .forEach((element: ResponseConstructorItem) => {
+      if (element.type === FieldOption.Array) {
+        jsonObject[element.key] = constructorToString(arr, element.uuid)
+        return
+      }
+
+      if (element.type === FieldOption.ArrayElement) {
+        if (!Object.keys(jsonObject).length) jsonObject = []
+        jsonObject = [...jsonObject, constructorToString(arr, element.uuid)]
+        return
+      }
+
       if ("value" in element) {
         jsonObject[element.key] = element.value
       } else {

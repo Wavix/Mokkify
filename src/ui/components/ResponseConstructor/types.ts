@@ -14,5 +14,7 @@ export enum FieldOption {
   Null = "Null",
   Dynamic = "Dynamic",
   Variable = "Variable",
-  Boolean = "Boolean"
+  Boolean = "Boolean",
+  Array = "Array",
+  ArrayElement = "ArrayElement"
 }
