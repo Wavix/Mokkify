@@ -1,4 +1,5 @@
 import classNames from "classnames"
+import { useState, useEffect } from "react"
 
 import { Skeleton as ChakraSkeleton, Stack } from "@chakra-ui/react"
 
@@ -13,6 +14,7 @@ interface BodyProps {
   children: ReactNode
   header?: string
   onNew?: () => void
+  onSearch?: (value: string) => void
 }
 
 interface LinkProps {
@@ -48,7 +50,13 @@ const Nav: FC<BasicProps> = ({ children }) => {
   return <div className={style.sideMenuNav}>{children}</div>
 }
 
-const Body: FC<BodyProps> = ({ header, onNew, children }) => {
+const Body: FC<BodyProps> = ({ header, onNew, onSearch, children }) => {
+  const [search, setSearch] = useState("")
+
+  useEffect(() => {
+    if (onSearch) onSearch(search)
+  }, [search])
+
   return (
     <div className={style.sideMenu}>
       <div className={style.sideMenuWrapper}>
@@ -59,6 +67,11 @@ const Body: FC<BodyProps> = ({ header, onNew, children }) => {
           {header && (
             <div className={style.sideMenuHeader}>
               <div>{header}</div>
+              {onSearch && (
+                <div>
+                  <input value={search} placeholder="Search" onChange={e => setSearch(e.target.value)} />
+                </div>
+              )}
               {onNew && (
                 <div className={style.new} onClick={onNew}>
                   <NewIcon />

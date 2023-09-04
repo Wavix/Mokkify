@@ -22,6 +22,8 @@ const Endpoints: NextPage = () => {
   const [activeEndpoint, setActiveEndpoint] = useState<EndpointWithResponse | null>(null)
   const [endpoints, setEndpoints] = useState<Array<EndpointWithResponse>>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [search, setSearch] = useState("")
+
   const endpointId = Number(router.query.endpointId)
 
   useEffect(() => {
@@ -69,22 +71,28 @@ const Endpoints: NextPage = () => {
       <Head>
         <title>{activeEndpoint ? `Endpoints - ${activeEndpoint.title}` : "Endpoints"}</title>
       </Head>
-      <SideMenu.Body header="Endpoints" onNew={() => router.push("/endpoints/create", undefined, { shallow: true })}>
+      <SideMenu.Body
+        header="Endpoints"
+        onSearch={value => setSearch(value)}
+        onNew={() => router.push("/endpoints/create", undefined, { shallow: true })}
+      >
         <SideMenu.Nav>
           {isLoading && <SideMenu.Skeleton />}
-          {endpoints.map(endpoint => (
-            <SideMenu.Link
-              key={endpoint.id}
-              onClick={() => router.push(`/endpoints/${endpoint.id}`, undefined, { scroll: false, shallow: true })}
-              isActive={endpointId === endpoint.id}
-            >
-              <EndpointItem
-                endpoint={endpoint}
-                onEdit={() => router.push(`/endpoints/${endpoint.id}/edit`, undefined, { shallow: true })}
-                onDelete={onDeleteEndpoint}
-              />
-            </SideMenu.Link>
-          ))}
+          {endpoints
+            .filter(endpoint => !search.trim() || endpoint.title.toLowerCase().includes(search.trim().toLowerCase()))
+            .map(endpoint => (
+              <SideMenu.Link
+                key={endpoint.id}
+                onClick={() => router.push(`/endpoints/${endpoint.id}`, undefined, { scroll: false, shallow: true })}
+                isActive={endpointId === endpoint.id}
+              >
+                <EndpointItem
+                  endpoint={endpoint}
+                  onEdit={() => router.push(`/endpoints/${endpoint.id}/edit`, undefined, { shallow: true })}
+                  onDelete={onDeleteEndpoint}
+                />
+              </SideMenu.Link>
+            ))}
         </SideMenu.Nav>
       </SideMenu.Body>
 

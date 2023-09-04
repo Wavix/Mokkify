@@ -27,12 +27,31 @@ $sidemenu-width: 310px;
 
     .sideMenuHeader {
       display: flex;
+      column-gap: 10px;
       color: #fff;
       font-size: 22px;
       font-style: normal;
       font-weight: 500;
       line-height: normal;
       padding-bottom: 14px;
+
+      input {
+        width: 100%;
+        vertical-align: middle;
+        background: #6b46c1;
+        font-size: 14px;
+        border: none;
+        outline: none;
+        padding: 4px;
+        margin-bottom: 2px;
+        border-bottom: 1px solid #8d79c8;
+        opacity: 0.8;
+
+        &::placeholder {
+          color: #8d79c8;
+          opacity: 1;
+        }
+      }
 
       .new {
         padding-top: 3px;
