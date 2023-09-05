@@ -37,7 +37,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
 
   const rawToConstructor = () => {
     if (rawString && bodyRaw === rawString) return
-    const jsonWithVariables = bodyRaw.replace(/@([\w.]+)/g, (_, variable) => `"@${variable}"`)
+    const jsonWithVariables = bodyRaw.replace(/":@([\w.]+)/g, (_, variable) => `":"@${variable}"`)
 
     try {
       const data = objectToConstructor(JSON.parse(jsonWithVariables))

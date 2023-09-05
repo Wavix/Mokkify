@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { v4 as uuidv4 } from "uuid"
 
 enum PayloadKeySource {
@@ -40,30 +41,44 @@ export const parseResponseBody = (
   responseBody?: unknown
 ): string | null => {
   if (!responseString) return null
+
+  const paramsReplace = parseVars(responseString, requestBody, responseBody)
+  const result = parseVars(paramsReplace, requestBody, responseBody, false)
+  return result
+}
+
+const parseVars = (
+  responseString: string | null,
+  requestBody?: unknown,
+  responseBody?: unknown,
+  paramsReplace = true
+): string | null => {
+  if (!responseString) return null
   let result = responseString
 
   const regex = /@([a-zA-Z0-9_.]+)([^a-zA-Z0-9_.]|$)/g
   const matches = Array.from(responseString.matchAll(regex))
 
-  if (matches.length) {
-    for (const [, key] of matches) {
-      let value = null
+  if (!matches.length) return result
+  for (const [, key] of matches) {
+    let value = null
 
-      if (key.includes(".")) {
-        const [source, ...nestedKeyArray] = key.split(".")
-        const nestedKey = nestedKeyArray.join(".")
+    if (key.includes(".")) {
+      const [source, ...nestedKeyArray] = key.split(".")
+      const nestedKey = nestedKeyArray.join(".")
 
-        const body = source === PayloadKeySource.Request ? requestBody : responseBody
-        const response = getValueFromBodyByNestedKey(nestedKey, body)
-        if (!response) value = null
-        value = response?.value === undefined ? null : response?.value
-        if (response?.type === "string") value = `"${response.value}"`
-      } else {
-        value = parseVar(key)
-      }
-
-      result = result.replace(`@${key}`, value as any)
+      const body = source === PayloadKeySource.Request ? requestBody : responseBody
+      const response = getValueFromBodyByNestedKey(nestedKey, body)
+      if (!response) value = null
+      value = response?.value === undefined ? null : response?.value
+      if (response?.type === "string") value = `"${response.value}"`
+    } else {
+      value = parseVar(key)
     }
+
+    result = paramsReplace
+      ? result.replace(`":@${key}`, `":${value}`)
+      : result.replace(`@${key}`, `${value}`.replaceAll('"', ""))
   }
 
   return result
@@ -73,8 +88,10 @@ const parseVar = (key: string): string | number | null => {
   switch (key) {
     case "uuid":
       return `"${uuidv4()}"`
+    case "unix":
+      return dayjs().unix()
     case "date":
-      return `"${new Date().toISOString()}"`
+      return `"${dayjs().toISOString()}"`
     default:
       return null
   }
