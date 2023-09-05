@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid"
 
 import { DeleteIcon } from "@chakra-ui/icons"
 
+import { ControlButton } from "../ControlButton"
 import { FieldOption } from "../types"
 
 import { Input } from "@/ui/components/Form"
@@ -22,6 +23,7 @@ interface Props {
 
 export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, onDelete, onUpdate }) => {
   const arrayItem = items.find(constructorItem => constructorItem.uuid === uuid)
+  const children = items.filter(item => item.parentUUID === uuid)
 
   const onArrayAddObject = () => {
     const newData = [
@@ -37,15 +39,23 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
   }
 
   const buildArray = () => {
-    return items
-      .filter(element => element.parentUUID === uuid)
-      .map(element => <div key={element.uuid}>ARRAY OBJECT {buildTree(element.uuid)}</div>)
+    return children.map(element => (
+      <div key={element.uuid} className={style.arrayObjectItem}>
+        <div className={style.deleteObject} onClick={() => onDelete(element.uuid)}>
+          +
+        </div>
+        {buildTree(element.uuid)}
+      </div>
+    ))
   }
 
   return (
     <div className={style.objectArray}>
       <div className={style.header}>
+        <div className={style.mark}>A</div>
         <Input onChange={value => onUpdate(uuid, "key", value)} value={arrayItem?.key} placeholder="key" />
+
+        <div className={style.info}>items: {children.length}</div>
 
         <div className={style.deleteButton}>
           <DeleteIcon _hover={{ cursor: "pointer" }} fontSize="19px" onClick={() => onDelete(uuid)} />
@@ -53,7 +63,8 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
       </div>
       <div className={style.container}>
         {buildArray()}
-        <span onClick={() => onArrayAddObject()}>ADD ARRAY ELEMENT</span>
+
+        <ControlButton title="Add array object" icon="plus" onClick={() => onArrayAddObject()} color="blue" />
       </div>
     </div>
   )
