@@ -78,7 +78,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
     <div className={style.actions}>
       <ControlButton title="Add attribute" icon="plus" onClick={() => addAttribute(parentUUID, false)} />
       <ControlButton title="Add nested" icon="nested" onClick={() => addAttribute(parentUUID, true)} />
-      <ControlButton title="Add array" icon="nested" onClick={() => addArrayAttribute(parentUUID)} />
+      <ControlButton title="Add array" icon="array" onClick={() => addArrayAttribute(parentUUID)} />
     </div>
   )
 
