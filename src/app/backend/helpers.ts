@@ -22,6 +22,19 @@ export const getValueFromBodyByNestedKey = (nestedKeys: string, body: any) => {
   for (let i = 0; i < keys.length; i += 1) {
     const key = keys[i]
 
+    if (key.includes("[")) {
+      const [keyName, index] = key.split("[")
+      const arrayIndex = Number(index.replace("]", ""))
+
+      if (currentObj && typeof currentObj === "object" && currentObj[keyName][arrayIndex]) {
+        currentObj = currentObj[keyName][arrayIndex]
+        // eslint-disable-next-line no-continue
+        continue
+      } else {
+        return null
+      }
+    }
+
     if (currentObj && typeof currentObj === "object" && key in currentObj) {
       currentObj = currentObj[key]
     } else {
@@ -56,7 +69,7 @@ const parseVars = (
   if (!responseString) return null
   let result = responseString
 
-  const regex = /@([a-zA-Z0-9_.]+)([^a-zA-Z0-9_.]|$)/g
+  const regex = /@([a-zA-Z0-9_.[\]]+)([^a-zA-Z0-9_.[\]]|$)/g
   const matches = Array.from(responseString.matchAll(regex))
 
   if (!matches.length) return result
