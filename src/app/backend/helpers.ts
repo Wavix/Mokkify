@@ -14,7 +14,7 @@ export const getBodyPayload = async (request: Request) => {
   }
 }
 
-// field1.field2.field3
+// field1.array_field[0].field3.field4
 export const getValueFromBodyByNestedKey = (nestedKeys: string, body: any) => {
   const keys = nestedKeys.split(".")
   let currentObj = body
