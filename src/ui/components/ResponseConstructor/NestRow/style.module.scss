@@ -16,7 +16,8 @@
 
   .deleteButton {
     align-self: center;
-    margin-left: $block-padding;
+    justify-self: end;
+    padding-right: 6px;
 
     svg {
       color: $main-purple;
