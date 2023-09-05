@@ -49,7 +49,7 @@ const Auth: NextPage = () => {
               <div className={style.container}>
                 <Logo />
                 <div className={style.welcome}>Welcome Page</div>
-                <div className={style.welcome2}>Sign in to continue access</div>
+                <div className={style.welcome2}>Sign in to get access</div>
                 <div className={style.link}>www.mokkify.dev</div>
               </div>
               <div className={style.lines}>

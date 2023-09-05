@@ -34,6 +34,7 @@ export const Input: FC<Props> = ({
         onChange={onChange ? e => onChange(e.target.value) : undefined}
         value={value}
         color="black"
+        backgroundColor={readOnly ? "gray.100" : "white"}
         focusBorderColor="purple.400"
         _placeholder={{ color: "grey" }}
         type={type || "text"}

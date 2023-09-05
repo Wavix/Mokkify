@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid"
 
 import { BlockQuote } from "@/ui/components"
 
+import { ArrayRow } from "./ArrayRow"
 import { AttributeRow } from "./AttributeRow"
 import { ControlButton } from "./ControlButton"
 import { NestRow } from "./NestRow"
@@ -77,7 +78,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
     <div className={style.actions}>
       <ControlButton title="Add attribute" icon="plus" onClick={() => addAttribute(parentUUID, false)} />
       <ControlButton title="Add nested" icon="nested" onClick={() => addAttribute(parentUUID, true)} />
-      {/* <ControlButton title="Add array" icon="nested" /> */}
+      <ControlButton title="Add array" icon="nested" onClick={() => addArrayAttribute(parentUUID)} />
     </div>
   )
 
@@ -94,9 +95,23 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
     setConstructorData(newData)
   }
 
+  const addArrayAttribute = (parentUUID: string | null) => {
+    const newData = [
+      ...constructorData,
+      {
+        type: FieldOption.Array,
+        uuid: uuidv4(),
+        key: "",
+        parentUUID
+      }
+    ]
+    setConstructorData(newData)
+  }
+
   const buildParentGroupAttributes = (parentUUID: string | null = null) => {
     return constructorData
       .filter(item => item.parentUUID === parentUUID && item.type)
+      .filter(item => item.type !== FieldOption.Array)
       .map(element => (
         <AttributeRow key={element.uuid} item={element} onUpdate={onUpdate} onDelete={onAttributeDelete} />
       ))
@@ -112,6 +127,22 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
       ))
   }
 
+  const buildParentArray = (parentUUID: string | null = null) => {
+    return constructorData
+      .filter(item => item.parentUUID === parentUUID && item.type === FieldOption.Array)
+      .map(element => (
+        <ArrayRow
+          items={constructorData}
+          key={element.uuid}
+          uuid={element.uuid}
+          buildTree={buildTree}
+          onSetConstructor={setConstructorData}
+          onUpdate={onUpdate}
+          onDelete={onNestAttributeDelete}
+        />
+      ))
+  }
+
   const buildTree = (parentUUID: string | null = null) => {
     const data = constructorData.filter(item => item.parentUUID === parentUUID)
     if (!data.length) return addButton(parentUUID)
@@ -123,6 +154,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
           {addButton(parentUUID)}
         </div>
 
+        {buildParentArray(parentUUID)}
         {buildParentNested(parentUUID)}
       </>
     )

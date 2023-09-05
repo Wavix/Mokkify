@@ -1,0 +1,103 @@
+@import "src/styles/palette.module.scss";
+@import "src/styles/global.module.scss";
+
+.objectArray {
+  margin-bottom: 20px;
+
+  .header {
+    background-color: $light-blue2;
+    padding-left: 12px;
+    display: grid;
+    grid-template-columns: auto auto 1fr 1fr;
+    grid-column-gap: $block-padding;
+    height: 58px;
+    align-content: center;
+
+    .mark {
+      display: flex;
+      align-items: center;
+      font-weight: 500;
+      color: $dark-purple;
+    }
+
+    .info {
+      display: flex;
+      align-items: center;
+      font-weight: 400;
+      font-size: 13px;
+      color: $dark-purple;
+    }
+  }
+
+  .deleteButton {
+    align-self: center;
+    justify-self: end;
+    padding-right: 29px;
+
+    svg {
+      color: $main-purple;
+    }
+  }
+
+  .container {
+    padding-top: $block-padding;
+    padding-left: 10px;
+    border-left: 1px dashed #d5d5d5;
+
+    .arrayObjectItem {
+      padding: 20px 24px 1px 24px;
+      position: relative;
+      border-left: 1px solid $main-purple;
+      border-top-left-radius: 6px;
+      border-bottom-left-radius: 6px;
+      background-color: $light-gray;
+      margin-bottom: 10px;
+
+      .deleteObject {
+        display: flex;
+        width: 16px;
+        height: 16px;
+        top: -4px;
+        right: -5px;
+        position: absolute;
+        background-color: $main-purple;
+        color: #fff;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        border-radius: 50%;
+        justify-content: center;
+        align-items: center;
+        transform: rotate(45deg);
+
+        &:hover {
+          background-color: $dark-purple;
+        }
+      }
+
+      &:before {
+        content: "";
+        position: absolute;
+        z-index: 2;
+        top: 50%;
+        left: -2px;
+        border: solid $main-purple;
+        border-width: 0 1px 1px 0;
+        display: inline-block;
+        padding: 3px 2px 2px 3px;
+        transform: rotate(135deg) translateY(50%);
+      }
+
+      &:after {
+        content: "";
+        position: absolute;
+        bottom: calc(50% - 1px);
+        left: -1px;
+        height: 7px;
+        width: 1px;
+        transform: translateY(50%);
+        background-color: #fff;
+      }
+    }
+  }
+}
