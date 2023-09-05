@@ -1,7 +1,6 @@
 {
   "name": "Mokkify",
   "version": "0.1.1",
-  "private": true,
   "repository": "git@github.com:icevl/mokkify.git",
   "author": "Mikhail Kabanov <kabanov.mike@gmail.com>",
   "scripts": {
