@@ -2,7 +2,7 @@
 @import "src/styles/global.module.scss";
 
 .objectNested {
-  border-left: 1px #d5d5d5 solid;
+  border-left: 1px #d5d5d5 dashed;
   margin-bottom: 20px;
 
   .header {
