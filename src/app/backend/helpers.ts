@@ -103,6 +103,8 @@ const parseVar = (key: string): string | number | null => {
       return `"${uuidv4()}"`
     case "unix":
       return dayjs().unix()
+    case "dateYYYYMMDD":
+      return `"${dayjs().format("YYYYMMDD")}"`
     case "date":
       return `"${dayjs().toISOString()}"`
     default:

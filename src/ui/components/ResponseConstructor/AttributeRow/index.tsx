@@ -18,6 +18,7 @@ interface Props {
 
 const dynamicOptions = [
   { value: "@date", label: "Date" },
+  { value: "@dateYYYYMMDD", label: "Date (YYYYMMDD)" },
   { value: "@unix", label: "Unix time" },
   { value: "@uuid", label: "UUID" }
 ]
