@@ -13,8 +13,9 @@ export const objectToConstructor = (
 
   Object.entries(obj).forEach(([key, value]) => {
     const uuid = uuidv4()
+    const isValueIsObject = value !== null && typeof value === "object"
 
-    if (parrent?.type === FieldOption.Array) {
+    if (parrent?.type === FieldOption.Array && isValueIsObject) {
       output.push({ uuid, parentUUID, key, type: FieldOption.ArrayElement })
       objectToConstructor(value, uuid, output)
       return
@@ -28,8 +29,9 @@ export const objectToConstructor = (
       objectToConstructor(value, uuid, output)
     } else {
       const type = getContentType(value)
+      const isArrayItem = parrent?.type === FieldOption.Array
       // @ts-ignore
-      output.push({ uuid, parentUUID, key, value, type })
+      output.push({ uuid, parentUUID, key, value, type, ...(isArrayItem && { isArrayItem: true }) })
     }
   })
 
@@ -55,11 +57,17 @@ export const constructorToString = (arr: Array<ResponseConstructorItem>, rootPar
         return
       }
 
+      if ("value" in element && element.isArrayItem) {
+        jsonObject = Array.isArray(jsonObject) ? [...jsonObject, element.value] : [element.value]
+        return
+      }
+
       if ("value" in element) {
         jsonObject[element.key] = element.value
-      } else {
-        jsonObject[element.key] = constructorToString(arr, element.uuid)
+        return
       }
+
+      jsonObject[element.key] = constructorToString(arr, element.uuid)
     })
 
   return rootParentUUID === null ? JSON.stringify(jsonObject) : jsonObject

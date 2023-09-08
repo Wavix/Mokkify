@@ -31,9 +31,11 @@ const booleanOptions = [
 export const AttributeRow: FC<Props> = ({ item, onUpdate, onDelete }) => {
   return (
     <div className={style.objectRow}>
-      <FormControl isRequired>
-        <Input onChange={value => onUpdate(item.uuid, "key", value)} value={item.key} placeholder="key" />
-      </FormControl>
+      {!item.isArrayItem && (
+        <FormControl isRequired>
+          <Input onChange={value => onUpdate(item.uuid, "key", value)} value={item.key} placeholder="key" />
+        </FormControl>
+      )}
 
       <FormControl>
         <Select

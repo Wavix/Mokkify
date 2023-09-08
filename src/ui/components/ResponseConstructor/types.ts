@@ -6,6 +6,7 @@ export interface ResponseConstructorItem {
   key: string
   value?: string | number | undefined | null | boolean
   type?: FieldOption
+  isArrayItem?: boolean
 }
 
 export enum FieldOption {

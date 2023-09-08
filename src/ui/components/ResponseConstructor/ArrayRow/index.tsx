@@ -2,6 +2,7 @@ import { v4 as uuidv4 } from "uuid"
 
 import { DeleteIcon } from "@chakra-ui/icons"
 
+import { AttributeRow } from "../AttributeRow"
 import { ControlButton } from "../ControlButton"
 import { FieldOption } from "../types"
 
@@ -38,14 +39,35 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
     onSetConstructor(newData)
   }
 
+  const onArrayAddItem = () => {
+    const newData = [
+      ...items,
+      {
+        type: FieldOption.String,
+        uuid: uuidv4(),
+        key: "",
+        value: "",
+        parentUUID: uuid,
+        isArrayItem: true
+      }
+    ]
+    onSetConstructor(newData)
+  }
+
   const buildArray = () => {
     return children.map(element => (
-      <div key={element.uuid} className={style.arrayObjectItem}>
-        <div className={style.deleteObject} onClick={() => onDelete(element.uuid)}>
-          +
-        </div>
-        {buildTree(element.uuid)}
-      </div>
+      <>
+        {"value" in element ? (
+          <AttributeRow item={element} onUpdate={onUpdate} onDelete={onDelete} />
+        ) : (
+          <div key={element.uuid} className={style.arrayObjectItem}>
+            <div className={style.deleteObject} onClick={() => onDelete(element.uuid)}>
+              +
+            </div>
+            {buildTree(element.uuid)}
+          </div>
+        )}
+      </>
     ))
   }
 
@@ -64,7 +86,10 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
       <div className={style.container}>
         {buildArray()}
 
-        <ControlButton title="Add array object" icon="plus" onClick={() => onArrayAddObject()} color="blue" />
+        <div className={style.arrayActions}>
+          <ControlButton title="Add array object" icon="plus" onClick={() => onArrayAddObject()} color="blue" />
+          <ControlButton title="Add array item" icon="plus" onClick={() => onArrayAddItem()} color="blue" />
+        </div>
       </div>
     </div>
   )
