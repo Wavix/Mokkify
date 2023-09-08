@@ -6,6 +6,7 @@ import { BlockQuote } from "@/ui/components"
 import { ArrayRow } from "./ArrayRow"
 import { AttributeRow } from "./AttributeRow"
 import { ControlButton } from "./ControlButton"
+import { ImportJson } from "./ImportJson"
 import { NestRow } from "./NestRow"
 import { objectToConstructor, constructorToString, removeAttributeWithChildren } from "./helpers"
 import style from "./style.module.scss"
@@ -22,6 +23,7 @@ interface Props {
 export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
   const [constructorData, setConstructorData] = useState<Array<ResponseConstructorItem>>([])
   const [rawString, setRawString] = useState("")
+  const [isImportOpen, setIsImportOpen] = useState(false)
 
   useEffect(() => {
     setRawString(rawString)
@@ -72,6 +74,12 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
     if (attribute === "type" && value === FieldOption.Variable) data[elementIndex].value = ""
 
     setConstructorData(data)
+  }
+
+  const onImport = (object: unknown) => {
+    const data = objectToConstructor(object)
+    setConstructorData(data)
+    setIsImportOpen(false)
   }
 
   const addButton = (parentUUID: string | null) => (
@@ -162,15 +170,30 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
 
   return (
     <>
-      <div className={style.hint}>
-        <BlockQuote>
-          <p>Variables are values that can be obtained from either the request body or the response body.</p>
-          <p>
-            For example, if the request body contained {"{"}id: 1{"}"}, you can access it through @request.id.
-          </p>
-        </BlockQuote>
+      <div className={style.topActions}>
+        <ControlButton
+          title={isImportOpen ? "Close import" : "Import JSON"}
+          color="blue"
+          icon="plus"
+          onClick={() => setIsImportOpen(!isImportOpen)}
+        />
       </div>
-      {buildTree()}
+
+      {isImportOpen ? (
+        <ImportJson onImport={onImport} />
+      ) : (
+        <>
+          <div className={style.hint}>
+            <BlockQuote>
+              <p>Variables are values that can be obtained from either the request body or the response body.</p>
+              <p>
+                For example, if the request body contained {"{"}id: 1{"}"}, you can access it through @request.id.
+              </p>
+            </BlockQuote>
+          </div>
+          {buildTree()}
+        </>
+      )}
     </>
   )
 }

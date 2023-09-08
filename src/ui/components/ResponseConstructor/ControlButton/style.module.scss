@@ -15,6 +15,10 @@
 
   &.colorBlue {
     background-color: $light-blue;
+
+    &:hover {
+      background-color: #00a5c6;
+    }
   }
 
   &:hover {
