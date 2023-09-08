@@ -35,6 +35,8 @@ const response = async (request: Request) => {
   const url = new URL(request.url)
   const endpointPath = url.pathname.split("/api/")[1]
   const requestBody = await getBody(request)
+  const queryParams = getQueryParams(url)
+  const requestBodyWithQueryParams = { ...requestBody, ...queryParams }
 
   try {
     const result: ApiResponse = {
@@ -53,7 +55,7 @@ const response = async (request: Request) => {
 
     if (endpoint.response_template_id && !endpoint.is_multiple_templates) {
       result.status = endpoint.response.code
-      result.body = getJsonResponse(endpoint.response.body, requestBody)
+      result.body = getJsonResponse(endpoint.response.body, requestBodyWithQueryParams)
       result.templateName = endpoint.response.title
     }
 
@@ -61,7 +63,7 @@ const response = async (request: Request) => {
       const randomIndex = randomInteger(0, endpoint.multiple_responses.length - 1)
       const randomResponse = endpoint.multiple_responses[randomIndex]
       result.status = randomResponse.response.code
-      result.body = getJsonResponse(randomResponse.response.body, requestBody)
+      result.body = getJsonResponse(randomResponse.response.body, requestBodyWithQueryParams)
       result.templateName = randomResponse.response.title
     }
 
@@ -112,7 +114,7 @@ const notFound = () => {
   return NextResponse.json({ error: "Not found" }, { status: 404 })
 }
 
-const getBody = async (request: Request): Promise<unknown> => {
+const getBody = async (request: Request): Promise<Record<string, any> | null> => {
   const contentType = request.headers.get("content-type") || ""
   if (contentType.includes("form-data")) return await parsedFormData(request)
 
@@ -123,7 +125,25 @@ const getBody = async (request: Request): Promise<unknown> => {
   }
 }
 
-const parsedFormData = async (request: Request): Promise<unknown> => {
+const getQueryParams = (url: URL): Record<string, any> => {
+  const params: Record<string, any> = {}
+  const queryParams = Object.fromEntries(url.searchParams)
+
+  Object.keys(queryParams).forEach(key => {
+    let value: number | string | boolean = queryParams[key]
+
+    const isNumber = /^\d+$/.test(value)
+
+    if (isNumber) value = Number(value)
+    if (value === "true" || value === "false") value = value === "true"
+
+    params[key] = value
+  })
+
+  return params
+}
+
+const parsedFormData = async (request: Request): Promise<Record<string, any>> => {
   const formData = await request.formData()
   const data: EndpointFormDataRequestBody = {}
 
