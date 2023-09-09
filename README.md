@@ -5,13 +5,14 @@
 
 # Mokkify
 
-Welcome to **Mokkify** - a RestAPI mocking service built with Next.js. Mokkify provides a flexible response builder and templating system for crafting your mocks, as well as support for Relay requests to an external hook to simulate various scenarios, like DLR. We've done our best to make the interface intuitive and easy to use.
+Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.js. Mokkify provides a flexible response builder and templating system for crafting your mocks, as well as support for Relay requests to an external hook to simulate various scenarios, like DLR. We've done our best to make the interface intuitive and easy to use.
 
 [Demo](https://demo.mokkify.dev) admin / admin
 
 ## Features
 
 - 🔁 RestAPI mocking
+- 🏗️ Self-hosted
 - 🧩 Flexible response builder and templates
 - ⏲️ Response delay emulation
 - 🔄 Relay request support with external hooks
