@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "npm"
-      - run: yarnn
+      - run: yarn
       - run: yarn build
       - run: mkdir ~/.ssh
       - run: echo "$SSH_KEY" >> ~/.ssh/github-action
