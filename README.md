@@ -47,13 +47,6 @@ After that, start the project in development mode:
 yarn dev
 ```
 
-## Updating
-```bash
-git pull
-yarn install
-yarn migrate up
-```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Nginx config for deployment

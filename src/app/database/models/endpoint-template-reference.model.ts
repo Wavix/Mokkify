@@ -14,10 +14,9 @@ export const EndpointTemplateReference = (
       "endpoint_template_references",
       {
         id: {
-          primaryKey: true,
-          autoIncrement: true,
           type: DataTypes.INTEGER,
-          allowNull: false
+          autoIncrement: true,
+          primaryKey: true
         },
         endpoint_id: {
           type: DataTypes.INTEGER,
@@ -40,7 +39,7 @@ export const EndpointTemplateReference = (
     )
 
   model.associate = (models: Models) => {
-    model.belongsTo(models.Endpoint, {
+    model.hasOne(models.Endpoint, {
       foreignKey: "endpoint_id",
       as: "endpoints",
       onDelete: "CASCADE"

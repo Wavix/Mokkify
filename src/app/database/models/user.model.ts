@@ -6,10 +6,9 @@ export const User = (sequelize: Sequelize.Sequelize, DataTypes: typeof Sequelize
     "users",
     {
       id: {
-        primaryKey: true,
-        autoIncrement: true,
         type: DataTypes.INTEGER,
-        allowNull: false
+        autoIncrement: true,
+        primaryKey: true
       },
       login: {
         type: DataTypes.STRING,
