@@ -12,10 +12,9 @@ export const ResponseTemplate = (
     "response_templates",
     {
       id: {
-        primaryKey: true,
-        autoIncrement: true,
         type: DataTypes.INTEGER,
-        allowNull: false
+        autoIncrement: true,
+        primaryKey: true
       },
       title: {
         type: DataTypes.STRING,
@@ -44,8 +43,7 @@ export const ResponseTemplate = (
         defaultValue: 200
       },
       user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+        type: DataTypes.INTEGER
       },
       created_at: {
         type: DataTypes.DATE,
@@ -64,6 +62,12 @@ export const ResponseTemplate = (
       sourceKey: "id",
       as: "endpoints",
       onDelete: "SET NULL"
+    })
+
+    model.belongsTo(models.User, {
+      foreignKey: "user_id",
+      as: "user",
+      onDelete: "CASCADE"
     })
   }
 

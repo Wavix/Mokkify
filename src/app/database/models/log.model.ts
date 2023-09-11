@@ -7,10 +7,9 @@ export const Log = (sequelize: Sequelize.Sequelize, DataTypes: typeof Sequelize.
     "logs",
     {
       id: {
-        primaryKey: true,
-        autoIncrement: true,
         type: DataTypes.INTEGER,
-        allowNull: false
+        autoIncrement: true,
+        primaryKey: true
       },
       endpoint_id: {
         type: DataTypes.INTEGER,

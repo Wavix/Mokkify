@@ -6,7 +6,7 @@ export type Migration = typeof migrator._types.migration
 
 export const migrator = new Umzug({
   migrations: {
-    glob: ["migrations/*.ts", { cwd: __dirname }]
+    glob: ["../migrations/*.ts", { cwd: __dirname }]
   },
   context: DB.sequelize,
   storage: new SequelizeStorage({

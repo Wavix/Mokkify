@@ -8,10 +8,9 @@ export const Endpoint = (sequelize: Sequelize.Sequelize, DataTypes: typeof Seque
     "endpoints",
     {
       id: {
-        primaryKey: true,
-        autoIncrement: true,
         type: DataTypes.INTEGER,
-        allowNull: false
+        autoIncrement: true,
+        primaryKey: true
       },
       title: {
         type: DataTypes.STRING,
@@ -73,11 +72,6 @@ export const Endpoint = (sequelize: Sequelize.Sequelize, DataTypes: typeof Seque
       underscored: true,
       timestamps: false,
       indexes: [
-        {
-          fields: ["id"],
-          unique: true,
-          using: "BTREE"
-        },
         {
           fields: ["path", "method"],
           unique: true,

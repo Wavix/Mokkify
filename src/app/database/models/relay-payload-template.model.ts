@@ -13,10 +13,9 @@ export const RelayPayloadTemplate = (
     "relay_payload_templates",
     {
       id: {
-        primaryKey: true,
-        autoIncrement: true,
         type: DataTypes.INTEGER,
-        allowNull: false
+        autoIncrement: true,
+        primaryKey: true
       },
       title: {
         type: DataTypes.STRING,
@@ -27,8 +26,7 @@ export const RelayPayloadTemplate = (
         allowNull: true
       },
       user_id: {
-        type: DataTypes.INTEGER,
-        allowNull: true
+        type: DataTypes.INTEGER
       },
       created_at: {
         type: DataTypes.DATE,
@@ -47,6 +45,12 @@ export const RelayPayloadTemplate = (
       sourceKey: "id",
       as: "endpoints",
       onDelete: "SET NULL"
+    })
+
+    model.belongsTo(models.User, {
+      foreignKey: "user_id",
+      as: "user",
+      onDelete: "CASCADE"
     })
   }
 
