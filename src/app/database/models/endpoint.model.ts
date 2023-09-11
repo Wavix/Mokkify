@@ -60,11 +60,11 @@ export const Endpoint = (sequelize: Sequelize.Sequelize, DataTypes: typeof Seque
       },
       user_id: {
         type: DataTypes.INTEGER,
-        defaultValue: null,
-        allowNull: true
+        allowNull: false
       },
       created_at: {
-        type: DataTypes.DATE
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
       }
     },
     {

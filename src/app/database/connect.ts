@@ -34,7 +34,7 @@ Object.keys(DB.models).forEach(item => {
 
 export const dbConnect = async () => {
   try {
-    await DB.sequelize.sync({ alter: true, force: false })
+    await DB.sequelize.sync({ alter: { drop: false } })
     console.log("Database connected")
   } catch (err) {
     console.log("ERROR", err)

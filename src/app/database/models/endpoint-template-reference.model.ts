@@ -39,12 +39,6 @@ export const EndpointTemplateReference = (
     )
 
   model.associate = (models: Models) => {
-    model.hasOne(models.Endpoint, {
-      foreignKey: "endpoint_id",
-      as: "endpoints",
-      onDelete: "CASCADE"
-    })
-
     model.belongsTo(models.ResponseTemplate, {
       foreignKey: "template_id",
       as: "response",
