@@ -46,7 +46,6 @@ const response = async (request: Request) => {
     }
 
     const endpoint = await endpointService.getEndpoint(endpointPath, request.method)
-
     if (endpoint instanceof Error) return notFound()
 
     if (endpoint.max_pending_time) {
