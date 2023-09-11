@@ -37,6 +37,7 @@ Then, navigate to the project directory and install the necessary dependencies:
 ```bash
 cd mokkify
 yarn install
+yarn migrate up
 yarn cli dbcreate
 yarn cli useradd <login> <password>
 ```
