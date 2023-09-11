@@ -37,7 +37,6 @@ Then, navigate to the project directory and install the necessary dependencies:
 ```bash
 cd mokkify
 yarn install
-yarn migrate up
 yarn cli dbcreate
 yarn cli useradd <login> <password>
 ```
@@ -46,6 +45,13 @@ After that, start the project in development mode:
 
 ```bash
 yarn dev
+```
+
+## Updating
+```bash
+git pull
+yarn install
+yarn migrate up
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
