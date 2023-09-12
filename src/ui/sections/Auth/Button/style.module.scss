@@ -11,6 +11,18 @@
   cursor: pointer;
   user-select: none;
 
+  &.disabled {
+    opacity: 0.4;
+  }
+
+  &:hover:not(.disabled) {
+    opacity: 0.9;
+    svg {
+      position: absolute;
+      right: 6px;
+    }
+  }
+
   .text {
     text-transform: uppercase;
     font-size: 13px;

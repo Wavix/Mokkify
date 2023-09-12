@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const { version } = require("./package.json")
+
 const nextConfig = {
   reactStrictMode: false,
   typescript: {
@@ -27,6 +29,9 @@ const nextConfig = {
   },
   experimental: {
     serverComponentsExternalPackages: ["sequelize", "sequelize-typescript"]
+  },
+  publicRuntimeConfig: {
+    version
   },
   webpack: config => {
     // eslint-disable-next-line no-param-reassign

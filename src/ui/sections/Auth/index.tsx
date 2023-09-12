@@ -1,3 +1,4 @@
+import getConfig from "next/config"
 import Head from "next/head"
 import { useState, useContext } from "react"
 
@@ -14,10 +15,13 @@ import type { NextPage } from "next"
 
 const Auth: NextPage = () => {
   const { onLoginStateChange } = useContext(LoginContext)
+  const { publicRuntimeConfig } = getConfig()
 
   const [login, setLogin] = useState("")
   const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const version = publicRuntimeConfig?.version
 
   const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -26,6 +30,7 @@ const Auth: NextPage = () => {
 
   const auth = async () => {
     setErrorMessage(null)
+    setIsLoading(true)
 
     try {
       const response = await API.auth(login, password)
@@ -34,6 +39,8 @@ const Auth: NextPage = () => {
       onLoginStateChange(true)
     } catch (error) {
       setErrorMessage((error as Error).message)
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -50,7 +57,11 @@ const Auth: NextPage = () => {
                 <Logo />
                 <div className={style.welcome}>Welcome Page</div>
                 <div className={style.welcome2}>Sign in to get access</div>
-                <div className={style.link}>www.mokkify.dev</div>
+                <div className={style.link}>
+                  <a href="https://mokkify.dev" target="_blank">
+                    www.mokkify.dev
+                  </a>
+                </div>
               </div>
               <div className={style.lines}>
                 <Lines />
@@ -69,13 +80,14 @@ const Auth: NextPage = () => {
                     onChange={value => setPassword(value)}
                   />
                   <button type="submit">Submit</button>
-                  <Button text="continue" onClick={auth} />
+                  <Button text="continue" disabled={isLoading} onClick={auth} />
                 </form>
                 <div className={style.errorMessage}>{errorMessage}</div>
               </div>
             </div>
           </div>
         </div>
+        <div className={style.version}>v{version}</div>
       </div>
     </>
   )

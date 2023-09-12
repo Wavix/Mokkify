@@ -1,20 +1,34 @@
+import classNames from "classnames"
+
 import style from "./style.module.scss"
 
 import type { FC, KeyboardEvent } from "react"
 
 interface Props {
   text: string
+  disabled?: boolean
   onClick: () => void
 }
 
-export const Button: FC<Props> = ({ text, onClick }) => {
+export const Button: FC<Props> = ({ text, disabled, onClick }) => {
+  const onClickHandler = () => {
+    if (disabled) return
+    onClick()
+  }
+
   const onKeyDown = (event: KeyboardEvent<HTMLImageElement>) => {
     event.preventDefault()
-    if (event.key === "Enter" || event.key === " ") onClick()
+    if (event.key === "Enter" || event.key === " ") onClickHandler()
   }
 
   return (
-    <div className={style.button} role="button" tabIndex={0} onClick={onClick} onKeyDown={onKeyDown}>
+    <div
+      className={classNames(style.button, { [style.disabled]: disabled })}
+      role="button"
+      tabIndex={0}
+      onClick={onClickHandler}
+      onKeyDown={onKeyDown}
+    >
       <div className={style.text}>{text}</div>
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
         <g clipPath="url(#clip0_17_2657)">

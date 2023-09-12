@@ -1,3 +1,5 @@
+@import "src/styles/palette.module.scss";
+
 .authPage {
   display: flex;
   width: 100vw;
@@ -51,6 +53,12 @@
           font-style: normal;
           font-weight: 500;
           line-height: normal;
+          z-index: 10;
+
+          a {
+            color: #fff !important;
+            text-decoration: none !important;
+          }
         }
 
         .lines {
@@ -94,4 +102,12 @@
       }
     }
   }
+}
+
+.version {
+  position: absolute;
+  bottom: 10px;
+  left: 20px;
+  font-size: 12px;
+  color: $dark-purple;
 }
