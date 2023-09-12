@@ -10,7 +10,6 @@ import { SectionWrapper } from "@/ui/components/layout"
 
 import { Details } from "./Details"
 import { Filters } from "./Filters"
-
 import style from "./style.module.scss"
 
 import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"

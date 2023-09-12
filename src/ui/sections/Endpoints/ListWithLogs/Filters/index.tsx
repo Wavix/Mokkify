@@ -1,10 +1,10 @@
-import { useState } from "react"
 import { useRouter } from "next/router"
-
-import style from "./style.module.scss"
+import { useState } from "react"
 
 import { Card, RangeDatePicker } from "@/ui/components"
 import { FilterInput } from "@/ui/components/Form"
+
+import style from "./style.module.scss"
 
 import type { NextPage } from "next"
 
