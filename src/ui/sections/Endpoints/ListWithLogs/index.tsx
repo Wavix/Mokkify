@@ -9,6 +9,8 @@ import { EndpointHref, Card, Table, Skeleton, Pagination, usePagination, Cap } f
 import { SectionWrapper } from "@/ui/components/layout"
 
 import { Details } from "./Details"
+import { Filters } from "./Filters"
+
 import style from "./style.module.scss"
 
 import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"
@@ -30,6 +32,7 @@ const REFRESH_LOGS_INTERVAL = 5_000
 
 export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
   const router = useRouter()
+  const { query } = useRouter()
 
   const { page, limit } = usePagination()
   const [logs, setLogs] = useState<ListResponse<LogAttributes>>(listInitial)
@@ -41,6 +44,11 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
 
   const endpointId = Number(router.query.endpointId)
   const logId = Number(router.query.logId)
+  const filters = {
+    ...(query.template && { template: query.template }),
+    ...(query.host && { host: query.host }),
+    ...(query.code && { code: Number(query.code) })
+  }
 
   useEffect(() => {
     if (!endpointId) return
@@ -49,7 +57,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     setLogs(listInitial)
     getLogs()
     startUpdateInterval()
-  }, [endpointId, page, limit])
+  }, [endpointId, page, limit, filters.code, filters.host, filters.template])
 
   useEffect(() => {
     if (!logId) return
@@ -65,7 +73,11 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
 
   const getLogs = async (skeleton = true) => {
     if (skeleton) setIsLogsLoading(true)
-    const response = await API.getEndpointLogs(endpointId, { page, limit })
+    const response = await API.getEndpointLogs(endpointId, {
+      page,
+      limit,
+      ...filters
+    })
     if (response instanceof Error) return setIsLogsLoading(false)
     setLogs(response)
     setIsLogsLoading(false)
@@ -79,12 +91,12 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
   }
 
   const getQueryString = (): string => {
-    const query = {
+    const queryParams = {
       page: logs.pagination.current_page || listInitial.pagination.current_page,
       limit: logs.pagination.limit || listInitial.pagination.limit
     }
 
-    return buildQueryString(query)
+    return buildQueryString(queryParams)
   }
 
   const startUpdateInterval = () => {
@@ -103,6 +115,8 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
       >
         <div className={style.endpointsContentLayout}>
           <div>
+            <Filters />
+
             {isLogsLoading && <Skeleton rows={10} />}
             {!isLogsLoading && (
               <Card.Container noPadding>

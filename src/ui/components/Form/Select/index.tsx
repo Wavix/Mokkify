@@ -13,7 +13,7 @@ interface Option {
   value: OptionValue
 }
 
-type Value = OptionValue | undefined
+export type Value = OptionValue | undefined
 type MultiValue = Array<Value>
 
 interface Props {

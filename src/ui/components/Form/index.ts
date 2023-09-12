@@ -1,4 +1,6 @@
 export { Input } from "./Input"
+export { FilterInput } from "./FilterInput"
 export { Select } from "./Select"
 export { HintLabel } from "./HintLabel"
 export { Switch } from "./Switch"
+export type { Value as SelectValue } from "./Select"
