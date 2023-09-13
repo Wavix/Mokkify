@@ -5,11 +5,10 @@ import React, { useState, useEffect } from "react"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as API from "@/ui/api/endpoints"
-import { SideMenu } from "@/ui/components"
+import { SideMenu, EndpointMenuItem } from "@/ui/components"
 
 import { EndpointsForm } from "./Form"
 import { ListWithLogs } from "./ListWithLogs"
-import { EndpointItem } from "./ListWithLogs/EndpointItem"
 
 import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"
 import type { NextPage } from "next"
@@ -86,7 +85,7 @@ const Endpoints: NextPage = () => {
                 onClick={() => router.push(`/endpoints/${endpoint.id}`, undefined, { scroll: false, shallow: true })}
                 isActive={endpointId === endpoint.id}
               >
-                <EndpointItem
+                <EndpointMenuItem
                   endpoint={endpoint}
                   onEdit={() => router.push(`/endpoints/${endpoint.id}/edit`, undefined, { shallow: true })}
                   onDelete={onDeleteEndpoint}

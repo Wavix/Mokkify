@@ -27,14 +27,14 @@ class StatsService {
     const query = `SELECT
     date,
     requests,
-    ROUND(MAX(requests * 1.0) / 60, 2) AS rps
+    ROUND(MAX(requests * 1.0), 2) AS rps
       FROM (
         SELECT
-        strftime('%Y-%m-%d %H:%M', created_at, 'localtime') AS date,
+        strftime('%Y-%m-%d %H:%M:%S', created_at, 'localtime') AS date,
         COUNT(*) AS requests
         FROM logs
         WHERE endpoint_id = ${endpointId} AND created_at >= '${dateFrom}'
-        GROUP BY strftime('%Y-%m-%d %H:%M', created_at)
+        GROUP BY strftime('%Y-%m-%d %H:%M:%S', created_at)
       ) AS grouped_requests
     GROUP BY date`
 
@@ -48,7 +48,7 @@ class StatsService {
       }
 
       for (let min = diffInMinutes; min >= 0; min -= 1) {
-        const date = now.subtract(min, "minute").format("YYYY-MM-DD HH:mm")
+        const date = now.subtract(min, "second").format("YYYY-MM-DD HH:mm:ss")
         result.push({
           date,
           rps: dbStats.has(date) ? Number(dbStats.get(date)?.rps) : 0,
