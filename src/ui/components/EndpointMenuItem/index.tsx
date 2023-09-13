@@ -9,11 +9,11 @@ import type { NextPage } from "next"
 
 interface Props {
   endpoint: EndpointWithResponse
-  onEdit: () => void
-  onDelete: (id: number) => void
+  onEdit?: () => void
+  onDelete?: (id: number) => void
 }
 
-export const EndpointItem: NextPage<Props> = ({ endpoint, onEdit, onDelete }) => {
+export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onDelete }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const getTemplateName = (): string => {
@@ -23,13 +23,15 @@ export const EndpointItem: NextPage<Props> = ({ endpoint, onEdit, onDelete }) =>
 
   return (
     <>
-      <ModalWindow
-        header="Delete endpoint"
-        text={`Are you sure you want to delete '${endpoint.title}'`}
-        onConfirmHandler={() => onDelete(endpoint.id)}
-        isOpen={isOpen}
-        onClose={onClose}
-      />
+      {onDelete && (
+        <ModalWindow
+          header="Delete endpoint"
+          text={`Are you sure you want to delete '${endpoint.title}'`}
+          onConfirmHandler={() => onDelete(endpoint.id)}
+          isOpen={isOpen}
+          onClose={onClose}
+        />
+      )}
 
       <div className={style.linkWrapper}>
         <MethodBadge method={endpoint.method} />
@@ -37,12 +39,14 @@ export const EndpointItem: NextPage<Props> = ({ endpoint, onEdit, onDelete }) =>
           <SideMenu.LinkText content={endpoint.title} />
           <SideMenu.LinkDescription content={getTemplateName()} />
         </div>
-        <ContextButton
-          menu={[
-            { title: "Edit", onClick: onEdit },
-            { title: "Delete", onClick: onOpen }
-          ]}
-        />
+        {onEdit && onDelete && (
+          <ContextButton
+            menu={[
+              { title: "Edit", onClick: onEdit },
+              { title: "Delete", onClick: onOpen }
+            ]}
+          />
+        )}
       </div>
     </>
   )

@@ -4,7 +4,7 @@ import { useContext } from "react"
 import { LoginContext } from "@/ui/LoginContext"
 
 import { MenuButton } from "./MenuButton"
-import { HomeIcon, TemplatesIcon, LogoutIcon, RelayIcon } from "./icons"
+import { HomeIcon, TemplatesIcon, LogoutIcon, RelayIcon, StatsIcon } from "./icons"
 import style from "./style.module.scss"
 
 import type { FC } from "react"
@@ -43,8 +43,8 @@ export const Sidebar: FC = () => {
         active={currentSection === Section.Templates}
       />
       <MenuButton title="Relay" icon={<RelayIcon />} href="/relays" active={currentSection === Section.Relay} />
-      {/* <MenuButton title="Stats" icon={<StatsIcon />} href="/endpoints" active={currentSection === Section.Stats} /> */}
-      <MenuButton title="Logout" icon={<LogoutIcon />} active={currentSection === Section.Stats} onClick={logOut} />
+      <MenuButton title="Stats" icon={<StatsIcon />} href="/stats" active={currentSection === Section.Stats} />
+      <MenuButton title="Logout" icon={<LogoutIcon />} onClick={logOut} />
     </div>
   )
 }
