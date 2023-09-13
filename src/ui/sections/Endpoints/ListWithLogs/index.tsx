@@ -96,7 +96,8 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
   const getQueryString = (): string => {
     const queryParams = {
       page: logs.pagination.current_page || listInitial.pagination.current_page,
-      limit: logs.pagination.limit || listInitial.pagination.limit
+      limit: logs.pagination.limit || listInitial.pagination.limit,
+      ...router.query
     }
 
     return buildQueryString(queryParams)

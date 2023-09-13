@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useRef } from "react"
 
 import { CloseIcon } from "@chakra-ui/icons"
 
@@ -18,20 +18,23 @@ interface Props {
 
 export const FilterInput: FC<Props> = ({ defaultValue, onChange, placeholder, type }) => {
   const [value, setValue] = useState<string | number | null>(defaultValue)
+  const timeout = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
-    const timer = setTimeout(() => onChange(value), 1000)
-
-    return () => clearTimeout(timer)
-  }, [value])
+    return () => {
+      if (timeout.current) clearTimeout(timeout.current)
+    }
+  }, [])
 
   useEffect(() => {
     setValue(defaultValue)
   }, [defaultValue])
 
   const onChangeHandle = (val: string) => {
+    if (timeout.current) clearTimeout(timeout.current)
     const newValue = type === "number" ? Number(val) : val
     setValue(newValue || null)
+    timeout.current = setTimeout(() => onChange(newValue || null), 1000)
   }
 
   const clearHandle = () => {
