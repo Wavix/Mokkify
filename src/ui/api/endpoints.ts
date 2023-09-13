@@ -16,7 +16,7 @@ export const getEndpointsList = async (): Promise<Array<EndpointWithResponse>> =
 
 export const getEndpointLogs = async (
   endpointId: number,
-  params: ListQueryParams
+  params: ListQueryParams<LogListFilters>
 ): Promise<ListResponse<LogAttributes>> => {
   const response = await fetch(`/backend/endpoint/${endpointId}/logs${buildQueryString(params)}`, {
     headers: {

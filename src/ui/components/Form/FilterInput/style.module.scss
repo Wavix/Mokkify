@@ -1,0 +1,17 @@
+.inputFilter {
+  position: relative;
+
+  input {
+    padding-right: 32px;
+  }
+
+  .clear {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    color: #ccc;
+    cursor: pointer;
+    font-size: 10px;
+    z-index: 10;
+  }
+}

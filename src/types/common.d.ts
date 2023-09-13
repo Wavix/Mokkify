@@ -42,4 +42,12 @@ declare global {
   }
 
   export interface ListQueryParams<T = {}> extends T, PaginationProps {}
+
+  export interface LogListFilters {
+    from: string
+    to: string
+    template: string
+    host: string
+    code: number
+  }
 }
