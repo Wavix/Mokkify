@@ -1,30 +1,33 @@
+import dayjs from "dayjs"
 import { useRouter } from "next/router"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
-import { Card, RangeDatePicker } from "@/ui/components"
-import { FilterInput } from "@/ui/components/Form"
+import { Card } from "@/ui/components"
+import { FilterInput, RangeDatePicker } from "@/ui/components/Form"
 
 import style from "./style.module.scss"
 
 import type { NextPage } from "next"
 
-interface Props {}
-
 type SelectedDate = Date | null
 
-export const Filters: NextPage<Props> = () => {
+export const Filters: NextPage = () => {
   const router = useRouter()
 
-  const [range, setRange] = useState<[SelectedDate, SelectedDate]>([null, null])
+  const initialFrom = router.query.from ? dayjs(String(router.query.from)).toDate() : null
+  const initialTo = router.query.to ? dayjs(String(router.query.to)).toDate() : null
+  const [range, setRange] = useState<[SelectedDate, SelectedDate]>([initialFrom, initialTo])
 
   const onChangeTemplate = (value: string | number | null) => {
     if (!value || !String(value).trim()) {
       delete router.query.template
+      router.query.page = String(1)
       router.push(router)
       return
     }
 
     router.query.template = String(value)
+    router.query.page = String(1)
     router.push(router)
   }
 
@@ -36,6 +39,7 @@ export const Filters: NextPage<Props> = () => {
     }
 
     router.query.code = String(code)
+    router.query.page = String(1)
     router.push(router)
   }
 
@@ -47,8 +51,32 @@ export const Filters: NextPage<Props> = () => {
     }
 
     router.query.host = String(host)
+    router.query.page = String(1)
     router.push(router)
   }
+
+  const onDateChange = () => {
+    const [from, to] = range
+
+    if (!from) {
+      delete router.query.from
+    } else {
+      router.query.from = dayjs(from).format()
+    }
+
+    if (!to) {
+      delete router.query.to
+    } else {
+      router.query.to = dayjs(to).format()
+    }
+
+    router.query.page = String(1)
+    router.push(router)
+  }
+
+  useEffect(() => {
+    onDateChange()
+  }, [range])
 
   return (
     <div className={style.filters}>

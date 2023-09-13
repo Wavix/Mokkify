@@ -56,7 +56,6 @@ export const RangeDatePicker: FC<Props> = ({
   const onChangeHandler = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates
     if (end) setOpen(false)
-
     onChange({ from: start, to: end })
   }
 

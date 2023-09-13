@@ -17,6 +17,8 @@ export const GET = async (request: Request) => {
 
     const pagination = getPaginationQuery(request)
     const filters: Partial<LogListFilters> = {
+      ...(url.searchParams.get("from") && { from: url.searchParams.get("from") || "" }),
+      ...(url.searchParams.get("to") && { to: url.searchParams.get("to") || "" }),
       ...(url.searchParams.get("template") && { template: url.searchParams.get("template") || "" }),
       ...(url.searchParams.get("host") && { host: url.searchParams.get("host") || "" }),
       ...(url.searchParams.get("code") && { code: Number(url.searchParams.get("code")) })

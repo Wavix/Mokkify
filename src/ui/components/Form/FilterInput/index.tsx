@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react"
 
+import { CloseIcon } from "@chakra-ui/icons"
+
 import { Input } from "../Input"
+
+import style from "./style.module.scss"
 
 import type { FC } from "react"
 
@@ -30,5 +34,15 @@ export const FilterInput: FC<Props> = ({ defaultValue, onChange, placeholder, ty
     setValue(newValue || null)
   }
 
-  return <Input value={value || ""} type={type} placeholder={placeholder} onChange={onChangeHandle} />
+  const clearHandle = () => {
+    setValue("")
+    onChange("")
+  }
+
+  return (
+    <div className={style.inputFilter}>
+      <Input value={value || ""} type={type} placeholder={placeholder} onChange={onChangeHandle} />
+      {value && <CloseIcon className={style.clear} onClick={clearHandle} />}
+    </div>
+  )
 }

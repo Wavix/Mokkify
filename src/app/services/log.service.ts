@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import { Op } from "sequelize"
 import { v4 as uuidv4 } from "uuid"
 
@@ -54,12 +55,22 @@ class LogService {
     pagination: PaginationProps,
     filters: Partial<LogListFilters>
   ): Promise<ListResponse<LogAttributes>> {
+    const isDateFilter = filters.from && filters.to
+    const isOneDayFilter = isDateFilter && dayjs(filters.from).format() === dayjs(filters.to).format()
+
     const respones = await findWithPaginate<LogAttributes>(DB.models.Log, {
       ...pagination,
       where: {
         endpoint_id: endpointId,
         ...(filters.host && { request_ip: filters.host }),
         ...(filters.code && { response_code: filters.code }),
+        ...(isDateFilter &&
+          !isOneDayFilter && {
+            created_at: { [Op.between]: [dayjs(filters.from).format(), dayjs(filters.to).format()] }
+          }),
+        ...(isOneDayFilter && {
+          created_at: { [Op.between]: [dayjs(filters.from).format(), dayjs(filters.to).add(1, "day").format()] }
+        }),
         ...(filters.template && {
           template_name: {
             [Op.like]: `%${filters.template}%`

@@ -44,10 +44,14 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
   const endpointId = Number(router.query.endpointId)
   const logId = Number(router.query.logId)
   const filters = {
+    ...(query.from && { from: dayjs(String(query.from)).format("YYYY-MM-DD HH:mm:ss +00:00") }),
+    ...(query.to && { to: dayjs(String(query.to)).format("YYYY-MM-DD HH:mm:ss +00:00") }),
     ...(query.template && { template: query.template }),
     ...(query.host && { host: query.host }),
     ...(query.code && { code: Number(query.code) })
   }
+
+  const filtersList = [filters.code, filters.host, filters.template, filters.from, filters.to]
 
   useEffect(() => {
     if (!endpointId) return
@@ -56,7 +60,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     setLogs(listInitial)
     getLogs()
     startUpdateInterval()
-  }, [endpointId, page, limit, filters.code, filters.host, filters.template])
+  }, [endpointId, page, limit, ...filtersList])
 
   useEffect(() => {
     if (!logId) return
