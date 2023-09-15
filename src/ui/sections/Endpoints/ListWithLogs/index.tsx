@@ -5,7 +5,7 @@ import { useEffect, useState, useRef } from "react"
 import { config } from "@/config"
 import * as API from "@/ui/api/endpoints"
 import { listInitial, buildQueryString } from "@/ui/api/helpers"
-import { EndpointHref, Card, Table, Skeleton, Pagination, usePagination, Cap } from "@/ui/components"
+import { EndpointHref, Card, Table, Skeleton, Pagination, usePagination, Cap, Sticky } from "@/ui/components"
 import { SectionWrapper } from "@/ui/components/layout"
 
 import { Details } from "./Details"
@@ -64,15 +64,37 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
 
   useEffect(() => {
     if (!logId) return
-    window.scrollTo(0, 0)
-    getLog()
+    getLog(false)
   }, [logId])
+
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown)
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown)
+    }
+  }, [logs?.items, logId])
 
   useEffect(() => {
     return () => {
       if (updateInterval.current) clearInterval(updateInterval.current)
+      document.removeEventListener("keydown", onKeyDown)
     }
   }, [])
+
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp") return
+    e.stopPropagation()
+
+    const currentIndex = logs.items.findIndex(log => log.id === logId)
+    const nextIndex = e.key === "ArrowDown" ? currentIndex + 1 : currentIndex - 1
+
+    if (!logs?.items[nextIndex]?.id) return
+    router.push(`/endpoints/${endpointId}/logs/${logs?.items[nextIndex].id}${getQueryString()}`, undefined, {
+      scroll: false,
+      shallow: true
+    })
+  }
 
   const getLogs = async (skeleton = true) => {
     if (skeleton) setIsLogsLoading(true)
@@ -86,8 +108,8 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     setIsLogsLoading(false)
   }
 
-  const getLog = async () => {
-    setIsLogLoading(true)
+  const getLog = async (skeleton = true) => {
+    if (skeleton) setIsLogLoading(true)
     const response = await API.getLogById(logId)
     setActiveLog(response)
     setIsLogLoading(false)
@@ -154,7 +176,13 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
               <Pagination pagination={logs.pagination} />
             </div>
           </div>
-          <div>{activeLog && <Details log={activeLog} isLoading={isLogLoading} />}</div>
+          <div>
+            {activeLog && (
+              <Sticky>
+                <Details log={activeLog} isLoading={isLogLoading} />
+              </Sticky>
+            )}
+          </div>
         </div>
       </SectionWrapper>
     </>
