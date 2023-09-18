@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { getBodyPayload } from "../../helpers"
 import { schema } from "../validation"
 
+import { cache } from "@/app/cache"
 import { TemplateService } from "@/app/services"
 
 const templateService = new TemplateService()
@@ -39,6 +40,8 @@ const updateTemplate = async (request: Request, query: NextQuery) => {
 
   try {
     const template = await templateService.updateTemplate(templateId, payload)
+    cache.clear()
+
     return NextResponse.json({ template })
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 })
@@ -51,6 +54,7 @@ const deleteTemplate = async (_: Request, query: NextQuery) => {
 
   try {
     await templateService.deleteTemplate(templateId)
+    cache.clear()
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 })
