@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { cache } from "../cache"
 import { DB, dbConnect } from "../database"
 import { EndpointService, LogService, RelayService } from "../services"
 
@@ -45,8 +46,10 @@ const response = async (request: Request) => {
       body: { success: true }
     }
 
-    const endpoint = await endpointService.getEndpoint(endpointPath, request.method)
+    const endpoint = await getEndpoint(endpointPath, request.method)
     if (endpoint instanceof Error) return notFound()
+
+    cache.set(endpointPath, request.method, endpoint)
 
     if (endpoint.max_pending_time) {
       const pendingTime = randomInteger(0, endpoint.max_pending_time * 1000)
@@ -75,6 +78,13 @@ const response = async (request: Request) => {
     console.log(url.pathname, (error as Error).message)
     return notFound()
   }
+}
+
+const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointWithResponse | Error> => {
+  const cacheData = await cache.get(endpointPath, method)
+  if (cacheData) return cacheData
+
+  return await endpointService.getEndpoint(endpointPath, method)
 }
 
 const relay = async (

@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { getBodyPayload } from "../../helpers"
 import { schema } from "../validation"
 
+import { cache } from "@/app/cache"
 import { RelayService } from "@/app/services"
 
 const relayService = new RelayService()
@@ -39,6 +40,7 @@ const updateRelayTemplate = async (request: Request, query: NextQuery) => {
 
   try {
     const relay = await relayService.updateRelayTemplate(relayTemplateId, payload)
+    cache.clear()
     return NextResponse.json({ relay })
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 })
@@ -51,6 +53,8 @@ const deleteRelayTemplate = async (_: Request, query: NextQuery) => {
 
   try {
     await relayService.deleteRelayTemplate(relayTemplateId)
+    cache.clear()
+
     return NextResponse.json({ success: true })
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 })

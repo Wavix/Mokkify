@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { getBodyPayload } from "../../helpers"
 import { schema } from "../validation"
 
+import { cache } from "@/app/cache"
 import { EndpointService } from "@/app/services"
 
 const endpointService = new EndpointService()
@@ -39,6 +40,10 @@ const updateEndpoint = async (request: Request, query: NextQuery) => {
 
   try {
     const endpoint = await endpointService.updateEndpoint(endpointId, payload)
+    if (endpoint instanceof Error) throw Error("Endpoint doesn't update")
+
+    await cache.delete(endpointId)
+
     return NextResponse.json({ endpoint })
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 })
@@ -50,7 +55,13 @@ const deleteEndpoint = async (request: Request, query: NextQuery) => {
   if (!endpointId) return NextResponse.json({ error: "Endpoint id must be a number" }, { status: 500 })
 
   try {
+    const endpoint = await endpointService.getEndpointById(endpointId)
+    if (endpoint instanceof Error) throw Error("Endpoint not found")
+
     const success = await endpointService.deleteEndpoint(endpointId)
+
+    await cache.delete(endpointId)
+
     return NextResponse.json({ success })
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 })

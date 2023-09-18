@@ -48,6 +48,8 @@ class TemplateService {
 
     try {
       await DB.models.ResponseTemplate.destroy({ where: { id } })
+      // cache.clear()
+
       return true
     } catch {
       return false

@@ -39,7 +39,7 @@ class EndpointService {
     })
 
     if (!response) throw new Error("Endpoint not found")
-    return response
+    return response.toJSON()
   }
 
   public async getEndpointById(id: number): Promise<EndpointWithResponse | Error> {

@@ -40,6 +40,7 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-unused-imports": "^3.0.0",
+    "file-system-cache": "^2.4.4",
     "framer-motion": "^10.16.4",
     "is-uuid": "^1.0.2",
     "joi": "^17.10.1",
