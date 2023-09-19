@@ -13,6 +13,7 @@ Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.j
 
 - 🔁 RestAPI mocking
 - 🏗️ Self-hosted
+- ⚡ Caching requests. Throughput up to 600 qps
 - 🧩 Flexible response builder and templates
 - ⏲️ Response delay emulation
 - 🔄 Relay request support with external hooks
