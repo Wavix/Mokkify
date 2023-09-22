@@ -24,6 +24,7 @@ export const Input: FC<Props> = ({ value, type, placeHolder, focused, onChange }
     <input
       ref={ref}
       type={type}
+      value={value}
       placeholder={placeHolder}
       className={classNames(style.input, { [style.password]: value.trim() && type === "password" })}
       onChange={e => onChange(e.target.value)}

@@ -14,11 +14,13 @@ import style from "./style.module.scss"
 import type { NextPage } from "next"
 
 const Auth: NextPage = () => {
+  const isDemo = document.URL.includes("demo.mokkify")
+
   const { onLoginStateChange } = useContext(LoginContext)
   const { publicRuntimeConfig } = getConfig()
 
-  const [login, setLogin] = useState("")
-  const [password, setPassword] = useState("")
+  const [login, setLogin] = useState(isDemo ? "admin" : "")
+  const [password, setPassword] = useState(isDemo ? "admin" : "")
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const version = publicRuntimeConfig?.version
