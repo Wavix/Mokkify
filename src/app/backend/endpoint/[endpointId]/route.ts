@@ -58,9 +58,9 @@ const deleteEndpoint = async (request: Request, query: NextQuery) => {
     const endpoint = await endpointService.getEndpointById(endpointId)
     if (endpoint instanceof Error) throw Error("Endpoint not found")
 
-    const success = await endpointService.deleteEndpoint(endpointId)
-
     await cache.delete(endpointId)
+
+    const success = await endpointService.deleteEndpoint(endpointId)
 
     return NextResponse.json({ success })
   } catch (error) {
