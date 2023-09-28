@@ -74,7 +74,6 @@ export const Endpoint = (sequelize: Sequelize.Sequelize, DataTypes: typeof Seque
       indexes: [
         {
           fields: ["path", "method"],
-          unique: true,
           using: "BTREE"
         }
       ]
