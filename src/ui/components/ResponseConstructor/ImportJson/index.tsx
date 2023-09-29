@@ -1,7 +1,4 @@
 import { useState } from "react"
-import JSONInput from "react-json-editor-ajrm"
-// @ts-ignore
-import locale from "react-json-editor-ajrm/locale/en"
 
 import { ControlButton } from "../ControlButton"
 
@@ -9,26 +6,32 @@ import style from "./style.module.scss"
 
 import type { FC } from "react"
 
-interface OnChangeProps {
-  error: boolean
-  jsObject: unknown
-  json: string
-}
-
 interface Props {
   onImport: (data: unknown) => void
 }
 
-const font = { fontSize: "15px", lineHeight: "20px", fontFamily: "Roboto" }
-const PLACEHOLDER = { success: true }
+const PLACEHOLDER = `
+{
+  "success": true
+}
+`
 
 export const ImportJson: FC<Props> = ({ onImport }) => {
-  const [object, setObject] = useState<unknown>(PLACEHOLDER)
-  const [isValid, setIsValid] = useState(true)
+  const [object, setObject] = useState<unknown>(JSON.parse(PLACEHOLDER))
+  const [value, setValue] = useState<string>(PLACEHOLDER)
 
-  const onChange = (response: OnChangeProps) => {
-    setIsValid(!response.error)
-    setObject(response.jsObject)
+  const [error, setError] = useState<string | null>(null)
+
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setValue(e.target.value)
+
+    try {
+      const json = JSON.parse(e.target.value)
+      setError(null)
+      setObject(json)
+    } catch (err) {
+      setError((err as Error).message)
+    }
   }
 
   const onImporthandler = () => {
@@ -38,22 +41,10 @@ export const ImportJson: FC<Props> = ({ onImport }) => {
   return (
     <div className={style.importJSON}>
       <div>
-        <JSONInput
-          locale={locale}
-          theme="dark_vscode_tribute"
-          width="100%"
-          height="350px"
-          style={{
-            body: { ...font, backgroundColor: "#432c82" },
-            errorMessage: { ...font, backgroundColor: "#432c82" },
-            warningBox: { backgroundColor: "#432c82" }
-          }}
-          placeholder={PLACEHOLDER}
-          onChange={onChange}
-          onBlur={onChange}
-        />
+        <textarea value={value} onChange={onChange} />
+        {error && <span className={style.error}>{error}</span>}
         <div className={style.importButton}>
-          {isValid && <ControlButton title="Import" icon="plus" onClick={onImporthandler} />}
+          {!error && <ControlButton title="Import" icon="plus" onClick={onImporthandler} />}
         </div>
       </div>
     </div>
