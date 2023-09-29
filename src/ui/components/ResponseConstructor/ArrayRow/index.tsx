@@ -58,7 +58,7 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
     return children.map(element => (
       <>
         {"value" in element ? (
-          <AttributeRow item={element} onUpdate={onUpdate} onDelete={onDelete} />
+          <AttributeRow item={element} key={element.uuid} onUpdate={onUpdate} onDelete={onDelete} />
         ) : (
           <div key={element.uuid} className={style.arrayObjectItem}>
             <div className={style.deleteObject} onClick={() => onDelete(element.uuid)}>
