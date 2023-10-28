@@ -81,6 +81,15 @@ export const deleteEndpoint = async (id: number): Promise<ApiResponseBasic> => {
   return data
 }
 
+export const flushEndpointLogs = async (id: number): Promise<ApiResponseBasic> => {
+  const response = await fetch(`/backend/endpoint/${id}/log`, {
+    headers: { Authorization: getAuthToken() },
+    method: "DELETE"
+  })
+  const data = await response.json()
+  return data
+}
+
 export const getEndpointMultipleTemplates = async (endpointId: number): Promise<MultipleTemplateResponse> => {
   const response = await fetch(`/backend/endpoint/${endpointId}/multiple-templates`, {
     headers: { Authorization: getAuthToken() }
