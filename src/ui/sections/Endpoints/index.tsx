@@ -54,6 +54,18 @@ const Endpoints: NextPage = () => {
     }
   }
 
+  const onFlushLogs = async (id: number) => {
+    try {
+      const response = await API.flushEndpointLogs(id)
+      if (!response.success) return failureToast("Error flushing logs")
+      if (activeEndpoint?.id === id) router.push(`/endpoints/${id}`, undefined, { scroll: false, shallow: true })
+
+      successToast("Logs flushed")
+    } catch (error) {
+      failureToast((error as Error).message)
+    }
+  }
+
   const getContent = () => {
     switch (router.pathname) {
       case "/endpoints/create":
@@ -88,6 +100,7 @@ const Endpoints: NextPage = () => {
                 <EndpointMenuItem
                   endpoint={endpoint}
                   onEdit={() => router.push(`/endpoints/${endpoint.id}/edit`, undefined, { shallow: true })}
+                  onFlushLogs={onFlushLogs}
                   onDelete={onDeleteEndpoint}
                 />
               </SideMenu.Link>

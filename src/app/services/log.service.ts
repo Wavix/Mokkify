@@ -87,6 +87,14 @@ class LogService {
     return response
   }
 
+  public async flushEndpointLogs(endpointId: number): Promise<void> {
+    await DB.models.Log.destroy({
+      where: {
+        endpoint_id: endpointId
+      }
+    })
+  }
+
   private getRealUrl(request: Request): string {
     const host = request.headers.get("host") || ""
     const url = new URL(request.url)

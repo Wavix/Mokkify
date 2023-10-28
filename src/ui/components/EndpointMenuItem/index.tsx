@@ -10,11 +10,13 @@ import type { NextPage } from "next"
 interface Props {
   endpoint: EndpointWithResponse
   onEdit?: () => void
+  onFlushLogs?: (id: number) => void
   onDelete?: (id: number) => void
 }
 
-export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onDelete }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onFlushLogs, onDelete }) => {
+  const { isOpen: isOpenDelete, onOpen: onOpenDelete, onClose: onCloseDelete } = useDisclosure()
+  const { isOpen: isOpenFlushLogs, onOpen: onOpenFlushLogs, onClose: onCloseFlushLogs } = useDisclosure()
 
   const getTemplateName = (): string => {
     if (endpoint.is_multiple_templates) return "Multiple templates"
@@ -28,8 +30,18 @@ export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onDelete }
           header="Delete endpoint"
           text={`Are you sure you want to delete '${endpoint.title}'`}
           onConfirmHandler={() => onDelete(endpoint.id)}
-          isOpen={isOpen}
-          onClose={onClose}
+          isOpen={isOpenDelete}
+          onClose={onCloseDelete}
+        />
+      )}
+
+      {onFlushLogs && (
+        <ModalWindow
+          header="Flush endpoint logs"
+          text={`Are you sure you want to flush logs for '${endpoint.title}'`}
+          onConfirmHandler={() => onFlushLogs(endpoint.id)}
+          isOpen={isOpenFlushLogs}
+          onClose={onCloseFlushLogs}
         />
       )}
 
@@ -43,7 +55,8 @@ export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onDelete }
           <ContextButton
             menu={[
               { title: "Edit", onClick: onEdit },
-              { title: "Delete", onClick: onOpen }
+              { title: "Flush logs", onClick: onOpenFlushLogs },
+              { title: "Delete", onClick: onOpenDelete }
             ]}
           />
         )}
