@@ -1,7 +1,7 @@
 import classNames from "classnames"
 import dayjs from "dayjs"
 import React, { useRef, useState } from "react"
-import DatePicker from "react-datepicker"
+import ReactDatePicker, { type ReactDatePickerProps } from "react-datepicker"
 
 import { CloseIcon } from "@chakra-ui/icons"
 
@@ -33,6 +33,9 @@ interface Props {
   monthPicker?: boolean
   disabled?: boolean
 }
+
+const DatePicker = ReactDatePicker as React.JSXElementConstructor<ReactDatePickerProps<any, false>>
+const DatePickerRange = ReactDatePicker as React.JSXElementConstructor<ReactDatePickerProps<any, true>>
 
 const PLACEHOLDER = "Date filter"
 
@@ -119,7 +122,7 @@ export const RangeDatePicker: FC<Props> = ({
 
           {!single && !monthPicker && (
             <div className={style.calendarWrapper}>
-              <DatePicker
+              <DatePickerRange
                 selected={startDate}
                 onChange={onChangeHandler}
                 startDate={startDate}
@@ -129,7 +132,7 @@ export const RangeDatePicker: FC<Props> = ({
                 inline
               >
                 {hasButtons && <PresetButtons onChange={onChangeHandler} buttonsVisible={buttonsVisible} />}
-              </DatePicker>
+              </DatePickerRange>
             </div>
           )}
 

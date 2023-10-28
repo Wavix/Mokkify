@@ -1,22 +1,17 @@
-import dynamic from "next/dynamic"
+import "react18-json-view/src/style.css"
 import React from "react"
+import DynamicReactJson from "react18-json-view"
+
+import style from "./style.module.scss"
 
 interface Props {
   data: unknown
 }
 
-const DynamicReactJson = dynamic(import("react-json-view"), { ssr: false })
-
 export const StyledJSON: React.FC<Props> = ({ data }) => {
   return (
-    <DynamicReactJson
-      style={{ overflowWrap: "break-word", wordBreak: "break-all" }}
-      src={data as any}
-      displayDataTypes={false}
-      displayObjectSize={false}
-      iconStyle="square"
-      sortKeys={false}
-      name={null}
-    />
+    <div className={style.jsonView}>
+      <DynamicReactJson src={data} />
+    </div>
   )
 }
