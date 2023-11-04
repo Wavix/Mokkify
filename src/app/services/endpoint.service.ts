@@ -2,15 +2,10 @@ import { v4 as uuidv4 } from "uuid"
 
 import { DB } from "../database"
 
-import type {
-  EndpointAttributes,
-  EndpointCreationAttributes,
-  EndpointWithResponse
-} from "../database/interfaces/endpoint.interface"
-import type { Model } from "sequelize"
+import type { EndpointAttributes, EndpointCreationAttributes } from "../database/interfaces/endpoint.interface"
 
 class EndpointService {
-  public async getEndpoint(path: string, method: string): Promise<EndpointWithResponse | Error> {
+  public async getEndpoint(path: string, method: string): Promise<EndpointAttributes | Error> {
     const response = await DB.models.Endpoint.findOne({
       where: {
         path,
@@ -42,7 +37,7 @@ class EndpointService {
     return response.toJSON()
   }
 
-  public async getEndpointById(id: number): Promise<EndpointWithResponse | Error> {
+  public async getEndpointById(id: number): Promise<EndpointAttributes | Error> {
     const response = await DB.models.Endpoint.findOne({
       where: { id },
       include: [
@@ -57,7 +52,7 @@ class EndpointService {
     return this.formatEndpoint(response.toJSON())
   }
 
-  public async getEndpointsList(): Promise<Array<EndpointWithResponse> | Error> {
+  public async getEndpointsList(): Promise<Array<EndpointAttributes> | Error> {
     const response = await DB.models.Endpoint.findAll({
       order: [["id", "DESC"]],
       include: [
@@ -69,7 +64,7 @@ class EndpointService {
     })
 
     if (!response) throw new Error("Endpoints not found")
-    return response.map((item: Model<EndpointWithResponse>) => this.formatEndpoint(item.dataValues))
+    return response.map(item => this.formatEndpoint(item.dataValues))
   }
 
   public async createEndpoint(payload: EndpointCreationAttributes): Promise<EndpointAttributes | Error> {
@@ -111,6 +106,7 @@ class EndpointService {
         }
       ]
     })
+    if (!response) throw new Error("Endpoint not found")
 
     return this.formatEndpoint(response.toJSON())
   }
@@ -122,8 +118,8 @@ class EndpointService {
     const transaction = await DB.sequelize.transaction()
 
     try {
-      await DB.models.Endpoint.destroy({ where: { id } }, { transaction })
-      await DB.models.Log.destroy({ where: { endpoint_id: id } }, { transaction })
+      await DB.models.Endpoint.destroy({ where: { id }, transaction })
+      await DB.models.Log.destroy({ where: { endpoint_id: id }, transaction })
 
       await transaction.commit()
       return true
@@ -147,7 +143,7 @@ class EndpointService {
     return newPayload
   }
 
-  private formatEndpoint(endpoint: EndpointWithResponse): EndpointWithResponse {
+  private formatEndpoint(endpoint: EndpointAttributes): EndpointAttributes {
     const newEndpoint = { ...endpoint }
     if (newEndpoint.path[0] !== "/") newEndpoint.path = `/${newEndpoint.path}`
     return newEndpoint

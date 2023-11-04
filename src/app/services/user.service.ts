@@ -54,6 +54,8 @@ export class UserService {
   public async checkToken(token: string): Promise<UserResponse | Error> {
     try {
       const { payload } = await jwtVerify(token, new TextEncoder().encode(config.jwtSecret))
+      if (!payload?.id) throw new Error("Jwt payload is empty")
+
       const user = await DB.models.User.findOne({ where: { id: payload.id } })
       if (!user) throw new Error("User not found")
 

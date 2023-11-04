@@ -10,7 +10,7 @@ import { SideMenu, EndpointMenuItem } from "@/ui/components"
 import { EndpointsForm } from "./Form"
 import { ListWithLogs } from "./ListWithLogs"
 
-import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { NextPage } from "next"
 
 const Endpoints: NextPage = () => {
@@ -18,8 +18,8 @@ const Endpoints: NextPage = () => {
   const failureToast = useFailureToast()
   const successToast = useSuccessToast()
 
-  const [activeEndpoint, setActiveEndpoint] = useState<EndpointWithResponse | null>(null)
-  const [endpoints, setEndpoints] = useState<Array<EndpointWithResponse>>([])
+  const [activeEndpoint, setActiveEndpoint] = useState<EndpointAttributes | null>(null)
+  const [endpoints, setEndpoints] = useState<Array<EndpointAttributes>>([])
   const [isLoading, setIsLoading] = useState(true)
   const [search, setSearch] = useState("")
 

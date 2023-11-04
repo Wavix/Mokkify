@@ -4,11 +4,11 @@ import { MethodBadge, ContextButton, ModalWindow, SideMenu } from "@/ui/componen
 
 import style from "./style.module.scss"
 
-import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { NextPage } from "next"
 
 interface Props {
-  endpoint: EndpointWithResponse
+  endpoint: EndpointAttributes
   onEdit?: () => void
   onFlushLogs?: (id: number) => void
   onDelete?: (id: number) => void

@@ -12,12 +12,12 @@ import { Details } from "./Details"
 import { Filters } from "./Filters"
 import style from "./style.module.scss"
 
-import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { LogAttributes } from "@/app/database/interfaces/log.interface"
 import type { FC } from "react"
 
 interface Props {
-  activeEndpoint: EndpointWithResponse | null
+  activeEndpoint: EndpointAttributes | null
 }
 
 const columns = {

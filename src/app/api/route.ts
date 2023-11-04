@@ -7,10 +7,10 @@ import { EndpointService, LogService, RelayService } from "../services"
 import { parseResponseBody } from "@/app/backend/helpers"
 
 import type { RelayResponse, ApiResponse } from "../services"
-import type { EndpointWithResponse, EndpointFormDataRequestBody } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes, EndpointFormDataRequestBody } from "@/app/database/interfaces/endpoint.interface"
 
 interface LogWithRelay {
-  endpoint: EndpointWithResponse
+  endpoint: EndpointAttributes
   request: Request
   requestBody: unknown
   apiResponse: ApiResponse
@@ -56,13 +56,13 @@ const response = async (request: Request) => {
       await new Promise(resolve => setTimeout(resolve, pendingTime))
     }
 
-    if (endpoint.response_template_id && !endpoint.is_multiple_templates) {
+    if (endpoint.response_template_id && !endpoint.is_multiple_templates && endpoint.response) {
       result.status = endpoint.response.code
       result.body = getJsonResponse(endpoint.response.body, requestBodyWithQueryParams)
       result.templateName = endpoint.response.title
     }
 
-    if (endpoint.is_multiple_templates && endpoint.multiple_responses.length) {
+    if (endpoint.is_multiple_templates && endpoint.multiple_responses?.length) {
       const randomIndex = randomInteger(0, endpoint.multiple_responses.length - 1)
       const randomResponse = endpoint.multiple_responses[randomIndex]
       result.status = randomResponse.response.code
@@ -80,7 +80,7 @@ const response = async (request: Request) => {
   }
 }
 
-const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointWithResponse | Error> => {
+const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointAttributes | Error> => {
   const cacheData = await cache.get(endpointPath, method)
   if (cacheData) return cacheData
 
@@ -90,7 +90,7 @@ const getEndpoint = async (endpointPath: string, method: string): Promise<Endpoi
 const relay = async (
   requestBody: unknown,
   apiResponse: ApiResponse,
-  endpoint: EndpointWithResponse
+  endpoint: EndpointAttributes
 ): Promise<RelayResponse | null> => {
   if (!endpoint.relay_enabled || !endpoint.relay_target?.trim()) return null
 
