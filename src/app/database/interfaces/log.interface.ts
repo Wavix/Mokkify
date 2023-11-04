@@ -10,13 +10,13 @@ export interface LogAttributes {
   method: Method
   user_agent: string | null
   search: string
-  request_payload: any
-  response_payload: any
+  request_payload: unknown
+  response_payload: unknown
   template_name: string | null
   relay_url: string | null
   relay_method: Method | null
-  relay_request_body: any
-  relay_response_body: any
+  relay_request_body: unknown
+  relay_response_body: unknown
   relay_response_code: number | null
   request_headers: Record<string, string>
   response_code: number

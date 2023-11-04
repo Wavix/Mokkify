@@ -4,7 +4,7 @@ export interface ResponseTemplateAttributes {
   id: number
   title: string
   body: string
-  body_parsed: any
+  body_parsed: unknown
   code: number
   user_id: number
   created_at: Date
