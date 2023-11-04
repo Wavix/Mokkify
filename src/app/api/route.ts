@@ -48,7 +48,6 @@ const response = async (request: Request) => {
 
     const endpoint = await getEndpoint(endpointPath, request.method)
     if (endpoint instanceof Error) return notFound()
-    if (!endpoint.response) return notFound()
 
     cache.set(endpointPath, request.method, endpoint)
 
@@ -57,7 +56,7 @@ const response = async (request: Request) => {
       await new Promise(resolve => setTimeout(resolve, pendingTime))
     }
 
-    if (endpoint.response_template_id && !endpoint.is_multiple_templates) {
+    if (endpoint.response_template_id && !endpoint.is_multiple_templates && endpoint.response) {
       result.status = endpoint.response.code
       result.body = getJsonResponse(endpoint.response.body, requestBodyWithQueryParams)
       result.templateName = endpoint.response.title
