@@ -49,7 +49,7 @@ export const getValueFromBodyByNestedKey = (nestedKeys: string, body: any) => {
 }
 
 export const parseResponseBody = (
-  responseString: string | null,
+  responseString: string | null | undefined,
   requestBody?: unknown,
   responseBody?: unknown
 ): string | null => {

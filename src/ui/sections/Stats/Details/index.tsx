@@ -16,13 +16,11 @@ import { SectionWrapper } from "@/ui/components/layout"
 
 import { RPSGraphic } from "./RPSGraphic"
 
-// import style from "./style.module.scss"
-
-import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { FC } from "react"
 
 interface Props {
-  endpoint: EndpointWithResponse
+  endpoint: EndpointAttributes
 }
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement)

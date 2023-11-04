@@ -4,7 +4,6 @@ import type {
   ResponseTemplateAttributes,
   ResponseTemplateCreationAttributes
 } from "../database/interfaces/response-template.interface"
-import type { Model } from "sequelize"
 
 class TemplateService {
   public async getTemplateById(id: number): Promise<ResponseTemplateAttributes | Error> {
@@ -20,7 +19,7 @@ class TemplateService {
     })
 
     if (!response) throw new Error("Templates request error")
-    return response.map((item: Model<ResponseTemplateAttributes>) => item.toJSON())
+    return response.map(item => item.toJSON())
   }
 
   public async createTemplate(

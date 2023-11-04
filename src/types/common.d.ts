@@ -1,7 +1,10 @@
 import type { Models } from "../database/models"
-import type Sequelize from "sequelize"
+import type Sequelize, { Model } from "sequelize"
 
 declare module "sequelize" {
+  type NonConstructorKeys<T> = { [P in keyof T]: T[P] extends new () => any ? never : P }[keyof T]
+  type NonConstructor<T> = Pick<T, NonConstructorKeys<T>>
+
   export type ModelStatic<M extends Model> = NonConstructor<typeof Model> & { new (): M } & {
     associate?: (reg: Models) => void
   } & { decrement?: any }

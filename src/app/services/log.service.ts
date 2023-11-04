@@ -4,6 +4,7 @@ import { v4 as uuidv4 } from "uuid"
 
 import { DB, findWithPaginate } from "../database"
 
+import type { Method } from "../database/interfaces/endpoint.interface"
 import type { LogAttributes } from "../database/interfaces/log.interface"
 import type { RelayResponse } from "@/app/services"
 
@@ -46,7 +47,7 @@ class LogService {
       pathname: url.pathname,
       search: url.search,
       user_agent: request.headers.get("user-agent") || null,
-      method: request.method
+      method: request.method as Method
     })
   }
 
@@ -82,7 +83,7 @@ class LogService {
     return respones
   }
 
-  public async getLogById(logId: number): Promise<LogAttributes> {
+  public async getLogById(logId: number): Promise<LogAttributes | null> {
     const response = await DB.models.Log.findByPk(logId)
     return response
   }

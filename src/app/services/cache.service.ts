@@ -2,7 +2,7 @@ import Cache from "file-system-cache"
 
 import { DB } from "../database"
 
-import type { EndpointWithResponse } from "../database/interfaces/endpoint.interface"
+import type { EndpointAttributes } from "../database/interfaces/endpoint.interface"
 
 const cache = Cache({ basePath: ".cache" })
 
@@ -12,7 +12,7 @@ export class CacheService {
     cache.set(key, payload)
   }
 
-  public async get(endpointPath: string, method: string): Promise<EndpointWithResponse | null> {
+  public async get(endpointPath: string, method: string): Promise<EndpointAttributes | null> {
     const key = this.key(endpointPath, method)
     const cacheData = await cache.get(key)
     return cacheData || null
@@ -20,8 +20,9 @@ export class CacheService {
 
   public async delete(endpointId: number) {
     const endpoint = await DB.models.Endpoint.findOne({ where: { id: endpointId } })
-    const key = this.key(endpoint.path, endpoint.method)
+    if (!endpoint?.path) return
 
+    const key = this.key(endpoint.path, endpoint.method)
     await cache.remove(key)
   }
 

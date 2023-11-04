@@ -19,7 +19,7 @@ export const RelayDetails: FC<Props> = ({ log }) => {
             <MethodBadge method={log.relay_method} />
           </KeyValueList.Column>
           <KeyValueList.Column>
-            <a href={log.relay_url} target="_blank">
+            <a href={log.relay_url || ""} target="_blank">
               {log.relay_url}
             </a>
           </KeyValueList.Column>

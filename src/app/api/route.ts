@@ -7,10 +7,10 @@ import { EndpointService, LogService, RelayService } from "../services"
 import { parseResponseBody } from "@/app/backend/helpers"
 
 import type { RelayResponse, ApiResponse } from "../services"
-import type { EndpointWithResponse, EndpointFormDataRequestBody } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes, EndpointFormDataRequestBody } from "@/app/database/interfaces/endpoint.interface"
 
 interface LogWithRelay {
-  endpoint: EndpointWithResponse
+  endpoint: EndpointAttributes
   request: Request
   requestBody: unknown
   apiResponse: ApiResponse
@@ -48,6 +48,7 @@ const response = async (request: Request) => {
 
     const endpoint = await getEndpoint(endpointPath, request.method)
     if (endpoint instanceof Error) return notFound()
+    if (!endpoint.response) return notFound()
 
     cache.set(endpointPath, request.method, endpoint)
 
@@ -62,7 +63,7 @@ const response = async (request: Request) => {
       result.templateName = endpoint.response.title
     }
 
-    if (endpoint.is_multiple_templates && endpoint.multiple_responses.length) {
+    if (endpoint.is_multiple_templates && endpoint.multiple_responses?.length) {
       const randomIndex = randomInteger(0, endpoint.multiple_responses.length - 1)
       const randomResponse = endpoint.multiple_responses[randomIndex]
       result.status = randomResponse.response.code
@@ -80,7 +81,7 @@ const response = async (request: Request) => {
   }
 }
 
-const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointWithResponse | Error> => {
+const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointAttributes | Error> => {
   const cacheData = await cache.get(endpointPath, method)
   if (cacheData) return cacheData
 
@@ -90,7 +91,7 @@ const getEndpoint = async (endpointPath: string, method: string): Promise<Endpoi
 const relay = async (
   requestBody: unknown,
   apiResponse: ApiResponse,
-  endpoint: EndpointWithResponse
+  endpoint: EndpointAttributes
 ): Promise<RelayResponse | null> => {
   if (!endpoint.relay_enabled || !endpoint.relay_target?.trim()) return null
 

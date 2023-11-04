@@ -2,17 +2,16 @@ import { DB } from "../database"
 
 import { getValueFromBodyByNestedKey, parseResponseBody } from "@/app/backend/helpers"
 
-import type { EndpointWithResponse } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes, Method } from "@/app/database/interfaces/endpoint.interface"
 import type {
   RelayPayloadTemplateAttributes,
   RelayPayloadTemplateCreationAttributes
 } from "@/app/database/interfaces/relay-payload-template.interface"
 import type { ApiResponse } from "@/app/services"
-import type { Model } from "sequelize"
 
 export interface RelayResponse {
   url: string | null
-  method: string
+  method: Method
   code: number
   requestBody: unknown
   responseBody: unknown
@@ -32,7 +31,7 @@ class RelayService {
     })
 
     if (!response) throw new Error("Relay templates request error")
-    return response.map((item: Model<RelayPayloadTemplateAttributes>) => item.toJSON())
+    return response.map(item => item.toJSON())
   }
 
   public async createRelayTemplate(
@@ -87,7 +86,7 @@ class RelayService {
   public async relay(
     requestBody: unknown,
     apiResponse: ApiResponse,
-    endpoint: EndpointWithResponse
+    endpoint: EndpointAttributes
   ): Promise<RelayResponse | Error> {
     const url = await this.getRelayUrl(String(endpoint.relay_target), requestBody)
     const method = endpoint.relay_method || "GET"

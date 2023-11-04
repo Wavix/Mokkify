@@ -1,10 +1,10 @@
 import { buildQueryString, getAuthToken } from "./helpers"
 
 import type { MultipleTemplateResponse } from "@/app/database/interfaces/endpoint-template-reference.interface"
-import type { EndpointWithResponse, EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
+import type { EndpointAttributes, EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { LogAttributes } from "@/app/database/interfaces/log.interface"
 
-export const getEndpointsList = async (): Promise<Array<EndpointWithResponse>> => {
+export const getEndpointsList = async (): Promise<Array<EndpointAttributes>> => {
   const response = await fetch("/backend/endpoint", {
     headers: {
       Authorization: getAuthToken()
@@ -33,7 +33,7 @@ export const getLogById = async (id: number): Promise<LogAttributes> => {
   return data?.log
 }
 
-export const getEndpointById = async (id: number): Promise<EndpointWithResponse & ApiResponseError> => {
+export const getEndpointById = async (id: number): Promise<EndpointAttributes & ApiResponseError> => {
   const response = await fetch(`/backend/endpoint/${id}`, { headers: { Authorization: getAuthToken() } })
   const data = await response.json()
   return data.endpoint ? data.endpoint : data
@@ -41,7 +41,7 @@ export const getEndpointById = async (id: number): Promise<EndpointWithResponse 
 
 export const createEndpoint = async (
   payload: Partial<EndpointCreationAttributes>
-): Promise<EndpointWithResponse & ApiResponseError> => {
+): Promise<EndpointAttributes & ApiResponseError> => {
   const response = await fetch("/backend/endpoint", {
     headers: {
       "Accept": "application/json",
@@ -58,7 +58,7 @@ export const createEndpoint = async (
 export const updateEndpoint = async (
   id: number,
   payload: Partial<EndpointCreationAttributes>
-): Promise<EndpointWithResponse & ApiResponseError> => {
+): Promise<EndpointAttributes & ApiResponseError> => {
   const response = await fetch(`/backend/endpoint/${id}`, {
     headers: {
       "Accept": "application/json",
