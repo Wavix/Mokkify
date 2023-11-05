@@ -124,7 +124,7 @@ const notFound = () => {
   return NextResponse.json({ error: "Not found" }, { status: 404 })
 }
 
-const getBody = async (request: Request): Promise<Record<string, any> | null> => {
+const getBody = async (request: Request): Promise<Record<string, unknown> | null> => {
   const contentType = request.headers.get("content-type") || ""
   if (contentType.includes("form-data")) return await parsedFormData(request)
 
@@ -135,8 +135,8 @@ const getBody = async (request: Request): Promise<Record<string, any> | null> =>
   }
 }
 
-const getQueryParams = (url: URL): Record<string, any> => {
-  const params: Record<string, any> = {}
+const getQueryParams = (url: URL): Record<string, unknown> => {
+  const params: Record<string, unknown> = {}
   const queryParams = Object.fromEntries(url.searchParams)
 
   Object.keys(queryParams).forEach(key => {
@@ -153,7 +153,7 @@ const getQueryParams = (url: URL): Record<string, any> => {
   return params
 }
 
-const parsedFormData = async (request: Request): Promise<Record<string, any>> => {
+const parsedFormData = async (request: Request): Promise<Record<string, unknown>> => {
   const formData = await request.formData()
   const data: EndpointFormDataRequestBody = {}
 

@@ -17,7 +17,7 @@ export interface ApiResponse {
 interface Log {
   endpointId: number
   request: Request
-  body: any
+  body: unknown
   templateName: string | null
   response: ApiResponse
   relayResponse: RelayResponse | null

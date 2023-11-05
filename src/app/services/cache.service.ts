@@ -7,7 +7,7 @@ import type { EndpointAttributes } from "../database/interfaces/endpoint.interfa
 const cache = Cache({ basePath: ".cache" })
 
 export class CacheService {
-  public set(endpointPath: string, method: string, payload: any) {
+  public set(endpointPath: string, method: string, payload: unknown) {
     const key = this.key(endpointPath, method)
     cache.set(key, payload)
   }
