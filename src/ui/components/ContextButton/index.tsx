@@ -40,6 +40,7 @@ export const ContextButton: React.FC<Props> = ({ menu, side }) => {
         className={classNames(style.button, {
           [style.active]: isContextOpened
         })}
+        aria-label="Menu"
         type="button"
       >
         <Icon />

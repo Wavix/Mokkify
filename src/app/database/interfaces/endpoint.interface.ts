@@ -25,19 +25,13 @@ export interface EndpointAttributes {
   multiple_responses?: NonAttribute<Array<EndpointTemplateReferenceWithTemplate>>
 }
 
-// export interface EndpointWithResponse extends EndpointAttributes {
-//   response: ResponseTemplateAttributes
-//   relay_payload: RelayPayloadTemplateAttributes
-//   multiple_responses: Array<EndpointTemplateReferenceWithTemplate>
-// }
-
 export interface EndpointCreationAttributes
   extends Optional<EndpointAttributes, "id" | "uuid" | "user_id" | "created_at"> {
   multiple_responses_templates?: Array<number>
 }
 
 export interface EndpointFormDataRequestBody {
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export interface EndpointInstance extends Model<EndpointAttributes, EndpointCreationAttributes>, EndpointAttributes {}

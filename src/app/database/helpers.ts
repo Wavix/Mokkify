@@ -1,10 +1,10 @@
-import type { ModelStatic, FindAndCountOptions } from "sequelize"
+import type { ModelStatic, FindAndCountOptions, Model } from "sequelize"
 
 const LIST_LIMIT_MIN = 25
 const LIST_LIMIT_MAX = 100
 
-export const findWithPaginate = async <T = any>(
-  model: ModelStatic<any>,
+export const findWithPaginate = async <T = unknown>(
+  model: ModelStatic<Model>,
   options: FindAndCountOptions
 ): Promise<ListResponse<T>> => {
   const page = options.page ? Number(options.page) : 1
@@ -17,8 +17,7 @@ export const findWithPaginate = async <T = any>(
   }
 
   const pagination = await getPagination(model, findOptions)
-
-  const items = pagination.items ? pagination.items.map((item: any) => item.toJSON() as T) : []
+  const items = pagination.items ? pagination.items.map(item => item.toJSON() as T) : []
 
   return {
     pagination: {
@@ -39,12 +38,11 @@ export const getPaginationQuery = (request: Request): PaginationProps => {
   }
 }
 
-const getPagination = async (model: ModelStatic<any>, options: FindAndCountOptions) => {
+const getPagination = async (model: ModelStatic<Model>, options: FindAndCountOptions) => {
   const response = await model.findAndCountAll(options)
-
   if (!response.count) return { total: 0, items: response.rows }
 
-  const total = typeof response.count === "number" ? response.count : (response.count as Array<any>).length
+  const total = typeof response.count === "number" ? response.count : (response.count as Array<Model>).length
 
   return {
     total,
