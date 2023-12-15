@@ -11,7 +11,7 @@ export const HeadersDetails: FC<Props> = ({ log }) => {
   const HEADERS_WHITELIST = ["connection", "user-agent", "content-type", "content-length"]
 
   const getFilteredHeaders = () => {
-    return Object.keys(log.request_headers).filter(name => HEADERS_WHITELIST.includes(name))
+    return Object.keys(log.request_headers).filter(name => HEADERS_WHITELIST.includes(name) || name.startsWith("x-"))
   }
 
   return (
