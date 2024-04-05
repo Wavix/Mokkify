@@ -12,15 +12,20 @@ jobs:
       SSH_KEY: ${{secrets.SSH_KEY}}
 
     steps:
-      - uses: actions/checkout@master
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: "npm"
+          node-version: 20
+
       - uses: pnpm/action-setup@v3
+        name: Install pnpm
         with:
           version: 8
+          run_install: false
+  
       - run: pnpm i
       - run: pnpm build
       - run: mkdir ~/.ssh
