@@ -37,15 +37,15 @@ Then, navigate to the project directory and install the necessary dependencies:
 
 ```bash
 cd mokkify
-yarn install
-yarn cli dbcreate
-yarn cli useradd <login> <password>
+pnpm install
+pnpm cli dbcreate
+pnpm cli useradd <login> <password>
 ```
 
 After that, start the project in development mode:
 
 ```bash
-yarn dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
