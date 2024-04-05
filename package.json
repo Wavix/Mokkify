@@ -12,10 +12,11 @@
     "start": "next start -p 7043",
     "cli": "node -r @swc-node/register ./src/app/database/cli.ts",
     "migrate": "node -r @swc-node/register ./src/app/database/migrate.ts",
-    "migrate:create": "yarn migrate create --folder ./src/app/migrations --name"
+    "migrate:create": "pnpm migrate create --folder ./src/app/migrations --name"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.1.1",
+    "@chakra-ui/input": "^2.1.2",
     "@chakra-ui/react": "^2.8.1",
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
@@ -73,7 +74,6 @@
     "prettier": "^3.0.3",
     "sass": "^1.69.5",
     "sequelize-cli": "^6.6.2",
-    "simple-pre-commit": "^1.2.1",
     "umzug": "^3.4.0"
   },
   "overrides": {
