@@ -2,7 +2,7 @@
   "name": "Mokkify",
   "version": "1.1.0",
   "repository": "git@github.com:icevl/mokkify.git",
-  "author": "Mikhail Kabanov <kabanov.mike@gmail.com>",
+  "author": "Wavix Inc. <product@wavix.com>",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
