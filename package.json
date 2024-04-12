@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "lint": "./node_modules/.bin/eslint ./src/ --ext .ts,.tsx,.js,.jsx --quiet --color",
+    "lint": "npx eslint ./src/ --ext .ts,.tsx,.js,.jsx --quiet --color",
     "type": "tsc --project tsconfig.json --noEmit",
     "format": "prettier --write './src/**/*.{js,ts,json,tsx,scss}'",
     "start": "next start -p 7043",
