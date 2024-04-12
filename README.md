@@ -30,7 +30,7 @@ Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.j
 First, clone the repository:
 
 ```bash
-git clone https://github.com/icevl/mokkify.git
+git clone https://github.com/Wavix/Mokkify.git
 ```
 
 Then, navigate to the project directory and install the necessary dependencies:
