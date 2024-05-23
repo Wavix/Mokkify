@@ -89,7 +89,7 @@ const parseVars = (
       value = parseVar(key)
     }
 
-    value = value.replaceAll("\n", "\\n")
+    if (value) value = value.replaceAll("\n", "\\n")
 
     result = paramsReplace
       ? result.replace(`":@${key}`, `":${value}`)
