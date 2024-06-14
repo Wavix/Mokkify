@@ -14,9 +14,12 @@ const backedAuth = async (request: Request) => {
   if (!url.pathname.startsWith("/backend/")) return NextResponse.next()
   if (UNAUTHORIZED_PATHS.includes(url.pathname)) return NextResponse.next()
 
-  const token = request.headers.get("Authorization") || ""
+  const token = request.headers.get("Authorization") || url.searchParams.get("token") || ""
   try {
-    await jwtVerify(token.slice(7), new TextEncoder().encode(config.jwtSecret))
+    const jwtArray = token.split(" ")
+    const jwtToken = jwtArray[jwtArray.length - 1]
+
+    await jwtVerify(jwtToken, new TextEncoder().encode(config.jwtSecret))
     return NextResponse.next()
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })

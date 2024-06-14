@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid"
+import { uuid as uuidv4 } from "uuidv4"
 
 import { FieldOption } from "./types"
 
@@ -12,7 +12,7 @@ export const objectToConstructor = (
   const parrent = output.find(item => item.uuid === parentUUID)
 
   Object.entries(obj).forEach(([key, value]) => {
-    const uuid = uuidv4()
+    const uuid = uuidv4().toString()
     const isValueIsObject = value !== null && typeof value === "object"
 
     if (parrent?.type === FieldOption.Array && isValueIsObject) {

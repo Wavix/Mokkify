@@ -15,6 +15,10 @@
     svg {
       fill: #c1b6e0;
     }
+
+    :global(.strokes) {
+      stroke: #c1b6e0;
+    }
   }
 
   .menuButtonTitle {
@@ -31,6 +35,10 @@
       svg {
         fill: #fff;
       }
+
+      :global(.strokes) {
+        stroke: #fff;
+      }
     }
 
     .menuButtonTitle {
@@ -41,6 +49,10 @@
   &:hover {
     svg {
       fill: #fff;
+    }
+
+    :global(.strokes) {
+      stroke: #fff;
     }
 
     .menuButtonTitle {

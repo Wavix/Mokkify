@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import { v4 as uuidv4 } from "uuid"
+import { uuid } from "uuidv4"
 
 enum PayloadKeySource {
   Request = "request",
@@ -102,7 +102,7 @@ const parseVars = (
 const parseVar = (key: string): string | number | null => {
   switch (key) {
     case "uuid":
-      return `"${uuidv4()}"`
+      return `"${uuid().toString()}"`
     case "unix":
       return dayjs().unix()
     case "dateYYYYMMDD":

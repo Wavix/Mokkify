@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 import { Op } from "sequelize"
-import { v4 as uuidv4 } from "uuid"
+import { uuid } from "uuidv4"
 
 import { DB, findWithPaginate } from "../database"
 
@@ -30,7 +30,7 @@ class LogService {
     const headers = this.getHeaders(request)
 
     await DB.models.Log.create({
-      uuid: uuidv4(),
+      uuid: uuid().toString(),
       endpoint_id: endpointId,
       request_payload: body,
       response_payload: response.body,

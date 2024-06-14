@@ -1,4 +1,4 @@
-import { v4 as uuidv4 } from "uuid"
+import { uuid as uuidv4 } from "uuidv4"
 
 import { DeleteIcon } from "@chakra-ui/icons"
 
@@ -31,7 +31,7 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
       ...items,
       {
         type: FieldOption.ArrayElement,
-        uuid: uuidv4(),
+        uuid: uuidv4().toString(),
         key: "",
         parentUUID: uuid
       }
@@ -44,7 +44,7 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
       ...items,
       {
         type: FieldOption.String,
-        uuid: uuidv4(),
+        uuid: uuidv4().toString(),
         key: "",
         value: "",
         parentUUID: uuid,
