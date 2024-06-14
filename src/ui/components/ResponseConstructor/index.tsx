@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { v4 as uuidv4 } from "uuid"
+import { uuid as uuidv4 } from "uuidv4"
 
 import { BlockQuote } from "@/ui/components"
 
@@ -95,7 +95,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
       ...constructorData,
       {
         ...(!nest && { type: FieldOption.String, value: "" }),
-        uuid: uuidv4(),
+        uuid: uuidv4().toString(),
         key: "",
         parentUUID
       }
@@ -108,7 +108,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
       ...constructorData,
       {
         type: FieldOption.Array,
-        uuid: uuidv4(),
+        uuid: uuidv4().toString(),
         key: "",
         parentUUID
       }

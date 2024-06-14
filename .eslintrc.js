@@ -91,6 +91,8 @@ module.exports = {
     "class-methods-use-this": "off",
     "lines-between-class-members": "off",
     "no-nested-ternary": "off",
+    "no-await-in-loop": "off",
+    "no-continue": "off",
     "no-unused-expressions": [
       "error",
       {
