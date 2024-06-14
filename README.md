@@ -19,6 +19,8 @@ Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.j
 - 🔄 Relay request support with external hooks
 - 🔮 Intuitive interface
 - 🔐 Authorization
+- 📈 Endpoint RPS graphics
+- 🗄️ Dump and restore configuration
 
 ![Interface example](https://i.imgur.com/KszL9Hb.png)
 
