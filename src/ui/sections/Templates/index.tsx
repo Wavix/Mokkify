@@ -76,7 +76,7 @@ const Templates: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Tamplates</title>
+        <title>Templates</title>
       </Head>
       <SideMenu.Body header="Templates" onNew={() => router.push("/templates/create", undefined, { shallow: true })}>
         {isLoading && <SideMenu.Skeleton />}
