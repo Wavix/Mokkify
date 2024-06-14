@@ -15,7 +15,6 @@ import { Bar } from "react-chartjs-2"
 import { getEndpointRps } from "@/ui/api/stats"
 import { Card } from "@/ui/components"
 
-// import style from "./style.module.scss"
 import type { RPSItem } from "@/ui/api/stats"
 import type { FC } from "react"
 
