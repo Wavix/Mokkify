@@ -1,4 +1,4 @@
-import { uuid } from "uuidv4"
+import { v4 } from "uuid"
 
 import { DB } from "../database"
 
@@ -68,7 +68,7 @@ class EndpointService {
   }
 
   public async createEndpoint(payload: EndpointCreationAttributes): Promise<EndpointAttributes | Error> {
-    const newPayload = this.getPayload({ ...payload, user_id: 1, uuid: uuid().toString() })
+    const newPayload = this.getPayload({ ...payload, user_id: 1, uuid: v4().toString() })
     const exists = await DB.models.Endpoint.findOne({
       where: {
         path: newPayload.path,

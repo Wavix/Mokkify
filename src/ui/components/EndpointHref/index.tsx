@@ -4,6 +4,8 @@ import { Tooltip } from "@chakra-ui/react"
 
 import { MethodBadge } from "../MethodBadge"
 
+import { useSuccessToast } from "@/hooks/useSuccessToast"
+
 import { CopyIcon } from "./icon"
 import style from "./style.module.scss"
 
@@ -15,6 +17,8 @@ interface Props {
 }
 
 export const EndpointHref: FC<Props> = ({ method, href }) => {
+  const successToast = useSuccessToast()
+
   const [baseUrl, setBaseUrl] = useState<string>("")
   const onClick = (event: React.MouseEvent<HTMLElement>) => {
     event.preventDefault()
@@ -26,6 +30,7 @@ export const EndpointHref: FC<Props> = ({ method, href }) => {
 
   const copyEndpoint = async () => {
     navigator.clipboard.writeText(`${baseUrl}${href}`)
+    successToast("Endpoint copied to clipboard")
   }
 
   return (

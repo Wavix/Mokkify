@@ -48,7 +48,7 @@ export const Sidebar: FC = () => {
       <MenuButton
         title="Settings"
         icon={<SettingsIcon />}
-        href="/settings"
+        href="/settings/general"
         active={currentSection === Section.Settings}
       />
       <MenuButton title="Logout" icon={<LogoutIcon />} onClick={logOut} />

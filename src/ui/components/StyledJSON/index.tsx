@@ -11,7 +11,7 @@ interface Props {
 export const StyledJSON: React.FC<Props> = ({ data }) => {
   return (
     <div className={style.jsonView}>
-      <DynamicReactJson src={data} />
+      {data ? <DynamicReactJson src={data} /> : <div className={style.cap}>No data available</div>}
     </div>
   )
 }
