@@ -81,10 +81,14 @@ const response = async (request: Request) => {
 }
 
 const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointAttributes | Error> => {
-  const cacheData = await cache.get(endpointPath, method)
-  if (cacheData) return cacheData
+  try {
+    const cacheData = await cache.get(endpointPath, method)
+    if (cacheData) return cacheData
 
-  return await endpointService.getEndpoint(endpointPath, method)
+    return await endpointService.getEndpoint(endpointPath, method)
+  } catch (error) {
+    return await endpointService.getEndpoint(endpointPath, method)
+  }
 }
 
 const relay = async (
