@@ -26,6 +26,9 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 RUN pnpm install --prod
+
+RUN apk add --no-cache sqlite sqlite-dev
+
 EXPOSE 3000
 
 CMD ["pnpm", "start"]
