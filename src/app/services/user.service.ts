@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt"
+import bcrypt from "bcryptjs"
 import { SignJWT, jwtVerify } from "jose"
 
 import { DB } from "../database"

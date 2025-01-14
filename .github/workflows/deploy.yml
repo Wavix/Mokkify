@@ -1,36 +1,32 @@
-name: Deploy Mokkify
+name: Build and Push Docker image
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [20.x]
-    env:
-      SSH_KEY: ${{secrets.SSH_KEY}}
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - uses: pnpm/action-setup@v3
-        name: Install pnpm
-        with:
-          version: 8
-          run_install: false
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
   
-      - run: pnpm i
-      - run: pnpm build
-      - run: mkdir ~/.ssh
-      - run: echo "$SSH_KEY" >> ~/.ssh/github-action
-      - run: chmod 400 ~/.ssh/github-action
-      - run: echo -e "Host vps\n\tUser ice\n\tHostname mokkify.dev\n\tIdentityFile ~/.ssh/github-action\n\tStrictHostKeyChecking No" >> ~/.ssh/config
-      - run: rsync -re ssh ./.next/ vps:/home/ice/mokkify-demo/mokkify/.next
-      - run: ssh vps "pm2 restart mokkify-demo"
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
+
+      - name: Build Docker image
+        run: |
+          docker build --platform linux/amd64 -t ghcr.io/icevl/mokkify:latest .
+
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/icevl/mokkify:latest
