@@ -28,6 +28,7 @@ COPY --from=builder /app/public ./public
 RUN pnpm install --prod
 
 RUN apk add --no-cache sqlite sqlite-dev
+RUN pnpm rebuild
 
 EXPOSE 3000
 
