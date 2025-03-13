@@ -83,6 +83,9 @@
       "react-dom": "$react-dom"
     }
   },
+  "pnpm": {
+    "neverBuiltDependencies": []
+  },
   "simple-pre-commit": "npx lint-staged",
   "lint-staged": {
     "*.{ts,js}": [

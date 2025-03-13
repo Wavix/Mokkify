@@ -56,7 +56,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ```
 upstream webhook {
-  server 127.0.0.1:7043;
+  server 127.0.0.1:3000;
 }
 
 location / {
