@@ -8,11 +8,12 @@ import type { NextPage } from "next"
 interface Props {
   endpoint: EndpointAttributes
   onEdit?: () => void
+  onDuplicate?: (id: number) => void
   onFlushLogs?: (id: number) => void
   onDelete?: (id: number) => void
 }
 
-export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onFlushLogs, onDelete }) => {
+export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onDuplicate, onFlushLogs, onDelete }) => {
   const [isOpenDelete, setOpenDelete] = useState(false)
   const [isOpenFlushLogs, setOpenFlushLogs] = useState(false)
 
@@ -53,6 +54,7 @@ export const EndpointMenuItem: NextPage<Props> = ({ endpoint, onEdit, onFlushLog
           <ContextButton
             menu={[
               { title: "Edit", onClick: onEdit },
+              ...(onDuplicate ? [{ title: "Duplicate", onClick: () => onDuplicate(endpoint.id) }] : []),
               { title: "Flush logs", onClick: () => setOpenFlushLogs(true) },
               { title: "Delete", onClick: () => setOpenDelete(true) }
             ]}

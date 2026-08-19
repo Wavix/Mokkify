@@ -81,6 +81,15 @@ export const deleteEndpoint = async (id: number): Promise<ApiResponseBasic> => {
   return data
 }
 
+export const duplicateEndpoint = async (id: number): Promise<ApiResponseBasic> => {
+  const response = await fetch(`/backend/endpoint/${id}/duplicate`, {
+    headers: { Authorization: getAuthToken() },
+    method: "POST"
+  })
+  const data = await response.json()
+  return data
+}
+
 export const flushEndpointLogs = async (id: number): Promise<ApiResponseBasic> => {
   const response = await fetch(`/backend/endpoint/${id}/log`, {
     headers: { Authorization: getAuthToken() },

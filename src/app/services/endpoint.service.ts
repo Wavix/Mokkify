@@ -167,6 +167,44 @@ class EndpointService {
     if (!templateResponse?.id) throw new Error("Response template not found")
   }
 
+  public async duplicateEndpoint(endpointId: number): Promise<EndpointAttributes | Error> {
+    const source = await DB.models.Endpoint.findByPk(endpointId)
+    if (!source?.id) throw new Error("Endpoint not found")
+
+    const src = source.toJSON()
+
+    let newPath = `${src.path}-copy`
+    let suffix = 2
+    while (await DB.models.Endpoint.findOne({ where: { path: newPath, method: src.method } })) {
+      newPath = `${src.path}-copy-${suffix}`
+      suffix += 1
+    }
+
+    const created = await DB.models.Endpoint.create({
+      uuid: v4().toString(),
+      title: `${src.title} (copy)`,
+      path: newPath,
+      method: src.method,
+      response_template_id: src.response_template_id,
+      is_multiple_templates: src.is_multiple_templates,
+      max_pending_time: src.max_pending_time,
+      relay_enabled: src.relay_enabled,
+      relay_target: src.relay_target,
+      relay_method: src.relay_method,
+      relay_payload_template_id: src.relay_payload_template_id,
+      user_id: src.user_id
+    })
+
+    const references = await DB.models.EndpointTemplateReference.findAll({ where: { endpoint_id: endpointId } })
+    if (references.length) {
+      await DB.models.EndpointTemplateReference.bulkCreate(
+        references.map(reference => ({ endpoint_id: created.id, template_id: reference.template_id }))
+      )
+    }
+
+    return this.formatEndpoint(created.toJSON())
+  }
+
   private getPayload(payload: EndpointCreationAttributes): EndpointCreationAttributes {
     const newPayload = { ...payload }
     if (newPayload.path[0] === "/") newPayload.path = newPayload.path.slice(1)
