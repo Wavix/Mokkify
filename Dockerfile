@@ -1,4 +1,6 @@
-FROM node:22 AS builder
+# Alpine on both stages: sqlite3 ships linuxmusl prebuilds, while its glibc
+# prebuilds require glibc >= 2.38 (newer than Debian bookworm provides)
+FROM node:22-alpine AS builder
 
 RUN npm install -g pnpm@10
 
@@ -20,14 +22,12 @@ WORKDIR /app
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
+COPY --from=builder /app/next.config.js ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 
 RUN pnpm install --prod
-
-RUN apk add --no-cache sqlite sqlite-dev
-RUN pnpm rebuild
 
 EXPOSE 3000
 
