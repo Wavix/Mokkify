@@ -13,19 +13,28 @@ Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.j
 
 - 🔁 RestAPI mocking
 - 🏗️ Self-hosted
-- ⚡ Caching requests. Throughput up to 600 qps
+- ⚡ In-memory endpoint caching and batched log writes. 2,500+ rps on a single node
 - 🧩 Flexible response builder and templates
 - ⏲️ Response delay emulation
 - 🔄 Relay request support with external hooks
-- 🔮 Intuitive interface
+- 🔮 Intuitive interface with light & dark themes
 - 🔐 Authorization
 - 📈 Endpoint RPS graphics
 - 🗄️ Dump and restore configuration
 
-![Interface example](https://i.imgur.com/KszL9Hb.png)
+![Interface example (light theme)](docs/screenshot-light.png)
+
+![Interface example (dark theme)](docs/screenshot-dark.png)
+
+## Tech stack
+
+Next.js 16 (Turbopack) · React 19 · Tailwind CSS 4 + shadcn/ui · Sequelize + SQLite (WAL)
 
 ## Requirements
-- Sqlite3
+
+- Node.js >= 20.17
+- pnpm 10
+- SQLite3
 
 ## Installation & Running
 
@@ -38,7 +47,7 @@ git clone https://github.com/Wavix/Mokkify.git
 Then, navigate to the project directory and install the necessary dependencies:
 
 ```bash
-cd mokkify
+cd Mokkify
 pnpm install
 pnpm cli dbcreate
 pnpm cli useradd <login> <password>
@@ -50,9 +59,18 @@ After that, start the project in development mode:
 pnpm dev
 ```
 
+Or build and run the production server:
+
+```bash
+pnpm build
+pnpm start
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 ## Nginx config for deployment
+
+Response compression is intentionally disabled in the app server (`compress: false`) - enable gzip in nginx instead.
 
 ```
 upstream webhook {
@@ -77,4 +95,3 @@ If you wish to contribute to the project's development, feel free to fork the re
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for more information.
-
