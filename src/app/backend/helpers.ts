@@ -83,6 +83,11 @@ const parseVars = (
       const [source, ...nestedKeyArray] = key.split(".")
       const nestedKey = nestedKeyArray.join(".")
 
+      // Unknown sources (e.g. an email like user@example.com) are not variables
+      const isKnownSource = (Object.values(PayloadKeySource) as Array<string>).includes(source)
+      // eslint-disable-next-line no-continue
+      if (!isKnownSource) continue
+
       let body: unknown = responseBody
       if (source === PayloadKeySource.Request) body = requestBody
       if (source === PayloadKeySource.Path) body = pathParams

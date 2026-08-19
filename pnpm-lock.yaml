@@ -65,6 +65,9 @@ importers:
       jose:
         specifier: ^6.2.9
         version: 6.2.9
+      js-yaml:
+        specifier: ^5.3.0
+        version: 5.3.0
       lucide-react:
         specifier: ^1.32.0
         version: 1.32.0(react@19.2.8)
@@ -150,6 +153,9 @@ importers:
       '@swc/core':
         specifier: ^1.16.1
         version: 1.16.1(@swc/helpers@0.5.23)
+      '@types/js-yaml':
+        specifier: ^4.0.9
+        version: 4.0.9
       autoprefixer:
         specifier: ^10.4.16
         version: 10.5.4(postcss@8.5.26)
@@ -2683,6 +2689,9 @@ packages:
   '@types/js-cookie@3.0.6':
     resolution: {integrity: sha512-wkw9yd1kEXOPnvEeEV1Go1MmxtBJL0RR79aOTAApecWFVu7w0NNXNqhcWgvw2YgZDYadliXkl14pa3WXw5jlCQ==}
 
+  '@types/js-yaml@4.0.9':
+    resolution: {integrity: sha512-k4MGaQl5TGo/iipqb2UDG2UwjXziSWkh0uysQelTlJpX1qGlpUZYm8PnO4DxG1qBomtJUdYJ6qR6xdIah10JLg==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -4202,6 +4211,10 @@ packages:
 
   js-yaml@4.3.1:
     resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
+    hasBin: true
+
+  js-yaml@5.3.0:
+    resolution: {integrity: sha512-muutsYr+e2+d3rTgUGslq5rxbBlUy3cJ61IsHag2QNDQV+7zXWjkUpmALIajhrlLlrgRUiymj6U3zUr/TMK84Q==}
     hasBin: true
 
   jsesc@3.1.0:
@@ -8127,6 +8140,8 @@ snapshots:
 
   '@types/js-cookie@3.0.6': {}
 
+  '@types/js-yaml@4.0.9': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
@@ -9846,6 +9861,10 @@ snapshots:
   js-tokens@4.0.0: {}
 
   js-yaml@4.3.1:
+    dependencies:
+      argparse: 2.0.1
+
+  js-yaml@5.3.0:
     dependencies:
       argparse: 2.0.1
 

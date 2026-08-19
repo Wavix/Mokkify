@@ -14,7 +14,11 @@ Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.j
 - 🔁 RestAPI mocking
 - 🏗️ Self-hosted
 - ⚡ In-memory endpoint caching and batched log writes. 2,500+ rps on a single node
-- 🧩 Flexible response builder and templates
+- 🧭 Path parameters and wildcards: `/users/:id`, `/files/*`
+- 🧩 Flexible response builder and templates with variables
+- 🎛️ Custom response headers and content types (JSON, XML, plain text, HTML, CSV)
+- 🌐 CORS out of the box (preflight, custom headers, credentials)
+- 📥 OpenAPI / Swagger import: generate endpoints from a spec
 - ⏲️ Response delay emulation
 - 🔄 Relay request support with external hooks
 - 🔮 Intuitive interface with light & dark themes
@@ -67,6 +71,20 @@ pnpm start
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Template variables
+
+Response templates (and relay payloads) support variables that are resolved per request:
+
+| Variable | Value |
+| --- | --- |
+| `@uuid` | Random UUID v4 |
+| `@date` | Current date/time (ISO 8601) |
+| `@dateYYYYMMDD` | Current date as `YYYYMMDD` |
+| `@unix` | Current unix timestamp |
+| `@request.field.nested` | Value from the request body or query string |
+| `@response.field` | Value from the mock response body (relay payloads) |
+| `@path.param` | Path parameter value (`/users/:param`); wildcard tail: `@path.wildcard` |
 
 ## Configuration
 

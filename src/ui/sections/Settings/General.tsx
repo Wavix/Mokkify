@@ -15,6 +15,7 @@ interface Props {
 export const SettingsGeneral: FC<Props> = ({ token }) => {
   const [settings, setSettings] = useState<SettingsType | null>(null)
   const [file, setFile] = useState<File | null>(null)
+  const [specFile, setSpecFile] = useState<File | null>(null)
 
   const appVersion = process.env.NEXT_PUBLIC_APP_VERSION
   const failureToast = useFailureToast()
@@ -43,6 +44,35 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
       })
 
       successToast("Backup uploaded")
+    } catch (error) {
+      failureToast((error as Error).message)
+    }
+  }
+
+  const onChangeSpecHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!event.target.files || !event.target.files.length) return
+    setSpecFile(event.target.files[0])
+  }
+
+  const importOpenApiHandler = async () => {
+    if (!specFile) return
+
+    const formData = new FormData()
+    formData.append("file", specFile)
+
+    try {
+      const response = await fetch("/backend/settings/openapi", {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      const data = await response.json()
+      if (data.error) return failureToast(data.error)
+
+      const skipped = data.skipped?.length ? `, skipped ${data.skipped.length} existing` : ""
+      successToast(`Imported ${data.created} endpoints${skipped}`)
     } catch (error) {
       failureToast((error as Error).message)
     }
@@ -101,6 +131,29 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
         <Card.Actions>
           <Button type="button" data-id="settings.restore" disabled={!file} onClick={uploadDumpHandler}>
             Restore
+          </Button>
+        </Card.Actions>
+      </Card.Container>
+
+      <Card.Container gutterTop>
+        <Card.Header>Import OpenAPI</Card.Header>
+        <BlockQuote>
+          Upload an OpenAPI / Swagger specification (YAML or JSON) to generate endpoints and response templates from
+          its paths and examples. Path parameters like {"{id}"} become :id. Existing endpoints are skipped.
+        </BlockQuote>
+        <div className="pt-4">
+          <Input
+            type="file"
+            className="max-w-sm"
+            data-id="settings.openapiFile"
+            onChange={onChangeSpecHandler}
+            accept=".yaml,.yml,.json"
+          />
+        </div>
+
+        <Card.Actions>
+          <Button type="button" data-id="settings.openapiImport" disabled={!specFile} onClick={importOpenApiHandler}>
+            Import
           </Button>
         </Card.Actions>
       </Card.Container>
