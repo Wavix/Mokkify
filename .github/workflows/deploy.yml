@@ -7,10 +7,6 @@ on:
     tags:
       - "v*"
 
-permissions:
-  contents: read
-  packages: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -27,17 +23,17 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_TOKEN }}
 
       - name: Build Docker image
         run: |
-          TAGS="-t ghcr.io/wavix/mokkify:latest"
+          TAGS="-t ghcr.io/icevl/mokkify:latest"
           if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
             VERSION="${GITHUB_REF#refs/tags/v}"
-            TAGS="$TAGS -t ghcr.io/wavix/mokkify:$VERSION"
+            TAGS="$TAGS -t ghcr.io/icevl/mokkify:$VERSION"
           fi
           docker build --platform linux/amd64 $TAGS .
 
       - name: Push Docker image
         run: |
-          docker push --all-tags ghcr.io/wavix/mokkify
+          docker push --all-tags ghcr.io/icevl/mokkify
