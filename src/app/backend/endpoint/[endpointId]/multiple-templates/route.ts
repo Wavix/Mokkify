@@ -6,7 +6,7 @@ import { RandomTemplates } from "@/app/services"
 const randomTemplates = new RandomTemplates()
 
 export const POST = async (request: Request, query: NextQuery) => {
-  const endpointId = Number(query.params.endpointId || 0)
+  const endpointId = Number((await query.params).endpointId || 0)
   const payload = await getBodyPayload(request)
 
   try {
@@ -18,7 +18,7 @@ export const POST = async (request: Request, query: NextQuery) => {
 }
 
 export const GET = async (_: Request, query: NextQuery) => {
-  const endpointId = Number(query.params.endpointId || 0)
+  const endpointId = Number((await query.params).endpointId || 0)
   if (!endpointId) return NextResponse.json({ templates: [] })
 
   const templates = await randomTemplates.getEndpointTemplates(endpointId)

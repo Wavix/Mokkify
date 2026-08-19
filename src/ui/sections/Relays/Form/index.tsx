@@ -2,17 +2,14 @@ import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 
-import { Button, FormControl } from "@chakra-ui/react"
-
 import { parseResponseBody } from "@/app/backend/helpers"
+import { Button } from "@/components/ui/button"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as relaysApi from "@/ui/api/relays"
 import { Card, StyledJSON, Skeleton, ResponseConstructor, CategoryBlock } from "@/ui/components"
 import { Input } from "@/ui/components/Form"
 import { SectionWrapper } from "@/ui/components/layout"
-
-import style from "./style.module.scss"
 
 import type { RelayPayloadTemplateAttributes } from "@/app/database/interfaces/relay-payload-template.interface"
 import type { FC, FormEvent } from "react"
@@ -132,14 +129,14 @@ export const RelayTemplatesForm: FC<Props> = ({ id, getList }) => {
           {!isLoading && (
             <form onSubmit={onSubmitHandler}>
               <CategoryBlock title="General">
-                <div className={style.templateGeneral}>
-                  <FormControl isRequired>
+                <div className="grid grid-cols-2 gap-[14px]">
+                  <div>
                     <Input
                       title="Title"
                       onChange={value => setFormData({ ...formData, title: value })}
                       value={formData.title}
                     />
-                  </FormControl>
+                  </div>
                 </div>
               </CategoryBlock>
 
@@ -148,7 +145,7 @@ export const RelayTemplatesForm: FC<Props> = ({ id, getList }) => {
               </CategoryBlock>
 
               <Card.Actions>
-                <Button type="submit" display="block" color="white" colorScheme="purple">
+                <Button type="submit" data-id="relayForm.submit">
                   {isEditing ? "Save" : "Create"}
                 </Button>
               </Card.Actions>

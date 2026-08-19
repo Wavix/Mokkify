@@ -9,7 +9,7 @@ import { EndpointService } from "@/app/services"
 const endpointService = new EndpointService()
 
 export const GET = async (_: Request, query: NextQuery) => {
-  const endpointId = Number(query.params.endpointId || 0)
+  const endpointId = Number((await query.params).endpointId || 0)
   if (endpointId) return await getEndpointById(endpointId)
 
   return NextResponse.json({ error: "Error while executing request" }, { status: 500 })
@@ -28,7 +28,7 @@ const getEndpointById = async (endpointId: number) => {
 }
 
 const updateEndpoint = async (request: Request, query: NextQuery) => {
-  const endpointId = Number(query.params.endpointId || 0)
+  const endpointId = Number((await query.params).endpointId || 0)
   if (!endpointId) return NextResponse.json({ error: "Endpoint id must be a number" }, { status: 500 })
 
   const payload = await getBodyPayload(request)
@@ -51,7 +51,7 @@ const updateEndpoint = async (request: Request, query: NextQuery) => {
 }
 
 const deleteEndpoint = async (request: Request, query: NextQuery) => {
-  const endpointId = Number(query.params.endpointId || 0)
+  const endpointId = Number((await query.params).endpointId || 0)
   if (!endpointId) return NextResponse.json({ error: "Endpoint id must be a number" }, { status: 500 })
 
   try {

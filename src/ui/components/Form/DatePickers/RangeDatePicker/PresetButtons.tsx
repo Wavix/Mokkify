@@ -1,7 +1,8 @@
 import React from "react"
 
 import { getYesterday, getToday, getTwoDaysAgo, getThisWeek, getThisMonth } from "../helpers"
-import style from "../style.module.scss"
+
+import { Button } from "@/components/ui/button"
 
 import type { FC } from "react"
 
@@ -53,31 +54,55 @@ export const PresetButtons: FC<Props> = ({ buttonsVisible, onChange }) => {
   }
 
   return (
-    <div className={style.buttonsContainer}>
+    <div className="flex flex-col gap-1">
       {showTodayButton && (
-        <div className={style.presetButton} onClick={onSetToday}>
+        <Button variant="ghost" size="sm" className="justify-start" data-id="datePreset.today" onClick={onSetToday}>
           Today
-        </div>
+        </Button>
       )}
       {showYesterdayButton && (
-        <div className={style.presetButton} onClick={onSetYesterday}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="justify-start"
+          data-id="datePreset.yesterday"
+          onClick={onSetYesterday}
+        >
           Yesterday
-        </div>
+        </Button>
       )}
       {showTwoDaysButton && (
-        <div className={style.presetButton} onClick={onSetTwoDaysAgo}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="justify-start"
+          data-id="datePreset.twoDaysAgo"
+          onClick={onSetTwoDaysAgo}
+        >
           2 days ago
-        </div>
+        </Button>
       )}
       {showThisWeekButton && (
-        <div className={style.presetButton} onClick={onSetThisWeek}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="justify-start"
+          data-id="datePreset.thisWeek"
+          onClick={onSetThisWeek}
+        >
           This week
-        </div>
+        </Button>
       )}
       {showThisMonthButton && (
-        <div className={style.presetButton} onClick={onSetThisMonth}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="justify-start"
+          data-id="datePreset.thisMonth"
+          onClick={onSetThisMonth}
+        >
           This month
-        </div>
+        </Button>
       )}
     </div>
   )

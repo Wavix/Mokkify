@@ -1,5 +1,6 @@
 import type { Models } from "../database/models"
-import type Sequelize, { Model } from "sequelize"
+import type Sequelize from "sequelize"
+import type { Model } from "sequelize"
 
 declare module "sequelize" {
   type NonConstructorKeys<T> = { [P in keyof T]: T[P] extends new () => any ? never : P }[keyof T]
@@ -16,7 +17,7 @@ declare module "sequelize" {
 
 declare global {
   export interface NextQuery {
-    params: { [key: string]: string | Array<string> }
+    params: Promise<{ [key: string]: string | Array<string> }>
   }
 
   export interface ApiResponseError {

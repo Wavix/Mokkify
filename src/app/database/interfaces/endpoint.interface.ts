@@ -25,8 +25,10 @@ export interface EndpointAttributes {
   multiple_responses?: NonAttribute<Array<EndpointTemplateReferenceWithTemplate>>
 }
 
-export interface EndpointCreationAttributes
-  extends Optional<EndpointAttributes, "id" | "uuid" | "user_id" | "created_at"> {
+export interface EndpointCreationAttributes extends Optional<
+  EndpointAttributes,
+  "id" | "uuid" | "user_id" | "created_at"
+> {
   multiple_responses_templates?: Array<number>
 }
 

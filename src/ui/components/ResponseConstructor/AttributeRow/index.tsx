@@ -1,11 +1,8 @@
-import { DeleteIcon } from "@chakra-ui/icons"
-import { FormControl } from "@chakra-ui/react"
+import { Trash2 } from "lucide-react"
 
 import { FieldOption } from "../types"
 
 import { Input, Select } from "@/ui/components/Form"
-
-import style from "./style.module.scss"
 
 import type { ResponseConstructorItem, ObjectAttribute } from "../types"
 import type { FC } from "react"
@@ -30,14 +27,14 @@ const booleanOptions = [
 
 export const AttributeRow: FC<Props> = ({ item, onUpdate, onDelete }) => {
   return (
-    <div className={style.objectRow}>
+    <div className="mb-[14px] grid grid-cols-[repeat(3,1fr)_24px] items-center gap-x-[14px]">
       {!item.isArrayItem && (
-        <FormControl isRequired>
-          <Input onChange={value => onUpdate(item.uuid, "key", value)} value={item.key} placeholder="key" />
-        </FormControl>
+        <div>
+          <Input onChange={value => onUpdate(item.uuid, "key", value)} value={item.key} placeholder="key" isRequired />
+        </div>
       )}
 
-      <FormControl>
+      <div>
         <Select
           value={item.type}
           options={[
@@ -50,9 +47,9 @@ export const AttributeRow: FC<Props> = ({ item, onUpdate, onDelete }) => {
           ]}
           onChange={value => onUpdate(item.uuid, "type", value)}
         />
-      </FormControl>
+      </div>
 
-      <FormControl>
+      <div>
         {item.type === FieldOption.String && (
           <Input
             onChange={value => onUpdate(item.uuid, "value", value)}
@@ -90,8 +87,15 @@ export const AttributeRow: FC<Props> = ({ item, onUpdate, onDelete }) => {
             onChange={value => onUpdate(item.uuid, "value", !!value)}
           />
         )}
-      </FormControl>
-      <DeleteIcon _hover={{ cursor: "pointer" }} fontSize="19px" onClick={() => onDelete(item.uuid)} />
+      </div>
+      <button
+        type="button"
+        data-id="attributeRow.delete"
+        className="text-muted-foreground hover:text-destructive cursor-pointer"
+        onClick={() => onDelete(item.uuid)}
+      >
+        <Trash2 className="size-4" />
+      </button>
     </div>
   )
 }

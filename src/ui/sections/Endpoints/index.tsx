@@ -54,6 +54,17 @@ const Endpoints: NextPage = () => {
     }
   }
 
+  const onDuplicateEndpoint = async (id: number) => {
+    try {
+      const response = await API.duplicateEndpoint(id)
+      if (!response.success) return failureToast("Error duplicating endpoint")
+      getEndpoints(false)
+      successToast("Endpoint duplicated")
+    } catch (error) {
+      failureToast((error as Error).message)
+    }
+  }
+
   const onFlushLogs = async (id: number) => {
     try {
       const response = await API.flushEndpointLogs(id)
@@ -100,6 +111,7 @@ const Endpoints: NextPage = () => {
                 <EndpointMenuItem
                   endpoint={endpoint}
                   onEdit={() => router.push(`/endpoints/${endpoint.id}/edit`, undefined, { shallow: true })}
+                  onDuplicate={onDuplicateEndpoint}
                   onFlushLogs={onFlushLogs}
                   onDelete={onDeleteEndpoint}
                 />

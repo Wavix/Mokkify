@@ -28,8 +28,11 @@ export const ResponseTemplate = (
         type: DataTypes.VIRTUAL,
         get() {
           const body = this.getDataValue("body")
+          const contentType = this.getDataValue("content_type") || "application/json"
           const parsResponse = parseResponseBody(body)
           if (!parsResponse) return null
+
+          if (!contentType.includes("json")) return parsResponse
 
           try {
             return JSON.parse(parsResponse)
@@ -41,6 +44,15 @@ export const ResponseTemplate = (
       code: {
         type: DataTypes.INTEGER,
         defaultValue: 200
+      },
+      content_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "application/json"
+      },
+      headers: {
+        type: DataTypes.JSON,
+        allowNull: true
       },
       user_id: {
         type: DataTypes.INTEGER

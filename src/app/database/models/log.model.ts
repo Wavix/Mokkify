@@ -89,6 +89,10 @@ export const Log = (sequelize: Sequelize.Sequelize, DataTypes: typeof Sequelize.
         {
           fields: ["endpoint_id"],
           using: "BTREE"
+        },
+        {
+          fields: ["created_at"],
+          using: "BTREE"
         }
       ]
     }

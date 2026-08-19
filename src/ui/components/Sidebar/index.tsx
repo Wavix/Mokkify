@@ -1,11 +1,11 @@
+import { ChartColumn, FileJson2, LogOut, Moon, Send, Settings, Sun, Waypoints } from "lucide-react"
 import { useRouter } from "next/router"
-import { useContext } from "react"
+import { useTheme } from "next-themes"
+import { useContext, useEffect, useState } from "react"
 
 import { LoginContext } from "@/ui/LoginContext"
 
 import { MenuButton } from "./MenuButton"
-import { HomeIcon, TemplatesIcon, LogoutIcon, RelayIcon, StatsIcon, SettingsIcon } from "./icons"
-import style from "./style.module.scss"
 
 import type { FC } from "react"
 
@@ -15,6 +15,20 @@ enum Section {
   Relay = "relays",
   Stats = "stats",
   Settings = "settings"
+}
+
+const ThemeToggle: FC = () => {
+  const { resolvedTheme, setTheme } = useTheme()
+  const [isMounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const icon =
+    isMounted && resolvedTheme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />
+
+  return <MenuButton title="Theme" icon={icon} onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")} />
 }
 
 export const Sidebar: FC = () => {
@@ -30,28 +44,41 @@ export const Sidebar: FC = () => {
   }
 
   return (
-    <div className={style.sidebar}>
+    <div className="bg-rail border-border fixed top-0 left-0 z-10 flex h-full w-[62px] flex-col items-center gap-0.5 border-r pt-6 pb-3">
       <MenuButton
         title="Endpoints"
-        icon={<HomeIcon />}
+        icon={<Waypoints className="size-[18px]" />}
         href="/endpoints"
         active={currentSection === Section.Endpoints}
       />
       <MenuButton
         title="Templates"
-        icon={<TemplatesIcon />}
+        icon={<FileJson2 className="size-[18px]" />}
         href="/templates"
         active={currentSection === Section.Templates}
       />
-      <MenuButton title="Relay" icon={<RelayIcon />} href="/relays" active={currentSection === Section.Relay} />
-      <MenuButton title="Stats" icon={<StatsIcon />} href="/stats" active={currentSection === Section.Stats} />
+      <MenuButton
+        title="Relay"
+        icon={<Send className="size-[18px]" />}
+        href="/relays"
+        active={currentSection === Section.Relay}
+      />
+      <MenuButton
+        title="Stats"
+        icon={<ChartColumn className="size-[18px]" />}
+        href="/stats"
+        active={currentSection === Section.Stats}
+      />
       <MenuButton
         title="Settings"
-        icon={<SettingsIcon />}
+        icon={<Settings className="size-[18px]" />}
         href="/settings/general"
         active={currentSection === Section.Settings}
       />
-      <MenuButton title="Logout" icon={<LogoutIcon />} onClick={logOut} />
+      <div className="mt-auto">
+        <ThemeToggle />
+        <MenuButton title="Logout" icon={<LogOut className="size-[18px]" />} onClick={logOut} />
+      </div>
     </div>
   )
 }

@@ -1,11 +1,9 @@
-import style from "./style.module.scss"
-
 import type { FC, ReactNode } from "react"
 
-interface Props {
-  children: ReactNode
-}
-
-export const BlockQuote: FC<Props> = ({ children }) => {
-  return <blockquote className={style.blockQuote}>{children}</blockquote>
+export const BlockQuote: FC<{ children: ReactNode }> = ({ children }) => {
+  return (
+    <blockquote className="bg-muted/50 text-muted-foreground border-foreground/20 w-full rounded-md border-l-2 p-3 text-[13px]">
+      {children}
+    </blockquote>
+  )
 }

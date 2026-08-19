@@ -1,9 +1,8 @@
-import classNames from "classnames"
 import { useRouter } from "next/router"
 
-import style from "./style.module.scss"
+import { cn } from "@/lib/utils"
 
-import type { FC } from "react"
+import type { FC, JSX } from "react"
 
 interface Props {
   icon: JSX.Element
@@ -22,9 +21,26 @@ export const MenuButton: FC<Props> = ({ icon, href, title, active, onClick }) =>
   }
 
   return (
-    <div className={classNames(style.menuButtonWrapper, { [style.active]: active })} onClick={onClickHandler}>
-      <div className={style.menuButtonIconWrapper}>{icon}</div>
-      <div className={style.menuButtonTitle}>{title}</div>
-    </div>
+    <button
+      type="button"
+      data-id={`sidebar.${title.toLowerCase()}`}
+      className={cn(
+        "group grid cursor-pointer justify-items-center gap-1 border-none bg-transparent pb-2.5",
+        "text-rail-foreground hover:text-rail-accent-foreground",
+        active && "text-rail-accent-foreground"
+      )}
+      onClick={onClickHandler}
+    >
+      <span
+        className={cn(
+          "flex size-9 items-center justify-center rounded-md transition-colors",
+          "group-hover:bg-rail-accent/60",
+          active && "bg-rail-accent group-hover:bg-rail-accent"
+        )}
+      >
+        {icon}
+      </span>
+      <span className="text-[10px] leading-none font-medium select-none">{title}</span>
+    </button>
   )
 }

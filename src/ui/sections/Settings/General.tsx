@@ -1,15 +1,12 @@
-import getConfig from "next/config"
 import React, { useEffect, useState, type FC } from "react"
 
-import { Button } from "@chakra-ui/react"
-
+import { Button } from "@/components/ui/button"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import { getSettings, type Settings as SettingsType } from "@/ui/api/settings"
 import { Card, BlockQuote } from "@/ui/components"
+import { FilePicker } from "@/ui/components/Form"
 import { SectionWrapper } from "@/ui/components/layout"
-
-import style from "./style.module.scss"
 
 interface Props {
   token: string
@@ -18,18 +15,13 @@ interface Props {
 export const SettingsGeneral: FC<Props> = ({ token }) => {
   const [settings, setSettings] = useState<SettingsType | null>(null)
   const [file, setFile] = useState<File | null>(null)
+  const [specFile, setSpecFile] = useState<File | null>(null)
 
-  const { publicRuntimeConfig } = getConfig()
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION
   const failureToast = useFailureToast()
   const successToast = useSuccessToast()
 
-  const newVersionAvailable =
-    publicRuntimeConfig?.version && settings?.last_version && settings?.last_version !== publicRuntimeConfig?.version
-
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || !event.target.files.length) return
-    setFile(event.target.files[0])
-  }
+  const newVersionAvailable = appVersion && settings?.last_version && settings?.last_version !== appVersion
 
   const uploadDumpHandler = async () => {
     if (!file) return
@@ -52,6 +44,30 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
     }
   }
 
+  const importOpenApiHandler = async () => {
+    if (!specFile) return
+
+    const formData = new FormData()
+    formData.append("file", specFile)
+
+    try {
+      const response = await fetch("/backend/settings/openapi", {
+        method: "POST",
+        body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      const data = await response.json()
+      if (data.error) return failureToast(data.error)
+
+      const skipped = data.skipped?.length ? `, skipped ${data.skipped.length} existing` : ""
+      successToast(`Imported ${data.created} endpoints${skipped}`)
+    } catch (error) {
+      failureToast((error as Error).message)
+    }
+  }
+
   const fetchSettings = async () => {
     try {
       const response = await getSettings()
@@ -68,14 +84,13 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
   return (
     <SectionWrapper title="Settings" description="General settings">
       {newVersionAvailable && (
-        <div className={style.newVersion}>
+        <div className="mb-[14px]">
           <BlockQuote>
             <p>
               <b>New version available</b>
             </p>
-            Current version: {publicRuntimeConfig.version}
-            <br />
-            Last version: {settings.last_version}
+            <p>Current version: {appVersion}</p>
+            <p>Last version: {settings.last_version}</p>
           </BlockQuote>
         </div>
       )}
@@ -86,7 +101,7 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
 
         <Card.Actions>
           <a href={`/backend/settings/dump?token=${token}`} target="_blank" rel="noopener noreferrer">
-            <Button type="submit" color="white" colorScheme="purple">
+            <Button type="button" data-id="settings.download">
               Download
             </Button>
           </a>
@@ -95,11 +110,28 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
 
       <Card.Container gutterTop>
         <Card.Header>Restore</Card.Header>
-        <input type="file" onChange={onChangeHandler} accept="text/csv" />
+        <FilePicker accept="text/csv" dataId="settings.restoreFile" onChange={selected => setFile(selected)} />
 
         <Card.Actions>
-          <Button type="submit" color="white" colorScheme="purple" isDisabled={!file} onClick={uploadDumpHandler}>
+          <Button type="button" data-id="settings.restore" disabled={!file} onClick={uploadDumpHandler}>
             Restore
+          </Button>
+        </Card.Actions>
+      </Card.Container>
+
+      <Card.Container gutterTop>
+        <Card.Header>Import OpenAPI</Card.Header>
+        <BlockQuote>
+          Upload an OpenAPI / Swagger specification (YAML or JSON) to generate endpoints and response templates from
+          its paths and examples. Path parameters like {"{id}"} become :id. Existing endpoints are skipped.
+        </BlockQuote>
+        <div className="pt-4">
+          <FilePicker accept=".yaml,.yml,.json" dataId="settings.openapiFile" onChange={selected => setSpecFile(selected)} />
+        </div>
+
+        <Card.Actions>
+          <Button type="button" data-id="settings.openapiImport" disabled={!specFile} onClick={importOpenApiHandler}>
+            Import
           </Button>
         </Card.Actions>
       </Card.Container>

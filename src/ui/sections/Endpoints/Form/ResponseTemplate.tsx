@@ -5,8 +5,6 @@ import * as endpointsApi from "@/ui/api/endpoints"
 import * as templatesApi from "@/ui/api/templates"
 import { Select, Switch } from "@/ui/components/Form"
 
-import style from "./style.module.scss"
-
 import type { EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { ResponseTemplateAttributes } from "@/app/database/interfaces/response-template.interface"
 import type { FC } from "react"
@@ -15,10 +13,11 @@ interface Props {
   isEditing: boolean
   formData: Partial<EndpointCreationAttributes>
   onTemplatesLoad: (templates: Array<ResponseTemplateAttributes>) => void
+  onMultipleTemplatesLoad: (templates: Array<number>) => void
   onChange: (data: Partial<EndpointCreationAttributes>) => void
 }
 
-export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onTemplatesLoad }) => {
+export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onTemplatesLoad, onMultipleTemplatesLoad }) => {
   const failureToast = useFailureToast()
   const [templates, setTemplates] = useState<Array<ResponseTemplateAttributes>>([])
 
@@ -36,11 +35,11 @@ export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onT
   }
 
   const loadEndpointMultipleTemplates = async () => {
-    if (!isEditing) return
+    if (!isEditing || !formData.id) return
 
     try {
       const response = await endpointsApi.getEndpointMultipleTemplates(Number(formData.id))
-      onChange({ ...formData, multiple_responses_templates: response.templates })
+      onMultipleTemplatesLoad(response.templates)
     } catch (error) {
       return failureToast((error as Error).message)
     }
@@ -55,7 +54,7 @@ export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onT
   }, [formData.id])
 
   return (
-    <div className={style.templateBehaviorContainer}>
+    <div className="grid grid-cols-[auto_1fr] gap-x-5">
       <div>
         <Switch
           title="Random template"

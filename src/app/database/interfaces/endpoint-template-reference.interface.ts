@@ -16,11 +16,14 @@ export interface MultipleTemplateResponse {
   templates: Array<number>
 }
 
-export interface EndpointTemplateReferenceCreationAttributes
-  extends Optional<EndpointTemplateReferenceAttributes, "id" | "created_at"> {}
+export interface EndpointTemplateReferenceCreationAttributes extends Optional<
+  EndpointTemplateReferenceAttributes,
+  "id" | "created_at"
+> {}
 
 export interface EndpointTemplateReferenceInstance
-  extends Model<EndpointTemplateReferenceAttributes, EndpointTemplateReferenceCreationAttributes>,
+  extends
+    Model<EndpointTemplateReferenceAttributes, EndpointTemplateReferenceCreationAttributes>,
     EndpointTemplateReferenceAttributes {}
 
 export interface EndpointTemplateReferenceModel extends ModelStatic<EndpointTemplateReferenceInstance> {}

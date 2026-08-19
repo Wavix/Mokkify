@@ -9,7 +9,7 @@ import { RelayService } from "@/app/services"
 const relayService = new RelayService()
 
 export const GET = async (_: Request, query: NextQuery) => {
-  const relayTemplateId = Number(query.params.relayId || 0)
+  const relayTemplateId = Number((await query.params).relayId || 0)
   if (relayTemplateId) return await getRelayTemplateById(relayTemplateId)
 
   return NextResponse.json({ error: "Error while executing request" }, { status: 500 })
@@ -22,13 +22,13 @@ const getRelayTemplateById = async (relayTemplateId: number) => {
   try {
     const relay = await relayService.getRelayTemplateById(relayTemplateId)
     return NextResponse.json({ relay })
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Error while executing request" }, { status: 500 })
   }
 }
 
 const updateRelayTemplate = async (request: Request, query: NextQuery) => {
-  const relayTemplateId = Number(query.params.relayId || 0)
+  const relayTemplateId = Number((await query.params).relayId || 0)
   if (!relayTemplateId) return NextResponse.json({ error: "Relay template id must be a number" }, { status: 500 })
 
   const payload = await getBodyPayload(request)
@@ -48,7 +48,7 @@ const updateRelayTemplate = async (request: Request, query: NextQuery) => {
 }
 
 const deleteRelayTemplate = async (_: Request, query: NextQuery) => {
-  const relayTemplateId = Number(query.params.relayId || 0)
+  const relayTemplateId = Number((await query.params).relayId || 0)
   if (!relayTemplateId) return NextResponse.json({ error: "Relay template id must be a number" }, { status: 500 })
 
   try {

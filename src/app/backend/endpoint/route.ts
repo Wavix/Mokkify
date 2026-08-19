@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { cache } from "../../cache"
 import { EndpointService } from "../../services"
 import { getBodyPayload } from "../helpers"
 
@@ -29,6 +30,7 @@ const createEndpoint = async (request: Request) => {
 
   try {
     const endpoint = await endpointService.createEndpoint(payload)
+    await cache.clear()
     return NextResponse.json({ endpoint })
   } catch (error) {
     return NextResponse.json({ error: (error as Error).message }, { status: 400 })

@@ -1,3 +1,4 @@
+import { Op } from "sequelize"
 import { v4 } from "uuid"
 
 import { DB } from "../database"
@@ -35,6 +36,36 @@ class EndpointService {
 
     if (!response) throw new Error("Endpoint not found")
     return response.toJSON()
+  }
+
+  public async getPatternEndpoints(): Promise<Array<EndpointAttributes>> {
+    const response = await DB.models.Endpoint.findAll({
+      where: {
+        [Op.or]: [{ path: { [Op.like]: "%:%" } }, { path: { [Op.like]: "%*%" } }]
+      },
+      include: [
+        {
+          model: DB.models.ResponseTemplate,
+          as: "response"
+        },
+        {
+          model: DB.models.RelayPayloadTemplate,
+          as: "relay_payload"
+        },
+        {
+          model: DB.models.EndpointTemplateReference,
+          as: "multiple_responses",
+          include: [
+            {
+              model: DB.models.ResponseTemplate,
+              as: "response"
+            }
+          ]
+        }
+      ]
+    })
+
+    return response.map(item => item.toJSON())
   }
 
   public async getEndpointById(id: number): Promise<EndpointAttributes | Error> {
@@ -134,6 +165,44 @@ class EndpointService {
 
     const templateResponse = await DB.models.ResponseTemplate.findByPk(payload.response_template_id)
     if (!templateResponse?.id) throw new Error("Response template not found")
+  }
+
+  public async duplicateEndpoint(endpointId: number): Promise<EndpointAttributes | Error> {
+    const source = await DB.models.Endpoint.findByPk(endpointId)
+    if (!source?.id) throw new Error("Endpoint not found")
+
+    const src = source.toJSON()
+
+    let newPath = `${src.path}-copy`
+    let suffix = 2
+    while (await DB.models.Endpoint.findOne({ where: { path: newPath, method: src.method } })) {
+      newPath = `${src.path}-copy-${suffix}`
+      suffix += 1
+    }
+
+    const created = await DB.models.Endpoint.create({
+      uuid: v4().toString(),
+      title: `${src.title} (copy)`,
+      path: newPath,
+      method: src.method,
+      response_template_id: src.response_template_id,
+      is_multiple_templates: src.is_multiple_templates,
+      max_pending_time: src.max_pending_time,
+      relay_enabled: src.relay_enabled,
+      relay_target: src.relay_target,
+      relay_method: src.relay_method,
+      relay_payload_template_id: src.relay_payload_template_id,
+      user_id: src.user_id
+    })
+
+    const references = await DB.models.EndpointTemplateReference.findAll({ where: { endpoint_id: endpointId } })
+    if (references.length) {
+      await DB.models.EndpointTemplateReference.bulkCreate(
+        references.map(reference => ({ endpoint_id: created.id, template_id: reference.template_id }))
+      )
+    }
+
+    return this.formatEndpoint(created.toJSON())
   }
 
   private getPayload(payload: EndpointCreationAttributes): EndpointCreationAttributes {

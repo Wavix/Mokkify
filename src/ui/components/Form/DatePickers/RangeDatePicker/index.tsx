@@ -1,18 +1,17 @@
-import classNames from "classnames"
 import dayjs from "dayjs"
-import React, { useRef, useState } from "react"
-import ReactDatePicker, { type ReactDatePickerProps } from "react-datepicker"
+import { Calendar as CalendarIcon, X } from "lucide-react"
+import { useState } from "react"
 
-import { CloseIcon } from "@chakra-ui/icons"
-
-import style from "../style.module.scss"
+import { Button } from "@/components/ui/button"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
 
 import { PresetButtons } from "./PresetButtons"
 
 import type { ButtonsVisible } from "./PresetButtons"
 import type { FC } from "react"
-
-import "../react-datepicker.scss"
+import type { DateRange } from "react-day-picker"
 
 export interface Dates {
   from: Date | null
@@ -30,12 +29,8 @@ interface Props {
   wrapperClassName?: string
   onChange: (dates: Dates) => void
   buttonsVisible?: ButtonsVisible
-  monthPicker?: boolean
   disabled?: boolean
 }
-
-const DatePicker = ReactDatePicker as React.JSXElementConstructor<ReactDatePickerProps<any, false>>
-const DatePickerRange = ReactDatePicker as React.JSXElementConstructor<ReactDatePickerProps<any, true>>
 
 const PLACEHOLDER = "Date filter"
 
@@ -49,39 +44,27 @@ export const RangeDatePicker: FC<Props> = ({
   wrapperClassName,
   noReset,
   buttonsVisible = {},
-  monthPicker,
   disabled
 }) => {
   const [isOpen, setOpen] = useState(false)
 
-  const datePickerRef = useRef(null)
-
-  const onChangeHandler = (dates: [Date | null, Date | null]) => {
-    const [start, end] = dates
-    if (end) setOpen(false)
-    onChange({ from: start, to: end })
+  const onRangeSelect = (range: DateRange | undefined) => {
+    if (range?.from && range?.to) setOpen(false)
+    onChange({ from: range?.from || null, to: range?.to || null })
   }
 
-  const onChangeHandlerSingle = (date: Date) => {
+  const onSingleSelect = (date: Date | undefined) => {
     setOpen(false)
-    onChange({ from: null, to: null, date })
+    onChange({ from: null, to: null, date: date || null })
   }
 
-  const onChangeHandlerMonth = (date: Date) => {
+  const onPresetSelect = (dates: [Date | null, Date | null]) => {
+    const [from, to] = dates
     setOpen(false)
-
-    onChange({ from: date, to: dayjs(date).endOf("month").toDate() })
+    onChange({ from, to })
   }
 
-  const onOutsideClick = (event: React.MouseEvent) => {
-    if (event.target !== datePickerRef.current) setOpen(false)
-  }
-
-  const onOpen = () => {
-    !disabled && setOpen(!isOpen)
-  }
-
-  const onCloseHandler = (event: React.MouseEvent) => {
+  const onReset = (event: React.MouseEvent) => {
     event.stopPropagation()
     onChange({ from: null, to: null })
   }
@@ -95,61 +78,59 @@ export const RangeDatePicker: FC<Props> = ({
 
     if (!dateDifference) return dayjs(startDate).format("DD MMM, YYYY")
 
-    return `${startDate ? dayjs(startDate).format("DD MMM, YYYY") : ""}
-                ${endDate ? "-" : ""}
-                ${endDate ? dayjs(endDate).format("DD MMM, YYYY") : ""}`
+    return [dayjs(startDate).format("DD MMM, YYYY"), endDate ? ` - ${dayjs(endDate).format("DD MMM, YYYY")}` : ""].join(
+      ""
+    )
   }
 
   const hasButtons = Object.values(buttonsVisible).some(item => item)
+  const hasValue = single ? !!signleDate : !!startDate
 
   return (
-    <div className={classNames(style.rangeDatePickerWrapper, { [style.withButtons]: hasButtons }, wrapperClassName)}>
-      <div
-        ref={datePickerRef}
-        className={classNames(style.datePickerInfo, {
-          [style.disabled]: disabled
-        })}
-        onClick={onOpen}
-      >
-        <span>{getLabel()}</span>
-        {startDate && !noReset && <CloseIcon className={style.closeIcon} onClick={onCloseHandler} />}
-      </div>
-      {isOpen && (
-        <div className={style.datePicker}>
-          {single && !monthPicker && (
-            <DatePicker selected={signleDate} onChange={onChangeHandlerSingle} onClickOutside={onOutsideClick} inline />
-          )}
-
-          {!single && !monthPicker && (
-            <div className={style.calendarWrapper}>
-              <DatePickerRange
-                selected={startDate}
-                onChange={onChangeHandler}
-                startDate={startDate}
-                endDate={endDate}
-                onClickOutside={onOutsideClick}
-                selectsRange
-                inline
+    <div className={wrapperClassName}>
+      <Popover open={isOpen} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            disabled={disabled}
+            data-id="rangeDatePicker.trigger"
+            className={cn("bg-background w-full justify-start font-normal", !hasValue && "text-muted-foreground")}
+          >
+            <CalendarIcon className="size-4" />
+            <span className="truncate">{getLabel()}</span>
+            {hasValue && !noReset && (
+              <span
+                role="button"
+                tabIndex={0}
+                data-id="rangeDatePicker.reset"
+                className="text-muted-foreground hover:text-foreground ml-auto cursor-pointer"
+                onClick={onReset}
+                onKeyDown={event => event.key === "Enter" && onReset(event as unknown as React.MouseEvent)}
               >
-                {hasButtons && <PresetButtons onChange={onChangeHandler} buttonsVisible={buttonsVisible} />}
-              </DatePickerRange>
-            </div>
-          )}
-
-          {monthPicker && (
-            <div className={classNames(style.calendarWrapper, style.monthPicker)}>
-              <DatePicker
-                selected={startDate}
-                onChange={onChangeHandlerMonth}
-                startDate={startDate}
-                onClickOutside={onOutsideClick}
-                inline
-                showMonthYearPicker
+                <X className="size-4" />
+              </span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <div className="flex">
+            {single ? (
+              <Calendar mode="single" selected={signleDate || undefined} onSelect={onSingleSelect} />
+            ) : (
+              <Calendar
+                mode="range"
+                selected={{ from: startDate || undefined, to: endDate || undefined }}
+                onSelect={onRangeSelect}
               />
-            </div>
-          )}
-        </div>
-      )}
+            )}
+            {hasButtons && (
+              <div className="border-border border-l p-2">
+                <PresetButtons onChange={onPresetSelect} buttonsVisible={buttonsVisible} />
+              </div>
+            )}
+          </div>
+        </PopoverContent>
+      </Popover>
     </div>
   )
 }

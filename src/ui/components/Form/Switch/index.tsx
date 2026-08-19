@@ -1,8 +1,6 @@
-import { Switch as ChakraSwitch } from "@chakra-ui/react"
-
 import { HintLabel } from "../HintLabel"
 
-import style from "./style.module.scss"
+import { Switch as UISwitch } from "@/components/ui/switch"
 
 import type { FC } from "react"
 
@@ -18,13 +16,11 @@ export const Switch: FC<Props> = ({ title, hint, defaultChecked, isChecked, onCh
   return (
     <div>
       <HintLabel value={title} hint={hint} />
-      <div className={style.switchContainer}>
-        <ChakraSwitch
-          size="lg"
-          colorScheme="purple"
+      <div className="pt-1">
+        <UISwitch
           defaultChecked={defaultChecked}
-          isChecked={isChecked}
-          onChange={e => (onChange ? onChange(e.target.checked) : undefined)}
+          checked={isChecked}
+          onCheckedChange={checked => (onChange ? onChange(checked) : undefined)}
         />
       </div>
     </div>

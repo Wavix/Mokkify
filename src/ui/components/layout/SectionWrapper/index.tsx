@@ -1,6 +1,4 @@
-import style from "./style.module.scss"
-
-import type { FC, ReactNode } from "react"
+import type { FC, JSX, ReactNode } from "react"
 
 interface Props {
   children: ReactNode
@@ -10,10 +8,10 @@ interface Props {
 
 export const SectionWrapper: FC<Props> = ({ title, description, children }) => {
   return (
-    <div className={style.sectionWrapper}>
-      <div className={style.sectionHeader}>{title}</div>
-      <div className={style.sectionDescription}>{description}</div>
-      <div className={style.sectionContent}>{children}</div>
+    <div className="flex min-h-full flex-auto flex-col p-4 pt-7">
+      <h1 className="text-foreground text-xl font-semibold tracking-tight">{title}</h1>
+      <div className="text-muted-foreground min-h-[20px] pt-0.5 text-[13px]">{description}</div>
+      <div className="flex-1 pt-5">{children}</div>
     </div>
   )
 }

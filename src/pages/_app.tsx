@@ -1,14 +1,19 @@
+import { Inter } from "next/font/google"
 import { useRouter } from "next/router"
+import { ThemeProvider } from "next-themes"
 import { useState, useEffect } from "react"
 
-import { ChakraProvider } from "@chakra-ui/react"
-
+import { Toaster } from "@/components/ui/sonner"
+import { TooltipProvider } from "@/components/ui/tooltip"
 import { LoginContext } from "@/ui/LoginContext"
 import { checkToken } from "@/ui/api/user"
 import { DefaultLayout } from "@/ui/components/layout"
 
-import "../index.css"
+import "@/styles/globals.css"
+
 import type { AppProps } from "next/app"
+
+const inter = Inter({ subsets: ["latin", "cyrillic"], variable: "--font-inter" })
 
 const UNAUTHENTICATED_ROUTES = ["/login"]
 
@@ -51,17 +56,25 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   if (!isTokenChecked) return null
 
   return (
-    <ChakraProvider>
-      <LoginContext.Provider value={{ onLoginStateChange: onChangeLoginState }}>
-        {isLogin ? (
-          <DefaultLayout>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+      <style jsx global>{`
+        :root {
+          --font-inter: ${inter.style.fontFamily};
+        }
+      `}</style>
+      <TooltipProvider>
+        <LoginContext.Provider value={{ onLoginStateChange: onChangeLoginState }}>
+          {isLogin ? (
+            <DefaultLayout>
+              <Component {...pageProps} />
+            </DefaultLayout>
+          ) : (
             <Component {...pageProps} />
-          </DefaultLayout>
-        ) : (
-          <Component {...pageProps} />
-        )}
-      </LoginContext.Provider>
-    </ChakraProvider>
+          )}
+        </LoginContext.Provider>
+      </TooltipProvider>
+      <Toaster position="top-right" richColors closeButton />
+    </ThemeProvider>
   )
 }
 

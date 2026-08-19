@@ -45,3 +45,5 @@ tsconfig.tsbuildinfo
 .sentryclirc
 
 database.sqlite
+database.sqlite-wal
+database.sqlite-shm

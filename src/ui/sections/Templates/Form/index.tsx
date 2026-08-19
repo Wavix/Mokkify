@@ -2,17 +2,15 @@ import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 
-import { Button, FormControl } from "@chakra-ui/react"
-
 import { parseResponseBody } from "@/app/backend/helpers"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as templatesApi from "@/ui/api/templates"
 import { Card, StyledJSON, Skeleton, ResponseConstructor, CategoryBlock } from "@/ui/components"
-import { Input } from "@/ui/components/Form"
+import { Input, Select, HeadersEditor, type HeaderRow } from "@/ui/components/Form"
 import { SectionWrapper } from "@/ui/components/layout"
-
-import style from "./style.module.scss"
 
 import type { ResponseTemplateCreationAttributes } from "@/app/database/interfaces/response-template.interface"
 import type { FC, FormEvent } from "react"
@@ -26,8 +24,17 @@ const defaultState: Partial<ResponseTemplateCreationAttributes> = {
   title: "",
   body: "",
   body_parsed: "",
-  code: 200
+  code: 200,
+  content_type: "application/json"
 }
+
+const CONTENT_TYPE_OPTIONS = [
+  { value: "application/json", label: "application/json" },
+  { value: "text/plain", label: "text/plain" },
+  { value: "text/html", label: "text/html" },
+  { value: "application/xml", label: "application/xml" },
+  { value: "text/csv", label: "text/csv" }
+]
 
 export const TemplatesForm: FC<Props> = ({ id, getList }) => {
   const isEditing = !!id
@@ -39,10 +46,14 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<Partial<ResponseTemplateCreationAttributes>>(defaultState)
+  const [headerRows, setHeaderRows] = useState<Array<HeaderRow>>([])
   const [previewPayload, setPreviewPayload] = useState<Record<string, unknown> | null>(null)
+
+  const isJson = (formData.content_type || "application/json").includes("json")
 
   useEffect(() => {
     setFormData(defaultState)
+    setHeaderRows([])
     if (id) loadTemplate()
   }, [id])
 
@@ -52,6 +63,7 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
 
   useEffect(() => {
     setFormData(defaultState)
+    setHeaderRows([])
     setPreviewPayload(null)
   }, [router.pathname])
 
@@ -95,6 +107,7 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
       if (response.error) return failureToast(response.error)
 
       setFormData(response)
+      setHeaderRows(Object.entries(response.headers || {}).map(([key, value]) => ({ key, value: String(value) })))
     } catch (error) {
       return failureToast((error as Error).message)
     } finally {
@@ -103,10 +116,15 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
   }
 
   const getPayload = (): Partial<ResponseTemplateCreationAttributes> => {
+    const headers: Record<string, string> = {}
+    headerRows.filter(row => row.key.trim()).forEach(row => (headers[row.key.trim()] = row.value))
+
     return {
       title: formData.title,
       code: formData.code,
-      body: formData.body
+      body: formData.body,
+      content_type: formData.content_type || "application/json",
+      headers: Object.keys(headers).length ? headers : null
     }
   }
 
@@ -115,7 +133,7 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
   }
 
   const parsePreviewPayload = () => {
-    if (!formData.body) return setPreviewPayload(null)
+    if (!formData.body || !isJson) return setPreviewPayload(null)
     try {
       const parsedString = parseResponseBody(formData.body || "")
       const json = JSON.parse(parsedString || "")
@@ -136,32 +154,55 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
           {!isLoading && (
             <form onSubmit={onSubmitHandler}>
               <CategoryBlock title="General">
-                <div className={style.templateGeneral}>
-                  <FormControl isRequired>
+                <div className="grid grid-cols-2 gap-[14px]">
+                  <div>
                     <Input
                       title="Title"
                       onChange={value => setFormData({ ...formData, title: value })}
                       value={formData.title}
                     />
-                  </FormControl>
+                  </div>
 
-                  <FormControl>
+                  <div>
                     <Input
                       title="Status code"
                       value={formData.code || 0}
                       onChange={value => setFormData({ ...formData, code: Number(value) })}
                       placeholder="200"
                     />
-                  </FormControl>
+                  </div>
+
+                  <Select
+                    title="Content type"
+                    value={formData.content_type || "application/json"}
+                    options={CONTENT_TYPE_OPTIONS}
+                    onChange={value => setFormData({ ...formData, content_type: String(value) })}
+                  />
                 </div>
               </CategoryBlock>
 
-              <CategoryBlock title="Response constructor">
-                <ResponseConstructor bodyRaw={formData.body || ""} onChange={onConstructorChange} />
+              <CategoryBlock title="Response headers">
+                <HeadersEditor rows={headerRows} onChange={setHeaderRows} />
               </CategoryBlock>
 
+              {isJson ? (
+                <CategoryBlock title="Response constructor">
+                  <ResponseConstructor bodyRaw={formData.body || ""} onChange={onConstructorChange} />
+                </CategoryBlock>
+              ) : (
+                <CategoryBlock title="Response body">
+                  <Textarea
+                    value={formData.body || ""}
+                    data-id="templateForm.rawBody"
+                    placeholder="Raw response body. Variables like @uuid, @date, @request.field and @path.param are supported."
+                    className="bg-background h-[300px] font-mono text-sm"
+                    onChange={event => setFormData({ ...formData, body: event.target.value })}
+                  />
+                </CategoryBlock>
+              )}
+
               <Card.Actions>
-                <Button type="submit" display="block" color="white" colorScheme="purple">
+                <Button type="submit" data-id="templateForm.submit">
                   {isEditing ? "Save" : "Create"}
                 </Button>
               </Card.Actions>

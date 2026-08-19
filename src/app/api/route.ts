@@ -6,14 +6,18 @@ import { EndpointService, LogService, RelayService } from "../services"
 
 import { parseResponseBody } from "@/app/backend/helpers"
 
+import { matchPatternPath, patternSpecificity } from "./matcher"
+
 import type { RelayResponse, ApiResponse } from "../services"
 import type { EndpointAttributes, EndpointFormDataRequestBody } from "@/app/database/interfaces/endpoint.interface"
+import type { ResponseTemplateAttributes } from "@/app/database/interfaces/response-template.interface"
 
 interface LogWithRelay {
   endpoint: EndpointAttributes
   request: Request
   requestBody: unknown
   apiResponse: ApiResponse
+  pathParams: Record<string, string>
 }
 
 const endpointService = new EndpointService()
@@ -30,7 +34,47 @@ export const PATCH = async (request: Request) => await response(request)
 
 export const DELETE = async (request: Request) => await response(request)
 
-const response = async (request: Request) => {
+export const HEAD = async (request: Request) => {
+  if (!DB.connected) await dbConnect()
+
+  const url = new URL(request.url)
+  const endpointPath = url.pathname.split("/api/")[1]
+
+  const resolved = await resolveEndpoint(endpointPath, "HEAD")
+  if (!(resolved instanceof Error)) return await response(request)
+
+  return await response(request, "GET")
+}
+
+export const OPTIONS = async (request: Request) => {
+  if (!DB.connected) await dbConnect()
+
+  const url = new URL(request.url)
+  const endpointPath = url.pathname.split("/api/")[1]
+
+  const resolved = await resolveEndpoint(endpointPath, "OPTIONS")
+  if (!(resolved instanceof Error)) return await response(request)
+
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      ...corsHeaders(request),
+      "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD",
+      "Access-Control-Allow-Headers": request.headers.get("access-control-request-headers") || "*",
+      "Access-Control-Max-Age": "86400"
+    }
+  })
+}
+
+const corsHeaders = (request: Request): Record<string, string> => {
+  return {
+    "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Expose-Headers": "*"
+  }
+}
+
+const response = async (request: Request, methodOverride?: string) => {
   if (!DB.connected) await dbConnect()
 
   const url = new URL(request.url)
@@ -45,61 +89,108 @@ const response = async (request: Request) => {
       templateName: null,
       body: { success: true }
     }
+    let responseContentType = "application/json"
+    let responseHeaders: Record<string, string> = {}
 
-    const endpoint = await getEndpoint(endpointPath, request.method)
-    if (endpoint instanceof Error) return notFound()
-
-    cache.set(endpointPath, request.method, endpoint)
+    const resolved = await resolveEndpoint(endpointPath, methodOverride || request.method)
+    if (resolved instanceof Error) return notFound(request)
+    const { endpoint, pathParams } = resolved
 
     if (endpoint.max_pending_time) {
       const pendingTime = randomInteger(0, endpoint.max_pending_time * 1000)
       await new Promise(resolve => setTimeout(resolve, pendingTime))
     }
 
+    const applyTemplate = (template: ResponseTemplateAttributes) => {
+      result.status = template.code
+      result.templateName = template.title
+      responseContentType = template.content_type || "application/json"
+      responseHeaders = template.headers || {}
+
+      result.body = responseContentType.includes("json")
+        ? getJsonResponse(template.body, requestBodyWithQueryParams, pathParams)
+        : parseResponseBody(template.body, requestBodyWithQueryParams, undefined, pathParams)
+    }
+
     if (endpoint.response_template_id && !endpoint.is_multiple_templates && endpoint.response) {
-      result.status = endpoint.response.code
-      result.body = getJsonResponse(endpoint.response.body, requestBodyWithQueryParams)
-      result.templateName = endpoint.response.title
+      applyTemplate(endpoint.response)
     }
 
     if (endpoint.is_multiple_templates && endpoint.multiple_responses?.length) {
       const randomIndex = randomInteger(0, endpoint.multiple_responses.length - 1)
-      const randomResponse = endpoint.multiple_responses[randomIndex]
-      result.status = randomResponse.response.code
-      result.body = getJsonResponse(randomResponse.response.body, requestBodyWithQueryParams)
-      result.templateName = randomResponse.response.title
+      applyTemplate(endpoint.multiple_responses[randomIndex].response)
     }
 
-    logWithRelay({ endpoint, request, requestBody, apiResponse: result })
+    logWithRelay({ endpoint, request, requestBody, apiResponse: result, pathParams })
 
-    return NextResponse.json(result.body, { status: result.status })
+    const headers = { ...corsHeaders(request), ...responseHeaders }
+
+    if (!responseContentType.includes("json")) {
+      return new NextResponse(String(result.body ?? ""), {
+        status: result.status,
+        headers: { ...headers, "Content-Type": responseContentType }
+      })
+    }
+
+    return NextResponse.json(result.body, { status: result.status, headers })
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(url.pathname, (error as Error).message)
-    return notFound()
+    return notFound(request)
   }
 }
 
-const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointAttributes | Error> => {
-  try {
-    const cacheData = await cache.get(endpointPath, method)
-    if (cacheData) return cacheData
+interface ResolvedEndpoint {
+  endpoint: EndpointAttributes
+  pathParams: Record<string, string>
+}
 
-    return await endpointService.getEndpoint(endpointPath, method)
-  } catch (error) {
-    return await endpointService.getEndpoint(endpointPath, method)
+const resolveEndpoint = async (endpointPath: string, method: string): Promise<ResolvedEndpoint | Error> => {
+  const cacheData = await cache.get(endpointPath, method)
+  if (cacheData) return { endpoint: cacheData, pathParams: {} }
+
+  try {
+    const endpoint = await endpointService.getEndpoint(endpointPath, method)
+    if (!(endpoint instanceof Error)) {
+      cache.set(endpointPath, method, endpoint)
+      return { endpoint, pathParams: {} }
+    }
+  } catch {
+    // no exact match: fall through to pattern matching
   }
+
+  return await resolveByPattern(endpointPath, method)
+}
+
+const resolveByPattern = async (endpointPath: string, method: string): Promise<ResolvedEndpoint | Error> => {
+  let patterns = cache.getPatternList()
+  if (!patterns) {
+    patterns = await endpointService.getPatternEndpoints()
+    cache.setPatternList(patterns)
+  }
+
+  const candidates = patterns
+    .filter(endpoint => endpoint.method === method)
+    .sort((a, b) => patternSpecificity(b.path) - patternSpecificity(a.path))
+
+  for (const endpoint of candidates) {
+    const pathParams = matchPatternPath(endpoint.path, endpointPath)
+    if (pathParams) return { endpoint, pathParams }
+  }
+
+  return new Error("Endpoint not found")
 }
 
 const relay = async (
   requestBody: unknown,
   apiResponse: ApiResponse,
-  endpoint: EndpointAttributes
+  endpoint: EndpointAttributes,
+  pathParams: Record<string, string>
 ): Promise<RelayResponse | null> => {
   if (!endpoint.relay_enabled || !endpoint.relay_target?.trim()) return null
 
   try {
-    const relayResponse = await relayService.relay(requestBody, apiResponse, endpoint)
+    const relayResponse = await relayService.relay(requestBody, apiResponse, endpoint, pathParams)
     if (relayResponse instanceof Error) return null
 
     return relayResponse
@@ -108,8 +199,8 @@ const relay = async (
   }
 }
 
-const logWithRelay = async ({ endpoint, request, requestBody, apiResponse }: LogWithRelay) => {
-  const relayResponse = await relay(requestBody, apiResponse, endpoint)
+const logWithRelay = async ({ endpoint, request, requestBody, apiResponse, pathParams }: LogWithRelay) => {
+  const relayResponse = await relay(requestBody, apiResponse, endpoint, pathParams)
   logService.writeLog({
     endpointId: endpoint.id,
     templateName: apiResponse.templateName,
@@ -124,8 +215,8 @@ const randomInteger = (min: number, max: number): number => {
   return Math.floor(min + Math.random() * (max + 1 - min))
 }
 
-const notFound = () => {
-  return NextResponse.json({ error: "Not found" }, { status: 404 })
+const notFound = (request: Request) => {
+  return NextResponse.json({ error: "Not found" }, { status: 404, headers: corsHeaders(request) })
 }
 
 const getBody = async (request: Request): Promise<Record<string, unknown> | null> => {
@@ -168,8 +259,8 @@ const parsedFormData = async (request: Request): Promise<Record<string, unknown>
   return data
 }
 
-const getJsonResponse = (responseBody: string, requestBody: unknown): unknown => {
-  const json = parseResponseBody(responseBody, requestBody)
+const getJsonResponse = (responseBody: string, requestBody: unknown, pathParams: Record<string, string>): unknown => {
+  const json = parseResponseBody(responseBody, requestBody, undefined, pathParams)
   if (!json) return null
 
   try {

@@ -2,8 +2,7 @@ import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 
-import { Button, FormControl } from "@chakra-ui/react"
-
+import { Button } from "@/components/ui/button"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as endpointsApi from "@/ui/api/endpoints"
@@ -13,7 +12,6 @@ import { SectionWrapper } from "@/ui/components/layout"
 
 import { Relay } from "./Relay"
 import { ResponseTemplate } from "./ResponseTemplate"
-import style from "./style.module.scss"
 
 import type { Method, EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { ResponseTemplateAttributes } from "@/app/database/interfaces/response-template.interface"
@@ -120,6 +118,16 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
     return templates.find(template => template.id === templateId) || null
   }
 
+  const renderTemplatePreview = (template: ResponseTemplateAttributes | null) => {
+    if (!template) return <StyledJSON data={null} />
+    if (template.content_type && !template.content_type.includes("json")) {
+      return (
+        <pre className="text-foreground/90 font-mono text-[13px] break-all whitespace-pre-wrap">{template.body}</pre>
+      )
+    }
+    return <StyledJSON data={template.body_parsed} />
+  }
+
   const getPayload = (): Partial<EndpointCreationAttributes> => {
     return {
       title: formData.title,
@@ -146,18 +154,19 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
           {!isLoading && (
             <form onSubmit={onSubmitHandler}>
               <CategoryBlock title="General">
-                <div className={style.formContentLayout}>
-                  <FormControl isRequired>
+                <div className="grid grid-cols-2 gap-[14px]">
+                  <div>
                     <Input
                       onChange={value => setFormData({ ...formData, title: value })}
                       value={formData.title}
                       title="Title"
                     />
-                  </FormControl>
+                  </div>
 
-                  <FormControl isRequired>
+                  <div>
                     <Input
                       title="Path"
+                      hint="Supports path parameters and wildcards: /users/:id or /files/*. Access parameters in templates via @path.id (wildcard tail: @path.wildcard)."
                       onChange={value => setFormData({ ...formData, path: value })}
                       value={formData.path}
                       placeholder="/my/end/point"
@@ -165,9 +174,9 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                       disabled={isEditing}
                       isRequired
                     />
-                  </FormControl>
+                  </div>
 
-                  <FormControl>
+                  <div>
                     <Input
                       title="Max pending time"
                       hint="Artificial response delay time (in seconds). Specify the maximum value here, which will be randomly selected from zero to the indicated value."
@@ -175,7 +184,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                       onChange={value => setFormData({ ...formData, max_pending_time: Number(value) })}
                       placeholder="0"
                     />
-                  </FormControl>
+                  </div>
 
                   <Select
                     title="Method"
@@ -185,7 +194,9 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                       { value: "PATCH", label: "PATCH" },
                       { value: "GET", label: "GET" },
                       { value: "POST", label: "POST" },
-                      { value: "DELETE", label: "DELETE" }
+                      { value: "DELETE", label: "DELETE" },
+                      { value: "OPTIONS", label: "OPTIONS" },
+                      { value: "HEAD", label: "HEAD" }
                     ]}
                     onChange={value => {
                       setFormData({ ...formData, method: value as Method })
@@ -195,12 +206,13 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
               </CategoryBlock>
 
               <CategoryBlock title="Response template">
-                <div className={style.formContentLayout}>
+                <div className="grid grid-cols-2 gap-[14px]">
                   <ResponseTemplate
                     isEditing={isEditing}
                     formData={formData}
                     onChange={data => setFormData(data)}
                     onTemplatesLoad={data => setTemplates(data)}
+                    onMultipleTemplatesLoad={ids => setFormData(prev => ({ ...prev, multiple_responses_templates: ids }))}
                   />
                 </div>
               </CategoryBlock>
@@ -210,7 +222,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
               </CategoryBlock>
 
               <Card.Actions>
-                <Button type="submit" color="white" colorScheme="purple">
+                <Button type="submit" data-id="endpointForm.submit">
                   {isEditing ? "Save" : "Create"}
                 </Button>
               </Card.Actions>
@@ -225,14 +237,14 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                 {multipleResponseTemplates.map(templateId => (
                   <Card.Container key={templateId} gutterTop>
                     <Card.Header>Response template ({getTemplateById(templateId)?.title})</Card.Header>
-                    <StyledJSON data={getTemplateById(templateId)?.body_parsed} />
+                    {renderTemplatePreview(getTemplateById(templateId))}
                   </Card.Container>
                 ))}
               </>
             ) : (
               <Card.Container gutterTop>
                 <Card.Header>Response template</Card.Header>
-                <StyledJSON data={getTemplateById(Number(formData.response_template_id))?.body_parsed} />
+                {renderTemplatePreview(getTemplateById(Number(formData.response_template_id)))}
               </Card.Container>
             )}
           </>

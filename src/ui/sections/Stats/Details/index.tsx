@@ -1,14 +1,3 @@
-import {
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LinearScale,
-  Title,
-  Tooltip,
-  PointElement,
-  LineElement
-} from "chart.js"
 import Head from "next/head"
 import React from "react"
 
@@ -22,8 +11,6 @@ import type { FC } from "react"
 interface Props {
   endpoint: EndpointAttributes
 }
-
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, PointElement, LineElement)
 
 export const StatsDetails: FC<Props> = ({ endpoint }) => {
   return (
