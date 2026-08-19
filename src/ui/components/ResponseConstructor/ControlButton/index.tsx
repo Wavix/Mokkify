@@ -1,7 +1,6 @@
 import { Brackets, ListTree, Plus } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
 
 import type { FC } from "react"
 
@@ -25,11 +24,9 @@ export const ControlButton: FC<Props> = ({ title, icon, onClick, color = "purple
     <Button
       type="button"
       size="sm"
+      variant={color === "blue" ? "outline" : "secondary"}
       data-id={`controlButton.${title}`}
-      className={cn(
-        "h-7 px-3 text-[11px] font-semibold tracking-wide uppercase",
-        color === "blue" && "bg-cyan-500 text-white hover:bg-cyan-600"
-      )}
+      className="h-7 px-2.5 text-xs font-medium"
       onClick={onClick}
     >
       <Icon className="size-3.5" />

@@ -22,7 +22,7 @@ const PageButton: FC<PageButtonProps> = ({ page, isActive, onClick }) => (
   <Button
     variant={isActive ? "default" : "ghost"}
     size="icon"
-    className="size-9"
+    className="size-8"
     data-id={`pagination.page.${page}`}
     onClick={onClick}
   >
@@ -42,7 +42,7 @@ export const PageSelect: FC<Props> = ({ currentPage, onClick, pageNumbers, total
         <Button
           variant="ghost"
           size="icon"
-          className="size-9"
+          className="size-8"
           data-id="pagination.previous"
           onClick={onClick(currentPage - 1)}
         >
@@ -77,7 +77,7 @@ export const PageSelect: FC<Props> = ({ currentPage, onClick, pageNumbers, total
         <Button
           variant="ghost"
           size="icon"
-          className="size-9"
+          className="size-8"
           data-id="pagination.next"
           onClick={onClick(currentPage + 1)}
         >

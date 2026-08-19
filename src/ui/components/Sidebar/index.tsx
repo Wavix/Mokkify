@@ -25,7 +25,8 @@ const ThemeToggle: FC = () => {
     setMounted(true)
   }, [])
 
-  const icon = isMounted && resolvedTheme === "dark" ? <Sun className="size-5" /> : <Moon className="size-5" />
+  const icon =
+    isMounted && resolvedTheme === "dark" ? <Sun className="size-[18px]" /> : <Moon className="size-[18px]" />
 
   return <MenuButton title="Theme" icon={icon} onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")} />
 }
@@ -43,40 +44,40 @@ export const Sidebar: FC = () => {
   }
 
   return (
-    <div className="bg-rail fixed top-0 left-0 flex h-full w-[62px] flex-col items-center gap-1 pt-8 pb-4">
+    <div className="bg-rail border-border fixed top-0 left-0 z-10 flex h-full w-[62px] flex-col items-center gap-0.5 border-r pt-6 pb-3">
       <MenuButton
         title="Endpoints"
-        icon={<Waypoints className="size-5" />}
+        icon={<Waypoints className="size-[18px]" />}
         href="/endpoints"
         active={currentSection === Section.Endpoints}
       />
       <MenuButton
         title="Templates"
-        icon={<FileJson2 className="size-5" />}
+        icon={<FileJson2 className="size-[18px]" />}
         href="/templates"
         active={currentSection === Section.Templates}
       />
       <MenuButton
         title="Relay"
-        icon={<Send className="size-5" />}
+        icon={<Send className="size-[18px]" />}
         href="/relays"
         active={currentSection === Section.Relay}
       />
       <MenuButton
         title="Stats"
-        icon={<ChartColumn className="size-5" />}
+        icon={<ChartColumn className="size-[18px]" />}
         href="/stats"
         active={currentSection === Section.Stats}
       />
       <MenuButton
         title="Settings"
-        icon={<Settings className="size-5" />}
+        icon={<Settings className="size-[18px]" />}
         href="/settings/general"
         active={currentSection === Section.Settings}
       />
       <div className="mt-auto">
         <ThemeToggle />
-        <MenuButton title="Logout" icon={<LogOut className="size-5" />} onClick={logOut} />
+        <MenuButton title="Logout" icon={<LogOut className="size-[18px]" />} onClick={logOut} />
       </div>
     </div>
   )

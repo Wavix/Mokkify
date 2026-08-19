@@ -4,7 +4,6 @@ import { FieldOption } from "../types"
 
 import { Input, Select } from "@/ui/components/Form"
 
-
 import type { ResponseConstructorItem, ObjectAttribute } from "../types"
 import type { FC } from "react"
 
@@ -92,10 +91,10 @@ export const AttributeRow: FC<Props> = ({ item, onUpdate, onDelete }) => {
       <button
         type="button"
         data-id="attributeRow.delete"
-        className="text-primary hover:text-destructive cursor-pointer"
+        className="text-muted-foreground hover:text-destructive cursor-pointer"
         onClick={() => onDelete(item.uuid)}
       >
-        <Trash2 className="size-[19px]" />
+        <Trash2 className="size-4" />
       </button>
     </div>
   )

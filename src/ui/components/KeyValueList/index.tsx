@@ -43,7 +43,7 @@ const Row: FC<Props> = ({ children }) => {
 }
 
 const Column: FC<Props> = ({ children }) => (
-  <div className="min-h-[25px] self-center overflow-y-auto py-1.5 pl-5 text-sm leading-tight first:font-medium [&:nth-child(2n)]:pr-5 [&:nth-child(2n)]:pl-0">
+  <div className="min-h-[25px] self-center overflow-y-auto py-1.5 pl-5 text-[13px] leading-tight first:font-medium [&:nth-child(2n)]:pr-5 [&:nth-child(2n)]:pl-0">
     {children}
   </div>
 )

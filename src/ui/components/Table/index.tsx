@@ -38,7 +38,7 @@ const Row: FC<RowProps> = ({ isActive, children, onClick }) => (
     className={cn(
       "border-border/60 hover:bg-muted/50 border-b transition-colors last:border-0",
       onClick && "cursor-pointer",
-      isActive && "bg-primary/10 hover:bg-primary/10"
+      isActive && "bg-accent hover:bg-accent"
     )}
     onClick={onClick}
   >
@@ -46,12 +46,12 @@ const Row: FC<RowProps> = ({ isActive, children, onClick }) => (
   </tr>
 )
 const Column: FC<ChildrenProps> = ({ children }) => (
-  <td className="text-foreground/90 p-4 text-left align-middle text-sm whitespace-nowrap">{children}</td>
+  <td className="text-foreground/90 px-4 py-2.5 text-left align-middle text-[13px] whitespace-nowrap">{children}</td>
 )
 
 const Cap: FC<CapProps> = ({ text }) => (
   <tr>
-    <td colSpan={99} className="text-muted-foreground h-14 p-4 text-center text-sm">
+    <td colSpan={99} className="text-muted-foreground h-14 p-4 text-center text-[13px]">
       {text || "No data to display"}
     </td>
   </tr>

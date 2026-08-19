@@ -8,20 +8,20 @@ interface Props {
 }
 
 const METHOD_CLASSES: Record<string, string> = {
-  GET: "bg-cyan-500/15 text-cyan-700 dark:text-cyan-300",
-  DELETE: "bg-red-500/15 text-red-700 dark:text-red-300",
-  POST: "bg-green-500/15 text-green-700 dark:text-green-300",
-  PATCH: "bg-teal-500/15 text-teal-700 dark:text-teal-300",
-  PUT: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
-  HEAD: "bg-purple-500/15 text-purple-700 dark:text-purple-300",
-  OPTIONS: "bg-blue-500/15 text-blue-700 dark:text-blue-300"
+  GET: "bg-sky-500/10 text-sky-700 dark:text-sky-400",
+  DELETE: "bg-red-500/10 text-red-700 dark:text-red-400",
+  POST: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+  PATCH: "bg-teal-500/10 text-teal-700 dark:text-teal-400",
+  PUT: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  HEAD: "bg-violet-500/10 text-violet-700 dark:text-violet-400",
+  OPTIONS: "bg-blue-500/10 text-blue-700 dark:text-blue-400"
 }
 
 export const MethodBadge: FC<Props> = ({ method }) => {
   return (
     <span
       className={cn(
-        "flex h-6 w-14 items-center justify-center rounded-md text-xs font-semibold select-none",
+        "flex h-5 w-12 items-center justify-center rounded text-[10.5px] font-semibold tracking-wide select-none",
         METHOD_CLASSES[method.toUpperCase()] || "bg-muted text-muted-foreground"
       )}
     >

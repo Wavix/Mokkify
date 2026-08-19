@@ -6,7 +6,6 @@ import { MethodBadge } from "../MethodBadge"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 
-
 import type { Method } from "@/app/database/interfaces/endpoint.interface"
 
 interface Props {
@@ -34,7 +33,11 @@ export const EndpointHref: FC<Props> = ({ method, href }) => {
   return (
     <div className="grid max-w-fit grid-cols-[auto_auto_20px] items-center gap-x-2.5">
       <MethodBadge method={method} />
-      <a href={href} className="text-primary text-sm underline underline-offset-2 hover:no-underline" onClick={onClick}>
+      <a
+        href={href}
+        className="text-foreground/80 decoration-muted-foreground/40 hover:text-foreground text-[13px] underline underline-offset-2"
+        onClick={onClick}
+      >
         {baseUrl}
         {href}
       </a>

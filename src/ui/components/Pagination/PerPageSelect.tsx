@@ -19,7 +19,7 @@ export const PerPageSelect: FC<Props> = ({ perPageValues, currentPerPageValue, o
           key={perPageValue}
           variant={perPageValue === currentPerPageValue ? "secondary" : "ghost"}
           size="sm"
-          className="h-9"
+          className="h-8"
           data-id={`pagination.perPage.${perPageValue}`}
           onClick={onClick(perPageValue)}
         >

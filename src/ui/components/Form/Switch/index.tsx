@@ -2,7 +2,6 @@ import { HintLabel } from "../HintLabel"
 
 import { Switch as UISwitch } from "@/components/ui/switch"
 
-
 import type { FC } from "react"
 
 interface Props {

@@ -2,7 +2,6 @@ import { Trash2, X } from "lucide-react"
 import React from "react"
 import { v4 } from "uuid"
 
-
 import { AttributeRow } from "../AttributeRow"
 import { ControlButton } from "../ControlButton"
 import { FieldOption } from "../types"
@@ -59,11 +58,11 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
         {"value" in element ? (
           <AttributeRow item={element} onUpdate={onUpdate} onDelete={onDelete} />
         ) : (
-          <div className="border-primary bg-muted/60 relative mb-2.5 rounded-l-md border-l p-6 pt-5 pb-px">
+          <div className="border-foreground/30 bg-muted/50 relative mb-2.5 rounded-l-md border-l p-6 pt-5 pb-px">
             <button
               type="button"
               data-id="arrayRow.deleteObject"
-              className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex size-4 cursor-pointer items-center justify-center rounded-full"
+              className="bg-foreground text-background absolute -top-1 -right-1 flex size-4 cursor-pointer items-center justify-center rounded-full"
               onClick={() => onDelete(element.uuid)}
             >
               <X className="size-3" />
@@ -77,24 +76,24 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
 
   return (
     <div className="mb-5">
-      <div className="grid h-[58px] content-center gap-x-[14px] rounded-lg bg-cyan-100 pl-3 [grid-template-columns:auto_auto_1fr_1fr] dark:bg-cyan-500/15">
-        <div className="text-primary flex items-center font-medium dark:text-cyan-200">A</div>
+      <div className="grid h-12 content-center gap-x-[14px] bg-muted/70 rounded-lg pl-3 [grid-template-columns:auto_auto_1fr_1fr]">
+        <div className="text-muted-foreground flex items-center text-[13px] font-semibold">A</div>
         <Input onChange={value => onUpdate(uuid, "key", value)} value={arrayItem?.key} placeholder="key" />
 
-        <div className="text-primary flex items-center text-[13px] dark:text-cyan-200">items: {children.length}</div>
+        <div className="text-muted-foreground flex items-center text-xs">items: {children.length}</div>
 
         <div className="self-center justify-self-end pr-2">
           <button
             type="button"
             data-id="arrayRow.delete"
-            className="text-primary hover:text-destructive cursor-pointer"
+            className="text-muted-foreground hover:text-destructive cursor-pointer"
             onClick={() => onDelete(uuid)}
           >
-            <Trash2 className="size-[19px]" />
+            <Trash2 className="size-4" />
           </button>
         </div>
       </div>
-      <div className="border-l border-dashed border-cyan-300 pt-[14px] pl-2.5 dark:border-cyan-500/40">
+      <div className="border-border border-l border-dashed pt-[14px] pl-2.5">
         {buildArray()}
 
         <div className="mb-5 flex gap-3">

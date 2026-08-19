@@ -15,17 +15,17 @@ interface Props {
 export const NestRow: FC<Props> = ({ item, children, onDelete, onUpdate }) => {
   return (
     <div className="border-border mb-5 border-l border-dashed">
-      <div className="bg-muted/60 grid h-[58px] grid-cols-[auto_1fr] content-center rounded-r-lg pl-[30px]">
+      <div className="bg-muted/60 grid h-12 grid-cols-[auto_1fr] content-center rounded-r-lg pl-[30px]">
         <Input onChange={value => onUpdate(item.uuid, "key", value)} value={item.key} placeholder="key" />
 
         <div className="self-center justify-self-end pr-2">
           <button
             type="button"
             data-id="nestRow.delete"
-            className="text-primary hover:text-destructive cursor-pointer"
+            className="text-muted-foreground hover:text-destructive cursor-pointer"
             onClick={() => onDelete(item.uuid)}
           >
-            <Trash2 className="size-[19px]" />
+            <Trash2 className="size-4" />
           </button>
         </div>
       </div>

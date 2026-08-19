@@ -6,7 +6,7 @@ export const TableHeader: FC<{ columns: Columns }> = ({ columns }) => {
     <thead>
       <tr className="border-border border-b">
         {Object.keys(columns).map(key => (
-          <th key={key} className="text-muted-foreground p-4 text-left text-xs font-medium tracking-wide uppercase">
+          <th key={key} className="text-muted-foreground px-4 py-2.5 text-left text-xs font-medium">
             {columns[key]}
           </th>
         ))}
