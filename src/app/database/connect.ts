@@ -5,10 +5,13 @@ import * as Models from "./models"
 
 import type { Db } from "./interfaces"
 
+// Single pooled connection: pragmas below stay applied for the process
+// lifetime, and SQLite allows only one writer anyway
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "database.sqlite",
-  logging: false
+  logging: false,
+  pool: { max: 1, idle: 3_600_000 }
 })
 
 const DB: Db = {
@@ -35,6 +38,11 @@ Object.keys(DB.models).forEach(item => {
 export const dbConnect = async () => {
   try {
     await DB.sequelize.sync({ alter: { drop: false } })
+    // WAL keeps readers unblocked by the log writer; NORMAL sync avoids a
+    // full fsync per insert; busy_timeout prevents SQLITE_BUSY under load
+    await DB.sequelize.query("PRAGMA journal_mode = WAL;")
+    await DB.sequelize.query("PRAGMA synchronous = NORMAL;")
+    await DB.sequelize.query("PRAGMA busy_timeout = 5000;")
     console.log("Database connected")
   } catch (err) {
     console.log("ERROR", err)

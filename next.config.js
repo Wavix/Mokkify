@@ -4,6 +4,7 @@ const { version } = require("./package.json")
 const nextConfig = {
   reactStrictMode: false,
   agentRules: false,
+  compress: false,
   typescript: {
     ignoreBuildErrors: true
   },

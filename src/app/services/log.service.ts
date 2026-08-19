@@ -5,7 +5,7 @@ import { v4 } from "uuid"
 import { DB, findWithPaginate } from "../database"
 
 import type { Method } from "../database/interfaces/endpoint.interface"
-import type { LogAttributes } from "../database/interfaces/log.interface"
+import type { LogAttributes, LogCreationAttributes } from "../database/interfaces/log.interface"
 import type { RelayResponse } from "@/app/services"
 
 export interface ApiResponse {
@@ -23,13 +23,20 @@ interface Log {
   relayResponse: RelayResponse | null
 }
 
+const FLUSH_INTERVAL_MS = 300
+const FLUSH_BUFFER_SIZE = 500
+
+// Module-level so every LogService instance shares one write buffer
+const buffer: Array<LogCreationAttributes> = []
+let flushTimer: NodeJS.Timeout | null = null
+
 class LogService {
-  public async writeLog({ endpointId, request, response, body, relayResponse, templateName }: Log): Promise<void> {
+  public writeLog({ endpointId, request, response, body, relayResponse, templateName }: Log): void {
     const ip = this.getIP(request)
     const url = new URL(request.url)
     const headers = this.getHeaders(request)
 
-    await DB.models.Log.create({
+    buffer.push({
       uuid: v4().toString(),
       endpoint_id: endpointId,
       request_payload: body,
@@ -47,8 +54,35 @@ class LogService {
       pathname: url.pathname,
       search: url.search,
       user_agent: request.headers.get("user-agent") || null,
-      method: request.method as Method
+      method: request.method as Method,
+      created_at: new Date()
     })
+
+    if (buffer.length >= FLUSH_BUFFER_SIZE) {
+      void this.flush()
+      return
+    }
+
+    if (!flushTimer) {
+      flushTimer = setTimeout(() => this.flush(), FLUSH_INTERVAL_MS)
+      flushTimer.unref()
+    }
+  }
+
+  private async flush(): Promise<void> {
+    if (flushTimer) {
+      clearTimeout(flushTimer)
+      flushTimer = null
+    }
+    if (!buffer.length) return
+
+    const rows = buffer.splice(0, buffer.length)
+    try {
+      await DB.models.Log.bulkCreate(rows)
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("Log flush failed:", (error as Error).message)
+    }
   }
 
   public async getEndpointLogs(

@@ -109,12 +109,10 @@ class RelayService {
           "Accept": "application/json",
           "Content-Type": "application/json"
         },
+        signal: AbortSignal.timeout(10_000),
         ...(json && { body: json })
       })
       const body = await this.getRelayHookBody(response)
-
-      // eslint-disable-next-line no-console
-      console.log("RELAY", url, method, json, response.status, body)
 
       return {
         ...result,

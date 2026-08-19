@@ -49,8 +49,6 @@ const response = async (request: Request) => {
     const endpoint = await getEndpoint(endpointPath, request.method)
     if (endpoint instanceof Error) return notFound()
 
-    cache.set(endpointPath, request.method, endpoint)
-
     if (endpoint.max_pending_time) {
       const pendingTime = randomInteger(0, endpoint.max_pending_time * 1000)
       await new Promise(resolve => setTimeout(resolve, pendingTime))
@@ -81,14 +79,13 @@ const response = async (request: Request) => {
 }
 
 const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointAttributes | Error> => {
-  try {
-    const cacheData = await cache.get(endpointPath, method)
-    if (cacheData) return cacheData
+  const cacheData = await cache.get(endpointPath, method)
+  if (cacheData) return cacheData
 
-    return await endpointService.getEndpoint(endpointPath, method)
-  } catch {
-    return await endpointService.getEndpoint(endpointPath, method)
-  }
+  const endpoint = await endpointService.getEndpoint(endpointPath, method)
+  if (!(endpoint instanceof Error)) cache.set(endpointPath, method, endpoint)
+
+  return endpoint
 }
 
 const relay = async (

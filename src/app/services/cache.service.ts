@@ -1,33 +1,27 @@
-import Cache from "file-system-cache"
-
 import { DB } from "../database"
 
 import type { EndpointAttributes } from "../database/interfaces/endpoint.interface"
 
-const cache = Cache({ basePath: ".cache" })
+const store = new Map<string, EndpointAttributes>()
 
 export class CacheService {
-  public set(endpointPath: string, method: string, payload: unknown) {
-    const key = this.key(endpointPath, method)
-    cache.set(key, payload)
+  public set(endpointPath: string, method: string, payload: EndpointAttributes) {
+    store.set(this.key(endpointPath, method), payload)
   }
 
   public async get(endpointPath: string, method: string): Promise<EndpointAttributes | null> {
-    const key = this.key(endpointPath, method)
-    const cacheData = await cache.get(key)
-    return cacheData || null
+    return store.get(this.key(endpointPath, method)) || null
   }
 
   public async delete(endpointId: number) {
     const endpoint = await DB.models.Endpoint.findOne({ where: { id: endpointId } })
     if (!endpoint?.path) return
 
-    const key = this.key(endpoint.path, endpoint.method)
-    await cache.remove(key)
+    store.delete(this.key(endpoint.path, endpoint.method))
   }
 
   public async clear() {
-    await cache.clear()
+    store.clear()
   }
 
   private key(endpointPath: string, method: string): string {

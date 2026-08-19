@@ -1,9 +1,13 @@
 import { jwtVerify } from "jose"
 import { NextResponse } from "next/server"
 
-import { config } from "@/config"
+import { config as appConfig } from "@/config"
 
 const UNAUTHORIZED_PATHS = ["/backend/auth"]
+
+export const config = {
+  matcher: "/backend/:path*"
+}
 
 export const proxy = (request: Request) => {
   return backedAuth(request)
@@ -19,7 +23,7 @@ const backedAuth = async (request: Request) => {
     const jwtArray = token.split(" ")
     const jwtToken = jwtArray[jwtArray.length - 1]
 
-    await jwtVerify(jwtToken, new TextEncoder().encode(config.jwtSecret))
+    await jwtVerify(jwtToken, new TextEncoder().encode(appConfig.jwtSecret))
     return NextResponse.next()
   } catch {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
