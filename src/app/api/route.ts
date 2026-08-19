@@ -10,6 +10,7 @@ import { matchPatternPath, patternSpecificity } from "./matcher"
 
 import type { RelayResponse, ApiResponse } from "../services"
 import type { EndpointAttributes, EndpointFormDataRequestBody } from "@/app/database/interfaces/endpoint.interface"
+import type { ResponseTemplateAttributes } from "@/app/database/interfaces/response-template.interface"
 
 interface LogWithRelay {
   endpoint: EndpointAttributes
@@ -88,6 +89,8 @@ const response = async (request: Request, methodOverride?: string) => {
       templateName: null,
       body: { success: true }
     }
+    let responseContentType = "application/json"
+    let responseHeaders: Record<string, string> = {}
 
     const resolved = await resolveEndpoint(endpointPath, methodOverride || request.method)
     if (resolved instanceof Error) return notFound(request)
@@ -98,23 +101,38 @@ const response = async (request: Request, methodOverride?: string) => {
       await new Promise(resolve => setTimeout(resolve, pendingTime))
     }
 
+    const applyTemplate = (template: ResponseTemplateAttributes) => {
+      result.status = template.code
+      result.templateName = template.title
+      responseContentType = template.content_type || "application/json"
+      responseHeaders = template.headers || {}
+
+      result.body = responseContentType.includes("json")
+        ? getJsonResponse(template.body, requestBodyWithQueryParams, pathParams)
+        : parseResponseBody(template.body, requestBodyWithQueryParams, undefined, pathParams)
+    }
+
     if (endpoint.response_template_id && !endpoint.is_multiple_templates && endpoint.response) {
-      result.status = endpoint.response.code
-      result.body = getJsonResponse(endpoint.response.body, requestBodyWithQueryParams, pathParams)
-      result.templateName = endpoint.response.title
+      applyTemplate(endpoint.response)
     }
 
     if (endpoint.is_multiple_templates && endpoint.multiple_responses?.length) {
       const randomIndex = randomInteger(0, endpoint.multiple_responses.length - 1)
-      const randomResponse = endpoint.multiple_responses[randomIndex]
-      result.status = randomResponse.response.code
-      result.body = getJsonResponse(randomResponse.response.body, requestBodyWithQueryParams, pathParams)
-      result.templateName = randomResponse.response.title
+      applyTemplate(endpoint.multiple_responses[randomIndex].response)
     }
 
     logWithRelay({ endpoint, request, requestBody, apiResponse: result, pathParams })
 
-    return NextResponse.json(result.body, { status: result.status, headers: corsHeaders(request) })
+    const headers = { ...corsHeaders(request), ...responseHeaders }
+
+    if (!responseContentType.includes("json")) {
+      return new NextResponse(String(result.body ?? ""), {
+        status: result.status,
+        headers: { ...headers, "Content-Type": responseContentType }
+      })
+    }
+
+    return NextResponse.json(result.body, { status: result.status, headers })
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(url.pathname, (error as Error).message)

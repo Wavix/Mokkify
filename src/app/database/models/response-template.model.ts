@@ -42,6 +42,15 @@ export const ResponseTemplate = (
         type: DataTypes.INTEGER,
         defaultValue: 200
       },
+      content_type: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        defaultValue: "application/json"
+      },
+      headers: {
+        type: DataTypes.JSON,
+        allowNull: true
+      },
       user_id: {
         type: DataTypes.INTEGER
       },
