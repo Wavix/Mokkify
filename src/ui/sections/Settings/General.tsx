@@ -1,11 +1,11 @@
 import React, { useEffect, useState, type FC } from "react"
 
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import { getSettings, type Settings as SettingsType } from "@/ui/api/settings"
 import { Card, BlockQuote } from "@/ui/components"
+import { FilePicker } from "@/ui/components/Form"
 import { SectionWrapper } from "@/ui/components/layout"
 
 interface Props {
@@ -22,11 +22,6 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
   const successToast = useSuccessToast()
 
   const newVersionAvailable = appVersion && settings?.last_version && settings?.last_version !== appVersion
-
-  const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || !event.target.files.length) return
-    setFile(event.target.files[0])
-  }
 
   const uploadDumpHandler = async () => {
     if (!file) return
@@ -47,11 +42,6 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
     } catch (error) {
       failureToast((error as Error).message)
     }
-  }
-
-  const onChangeSpecHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (!event.target.files || !event.target.files.length) return
-    setSpecFile(event.target.files[0])
   }
 
   const importOpenApiHandler = async () => {
@@ -120,13 +110,7 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
 
       <Card.Container gutterTop>
         <Card.Header>Restore</Card.Header>
-        <Input
-          type="file"
-          className="max-w-sm"
-          data-id="settings.restoreFile"
-          onChange={onChangeHandler}
-          accept="text/csv"
-        />
+        <FilePicker accept="text/csv" dataId="settings.restoreFile" onChange={selected => setFile(selected)} />
 
         <Card.Actions>
           <Button type="button" data-id="settings.restore" disabled={!file} onClick={uploadDumpHandler}>
@@ -142,13 +126,7 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
           its paths and examples. Path parameters like {"{id}"} become :id. Existing endpoints are skipped.
         </BlockQuote>
         <div className="pt-4">
-          <Input
-            type="file"
-            className="max-w-sm"
-            data-id="settings.openapiFile"
-            onChange={onChangeSpecHandler}
-            accept=".yaml,.yml,.json"
-          />
+          <FilePicker accept=".yaml,.yml,.json" dataId="settings.openapiFile" onChange={selected => setSpecFile(selected)} />
         </div>
 
         <Card.Actions>
