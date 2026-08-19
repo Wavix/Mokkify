@@ -118,6 +118,16 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
     return templates.find(template => template.id === templateId) || null
   }
 
+  const renderTemplatePreview = (template: ResponseTemplateAttributes | null) => {
+    if (!template) return <StyledJSON data={null} />
+    if (template.content_type && !template.content_type.includes("json")) {
+      return (
+        <pre className="text-foreground/90 font-mono text-[13px] break-all whitespace-pre-wrap">{template.body}</pre>
+      )
+    }
+    return <StyledJSON data={template.body_parsed} />
+  }
+
   const getPayload = (): Partial<EndpointCreationAttributes> => {
     return {
       title: formData.title,
@@ -202,6 +212,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                     formData={formData}
                     onChange={data => setFormData(data)}
                     onTemplatesLoad={data => setTemplates(data)}
+                    onMultipleTemplatesLoad={ids => setFormData(prev => ({ ...prev, multiple_responses_templates: ids }))}
                   />
                 </div>
               </CategoryBlock>
@@ -226,14 +237,14 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                 {multipleResponseTemplates.map(templateId => (
                   <Card.Container key={templateId} gutterTop>
                     <Card.Header>Response template ({getTemplateById(templateId)?.title})</Card.Header>
-                    <StyledJSON data={getTemplateById(templateId)?.body_parsed} />
+                    {renderTemplatePreview(getTemplateById(templateId))}
                   </Card.Container>
                 ))}
               </>
             ) : (
               <Card.Container gutterTop>
                 <Card.Header>Response template</Card.Header>
-                <StyledJSON data={getTemplateById(Number(formData.response_template_id))?.body_parsed} />
+                {renderTemplatePreview(getTemplateById(Number(formData.response_template_id)))}
               </Card.Container>
             )}
           </>

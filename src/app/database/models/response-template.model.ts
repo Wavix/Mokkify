@@ -28,8 +28,11 @@ export const ResponseTemplate = (
         type: DataTypes.VIRTUAL,
         get() {
           const body = this.getDataValue("body")
+          const contentType = this.getDataValue("content_type") || "application/json"
           const parsResponse = parseResponseBody(body)
           if (!parsResponse) return null
+
+          if (!contentType.includes("json")) return parsResponse
 
           try {
             return JSON.parse(parsResponse)

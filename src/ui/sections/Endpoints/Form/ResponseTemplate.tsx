@@ -13,10 +13,11 @@ interface Props {
   isEditing: boolean
   formData: Partial<EndpointCreationAttributes>
   onTemplatesLoad: (templates: Array<ResponseTemplateAttributes>) => void
+  onMultipleTemplatesLoad: (templates: Array<number>) => void
   onChange: (data: Partial<EndpointCreationAttributes>) => void
 }
 
-export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onTemplatesLoad }) => {
+export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onTemplatesLoad, onMultipleTemplatesLoad }) => {
   const failureToast = useFailureToast()
   const [templates, setTemplates] = useState<Array<ResponseTemplateAttributes>>([])
 
@@ -34,11 +35,11 @@ export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onT
   }
 
   const loadEndpointMultipleTemplates = async () => {
-    if (!isEditing) return
+    if (!isEditing || !formData.id) return
 
     try {
       const response = await endpointsApi.getEndpointMultipleTemplates(Number(formData.id))
-      onChange({ ...formData, multiple_responses_templates: response.templates })
+      onMultipleTemplatesLoad(response.templates)
     } catch (error) {
       return failureToast((error as Error).message)
     }
