@@ -183,7 +183,9 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                       { value: "PATCH", label: "PATCH" },
                       { value: "GET", label: "GET" },
                       { value: "POST", label: "POST" },
-                      { value: "DELETE", label: "DELETE" }
+                      { value: "DELETE", label: "DELETE" },
+                      { value: "OPTIONS", label: "OPTIONS" },
+                      { value: "HEAD", label: "HEAD" }
                     ]}
                     onChange={value => {
                       setFormData({ ...formData, method: value as Method })

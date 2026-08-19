@@ -30,7 +30,55 @@ export const PATCH = async (request: Request) => await response(request)
 
 export const DELETE = async (request: Request) => await response(request)
 
-const response = async (request: Request) => {
+export const HEAD = async (request: Request) => {
+  if (!DB.connected) await dbConnect()
+
+  const url = new URL(request.url)
+  const endpointPath = url.pathname.split("/api/")[1]
+
+  try {
+    const endpoint = await getEndpoint(endpointPath, "HEAD")
+    if (!(endpoint instanceof Error)) return await response(request)
+  } catch {
+    // no user-defined HEAD mock: HTTP semantics fall back to the GET mock
+  }
+
+  return await response(request, "GET")
+}
+
+export const OPTIONS = async (request: Request) => {
+  if (!DB.connected) await dbConnect()
+
+  const url = new URL(request.url)
+  const endpointPath = url.pathname.split("/api/")[1]
+
+  try {
+    const endpoint = await getEndpoint(endpointPath, "OPTIONS")
+    if (!(endpoint instanceof Error)) return await response(request)
+  } catch {
+    // no user-defined OPTIONS mock: answer as a CORS preflight
+  }
+
+  return new NextResponse(null, {
+    status: 204,
+    headers: {
+      ...corsHeaders(request),
+      "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS,HEAD",
+      "Access-Control-Allow-Headers": request.headers.get("access-control-request-headers") || "*",
+      "Access-Control-Max-Age": "86400"
+    }
+  })
+}
+
+const corsHeaders = (request: Request): Record<string, string> => {
+  return {
+    "Access-Control-Allow-Origin": request.headers.get("origin") || "*",
+    "Access-Control-Allow-Credentials": "true",
+    "Access-Control-Expose-Headers": "*"
+  }
+}
+
+const response = async (request: Request, methodOverride?: string) => {
   if (!DB.connected) await dbConnect()
 
   const url = new URL(request.url)
@@ -46,8 +94,8 @@ const response = async (request: Request) => {
       body: { success: true }
     }
 
-    const endpoint = await getEndpoint(endpointPath, request.method)
-    if (endpoint instanceof Error) return notFound()
+    const endpoint = await getEndpoint(endpointPath, methodOverride || request.method)
+    if (endpoint instanceof Error) return notFound(request)
 
     if (endpoint.max_pending_time) {
       const pendingTime = randomInteger(0, endpoint.max_pending_time * 1000)
@@ -70,11 +118,11 @@ const response = async (request: Request) => {
 
     logWithRelay({ endpoint, request, requestBody, apiResponse: result })
 
-    return NextResponse.json(result.body, { status: result.status })
+    return NextResponse.json(result.body, { status: result.status, headers: corsHeaders(request) })
   } catch (error) {
     // eslint-disable-next-line no-console
     console.log(url.pathname, (error as Error).message)
-    return notFound()
+    return notFound(request)
   }
 }
 
@@ -121,8 +169,8 @@ const randomInteger = (min: number, max: number): number => {
   return Math.floor(min + Math.random() * (max + 1 - min))
 }
 
-const notFound = () => {
-  return NextResponse.json({ error: "Not found" }, { status: 404 })
+const notFound = (request: Request) => {
+  return NextResponse.json({ error: "Not found" }, { status: 404, headers: corsHeaders(request) })
 }
 
 const getBody = async (request: Request): Promise<Record<string, unknown> | null> => {
