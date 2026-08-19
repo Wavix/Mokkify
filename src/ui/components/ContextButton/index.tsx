@@ -1,10 +1,8 @@
-import classNames from "classnames"
-import React, { useRef, useState } from "react"
-import { useClickAway } from "react-use"
+import { EllipsisVertical } from "lucide-react"
+import React from "react"
 
-import { Icon } from "./Icon"
-import { ContextMenu } from "./Menu"
-import style from "./style.module.scss"
+import { Button } from "@/components/ui/button"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 
 interface Item {
   title: string
@@ -17,38 +15,33 @@ interface Props {
 }
 
 export const ContextButton: React.FC<Props> = ({ menu, side }) => {
-  const [isContextOpened, setContextOpened] = useState(false)
-  const ref = useRef<HTMLDivElement | null>(null)
-
-  const toggleContext = () => {
-    setContextOpened(!isContextOpened)
-  }
-
-  useClickAway(ref, () => {
-    if (isContextOpened) toggleContext()
-  })
-
-  const onClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+  const onClick = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
   }
 
   return (
-    <div className={style.contextButtonWrapper} ref={ref} onClick={onClick}>
-      <button
-        onClick={toggleContext}
-        className={classNames(style.button, {
-          [style.active]: isContextOpened
-        })}
-        aria-label="Menu"
-        type="button"
-      >
-        <Icon />
-      </button>
-
-      {isContextOpened && menu && (
-        <ContextMenu side={side || "bottom"} onClose={() => setContextOpened(false)} items={menu} />
-      )}
+    <div onClick={onClick}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground hover:text-foreground size-7"
+            aria-label="Menu"
+            data-id="contextButton.trigger"
+          >
+            <EllipsisVertical className="size-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent side={side === "left" ? "left" : "bottom"} align="end">
+          {menu.map(item => (
+            <DropdownMenuItem key={item.title} data-id={`contextButton.${item.title}`} onClick={item.onClick}>
+              {item.title}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

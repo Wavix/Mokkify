@@ -1,7 +1,7 @@
-import classNames from "classnames"
+import { Brackets, ListTree, Plus } from "lucide-react"
 
-import { AddNestIcon, PlusIcon, ArrayIcon } from "./icons"
-import style from "./style.module.scss"
+import { Button } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 import type { FC } from "react"
 
@@ -12,27 +12,28 @@ interface Props {
   onClick: () => void
 }
 
+const ICONS = {
+  nested: ListTree,
+  plus: Plus,
+  array: Brackets
+}
+
 export const ControlButton: FC<Props> = ({ title, icon, onClick, color = "purple" }) => {
-  const getIcon = () => {
-    switch (icon) {
-      case "nested":
-        return <AddNestIcon />
-
-      case "plus":
-        return <PlusIcon />
-
-      case "array":
-        return <ArrayIcon />
-
-      default:
-        return null
-    }
-  }
+  const Icon = ICONS[icon]
 
   return (
-    <div className={classNames(style.controllButton, { [style.colorBlue]: color === "blue" })} onClick={onClick}>
-      <div>{getIcon()}</div>
-      <div className={style.title}>{title}</div>
-    </div>
+    <Button
+      type="button"
+      size="sm"
+      data-id={`controlButton.${title}`}
+      className={cn(
+        "h-7 px-3 text-[11px] font-semibold tracking-wide uppercase",
+        color === "blue" && "bg-cyan-500 text-white hover:bg-cyan-600"
+      )}
+      onClick={onClick}
+    >
+      <Icon className="size-3.5" />
+      {title}
+    </Button>
   )
 }

@@ -1,7 +1,6 @@
-import { QuestionOutlineIcon } from "@chakra-ui/icons"
-import { Tooltip } from "@chakra-ui/react"
+import { CircleHelp } from "lucide-react"
 
-import style from "./style.module.scss"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 
 import type { FC } from "react"
 
@@ -12,14 +11,15 @@ interface Props {
 
 export const HintLabel: FC<Props> = ({ value, hint }) => {
   return (
-    <div className={style.hintLabel}>
+    <div className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
       <div>{value}</div>
       {hint && (
-        <div className={style.infoWrapper}>
-          <Tooltip hasArrow label={hint} bg="black" color="white" fontSize={12} fontWeight={400} maxWidth={250}>
-            <QuestionOutlineIcon color="gray.500" />
-          </Tooltip>
-        </div>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <CircleHelp className="text-muted-foreground size-3.5" />
+          </TooltipTrigger>
+          <TooltipContent className="max-w-[250px]">{hint}</TooltipContent>
+        </Tooltip>
       )}
     </div>
   )

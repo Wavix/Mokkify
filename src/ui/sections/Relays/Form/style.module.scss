@@ -1,8 +1,0 @@
-@use "src/styles/global.module.scss" as *;
-
-.templateGeneral {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-column-gap: $block-padding;
-  grid-row-gap: $block-padding;
-}

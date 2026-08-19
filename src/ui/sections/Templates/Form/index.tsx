@@ -2,17 +2,14 @@ import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 
-import { Button, FormControl } from "@chakra-ui/react"
-
 import { parseResponseBody } from "@/app/backend/helpers"
+import { Button } from "@/components/ui/button"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as templatesApi from "@/ui/api/templates"
 import { Card, StyledJSON, Skeleton, ResponseConstructor, CategoryBlock } from "@/ui/components"
 import { Input } from "@/ui/components/Form"
 import { SectionWrapper } from "@/ui/components/layout"
-
-import style from "./style.module.scss"
 
 import type { ResponseTemplateCreationAttributes } from "@/app/database/interfaces/response-template.interface"
 import type { FC, FormEvent } from "react"
@@ -136,23 +133,23 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
           {!isLoading && (
             <form onSubmit={onSubmitHandler}>
               <CategoryBlock title="General">
-                <div className={style.templateGeneral}>
-                  <FormControl isRequired>
+                <div className="grid grid-cols-2 gap-[14px]">
+                  <div>
                     <Input
                       title="Title"
                       onChange={value => setFormData({ ...formData, title: value })}
                       value={formData.title}
                     />
-                  </FormControl>
+                  </div>
 
-                  <FormControl>
+                  <div>
                     <Input
                       title="Status code"
                       value={formData.code || 0}
                       onChange={value => setFormData({ ...formData, code: Number(value) })}
                       placeholder="200"
                     />
-                  </FormControl>
+                  </div>
                 </div>
               </CategoryBlock>
 
@@ -161,7 +158,7 @@ export const TemplatesForm: FC<Props> = ({ id, getList }) => {
               </CategoryBlock>
 
               <Card.Actions>
-                <Button type="submit" display="block" color="white" colorScheme="purple">
+                <Button type="submit" data-id="templateForm.submit">
                   {isEditing ? "Save" : "Create"}
                 </Button>
               </Card.Actions>

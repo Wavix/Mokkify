@@ -10,7 +10,6 @@ import { SectionWrapper } from "@/ui/components/layout"
 
 import { Details } from "./Details"
 import { Filters } from "./Filters"
-import style from "./style.module.scss"
 
 import type { EndpointAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { LogAttributes } from "@/app/database/interfaces/log.interface"
@@ -139,7 +138,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
         title={activeEndpoint?.title || "Endpoint Requests"}
         description={<EndpointHref method={activeEndpoint?.method || "GET"} href={activeEndpoint?.path || ""} />}
       >
-        <div className={style.endpointsContentLayout}>
+        <div className="grid grid-cols-[1.5fr_1fr] gap-x-[14px]">
           <div>
             <Filters />
 

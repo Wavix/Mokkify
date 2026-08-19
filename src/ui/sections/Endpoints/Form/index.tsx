@@ -2,8 +2,7 @@ import Head from "next/head"
 import { useRouter } from "next/router"
 import React, { useEffect, useState } from "react"
 
-import { Button, FormControl } from "@chakra-ui/react"
-
+import { Button } from "@/components/ui/button"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as endpointsApi from "@/ui/api/endpoints"
@@ -13,7 +12,6 @@ import { SectionWrapper } from "@/ui/components/layout"
 
 import { Relay } from "./Relay"
 import { ResponseTemplate } from "./ResponseTemplate"
-import style from "./style.module.scss"
 
 import type { Method, EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { ResponseTemplateAttributes } from "@/app/database/interfaces/response-template.interface"
@@ -146,16 +144,16 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
           {!isLoading && (
             <form onSubmit={onSubmitHandler}>
               <CategoryBlock title="General">
-                <div className={style.formContentLayout}>
-                  <FormControl isRequired>
+                <div className="grid grid-cols-2 gap-[14px]">
+                  <div>
                     <Input
                       onChange={value => setFormData({ ...formData, title: value })}
                       value={formData.title}
                       title="Title"
                     />
-                  </FormControl>
+                  </div>
 
-                  <FormControl isRequired>
+                  <div>
                     <Input
                       title="Path"
                       onChange={value => setFormData({ ...formData, path: value })}
@@ -165,9 +163,9 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                       disabled={isEditing}
                       isRequired
                     />
-                  </FormControl>
+                  </div>
 
-                  <FormControl>
+                  <div>
                     <Input
                       title="Max pending time"
                       hint="Artificial response delay time (in seconds). Specify the maximum value here, which will be randomly selected from zero to the indicated value."
@@ -175,7 +173,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                       onChange={value => setFormData({ ...formData, max_pending_time: Number(value) })}
                       placeholder="0"
                     />
-                  </FormControl>
+                  </div>
 
                   <Select
                     title="Method"
@@ -195,7 +193,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
               </CategoryBlock>
 
               <CategoryBlock title="Response template">
-                <div className={style.formContentLayout}>
+                <div className="grid grid-cols-2 gap-[14px]">
                   <ResponseTemplate
                     isEditing={isEditing}
                     formData={formData}
@@ -210,7 +208,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
               </CategoryBlock>
 
               <Card.Actions>
-                <Button type="submit" color="white" colorScheme="purple">
+                <Button type="submit" data-id="endpointForm.submit">
                   {isEditing ? "Save" : "Create"}
                 </Button>
               </Card.Actions>

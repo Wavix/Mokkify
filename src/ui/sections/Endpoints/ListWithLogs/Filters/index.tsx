@@ -5,8 +5,6 @@ import { useState, useEffect } from "react"
 import { Card } from "@/ui/components"
 import { FilterInput, RangeDatePicker } from "@/ui/components/Form"
 
-import style from "./style.module.scss"
-
 import type { NextPage } from "next"
 
 type SelectedDate = Date | null
@@ -79,9 +77,9 @@ export const Filters: NextPage = () => {
   }, [range])
 
   return (
-    <div className={style.filters}>
+    <div className="mb-[14px]">
       <Card.Container>
-        <div className={style.container}>
+        <div className="grid grid-cols-2 gap-[14px]">
           <RangeDatePicker
             startDate={range[0] || undefined}
             endDate={range[1] || undefined}

@@ -1,8 +1,7 @@
-import classNames from "classnames"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 import React from "react"
 
-import { ArrowIcon } from "./ArrowIcon"
-import style from "./style.module.scss"
+import { Button } from "@/components/ui/button"
 
 import type { FC } from "react"
 
@@ -13,58 +12,77 @@ interface Props {
   totalPages: number
 }
 
+interface PageButtonProps {
+  page: number
+  isActive: boolean
+  onClick?: () => void
+}
+
+const PageButton: FC<PageButtonProps> = ({ page, isActive, onClick }) => (
+  <Button
+    variant={isActive ? "default" : "ghost"}
+    size="icon"
+    className="size-9"
+    data-id={`pagination.page.${page}`}
+    onClick={onClick}
+  >
+    {page}
+  </Button>
+)
+
+const Ellipsis = () => <span className="text-muted-foreground px-1 select-none">…</span>
+
 export const PageSelect: FC<Props> = ({ currentPage, onClick, pageNumbers, totalPages }) => {
   const isShowMinPage = pageNumbers.indexOf(1) === -1
   const isShowMaxPage = pageNumbers.indexOf(totalPages) === -1
 
   return (
-    <div className={style.paginatorItemsContainer}>
+    <div className="my-5 mt-6 flex items-center gap-1">
       {currentPage > 1 && (
-        <div className={classNames(style.paginatorItem, style.navPrevious)} onClick={onClick(currentPage - 1)}>
-          <ArrowIcon className={style.navIcon} />
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-9"
+          data-id="pagination.previous"
+          onClick={onClick(currentPage - 1)}
+        >
+          <ChevronLeft />
+        </Button>
       )}
 
       {isShowMinPage && (
         <>
-          <div
-            className={classNames(style.paginatorItem, { [style.paginatorItemActive]: currentPage === 1 })}
-            key={1}
-            onClick={onClick(1)}
-          >
-            1
-          </div>
-          <div className={classNames(style.paginatorItem, style.paginatorItemTransparent)}>...</div>
+          <PageButton page={1} isActive={currentPage === 1} onClick={onClick(1)} />
+          <Ellipsis />
         </>
       )}
 
       {pageNumbers.map(pageNumber => (
-        <div
-          className={classNames(style.paginatorItem, { [style.paginatorItemActive]: pageNumber === currentPage })}
+        <PageButton
           key={pageNumber}
+          page={pageNumber}
+          isActive={pageNumber === currentPage}
           onClick={pageNumber !== currentPage ? onClick(pageNumber) : undefined}
-        >
-          {pageNumber}
-        </div>
+        />
       ))}
 
       {isShowMaxPage && (
-        <React.Fragment>
-          <div className={classNames(style.paginatorItem, style.paginatorItemTransparent)}>...</div>
-          <div
-            className={classNames(style.paginatorItem, { [style.paginatorItemActive]: currentPage === totalPages })}
-            key={totalPages}
-            onClick={onClick(totalPages)}
-          >
-            {totalPages}
-          </div>
-        </React.Fragment>
+        <>
+          <Ellipsis />
+          <PageButton page={totalPages} isActive={currentPage === totalPages} onClick={onClick(totalPages)} />
+        </>
       )}
 
       {currentPage < totalPages && (
-        <div className={classNames(style.paginatorItem, style.navNext)} onClick={onClick(currentPage + 1)}>
-          <ArrowIcon className={style.navIcon} />
-        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="size-9"
+          data-id="pagination.next"
+          onClick={onClick(currentPage + 1)}
+        >
+          <ChevronRight />
+        </Button>
       )}
     </div>
   )

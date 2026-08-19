@@ -36,7 +36,7 @@ export default defineConfig([
       "import/order": [
         "error",
         {
-          pathGroups: [
+          "pathGroups": [
             {
               pattern: "@chakra-ui/**",
               group: "external",
@@ -57,10 +57,10 @@ export default defineConfig([
               position: "after"
             }
           ],
-          pathGroupsExcludedImportTypes: ["builtin", "type"],
-          groups: ["builtin", "external", "internal", "parent", "sibling", "object", "type", "index"],
+          "pathGroupsExcludedImportTypes": ["builtin", "type"],
+          "groups": ["builtin", "external", "internal", "parent", "sibling", "object", "type", "index"],
           "newlines-between": "always",
-          alphabetize: { order: "asc" }
+          "alphabetize": { order: "asc" }
         }
       ],
       "@typescript-eslint/no-unused-vars": [
@@ -110,6 +110,20 @@ export default defineConfig([
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-empty-object-type": "off",
       "@typescript-eslint/ban-ts-comment": "off"
+    }
+  },
+  {
+    // Generated shadcn/ui primitives keep upstream style so future `shadcn add` diffs stay clean
+    files: ["src/components/ui/**", "src/hooks/use-mobile.ts"],
+    rules: {
+      "func-style": "off",
+      "react/function-component-definition": "off",
+      "react-hooks/purity": "off",
+      "import/order": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-shadow": "off",
+      "@typescript-eslint/consistent-type-imports": "off",
+      "@typescript-eslint/array-type": "off"
     }
   },
   prettier

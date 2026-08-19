@@ -1,10 +1,7 @@
+import { X } from "lucide-react"
 import React, { useEffect, useState, useRef } from "react"
 
-import { CloseIcon } from "@chakra-ui/icons"
-
 import { Input } from "../Input"
-
-import style from "./style.module.scss"
 
 import type { FC } from "react"
 
@@ -43,9 +40,18 @@ export const FilterInput: FC<Props> = ({ defaultValue, onChange, placeholder, ty
   }
 
   return (
-    <div className={style.inputFilter}>
+    <div className="relative">
       <Input value={value || ""} type={type} placeholder={placeholder} onChange={onChangeHandle} />
-      {value && <CloseIcon className={style.clear} onClick={clearHandle} />}
+      {value && (
+        <button
+          type="button"
+          data-id="filterInput.clear"
+          className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2.5 -translate-y-1/2 cursor-pointer"
+          onClick={clearHandle}
+        >
+          <X className="size-4" />
+        </button>
+      )}
     </div>
   )
 }

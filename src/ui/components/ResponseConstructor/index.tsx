@@ -9,7 +9,6 @@ import { ControlButton } from "./ControlButton"
 import { ImportJson } from "./ImportJson"
 import { NestRow } from "./NestRow"
 import { objectToConstructor, constructorToString, removeAttributeWithChildren } from "./helpers"
-import style from "./style.module.scss"
 import { FieldOption } from "./types"
 
 import type { ResponseConstructorItem, ObjectAttribute } from "./types"
@@ -83,7 +82,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
   }
 
   const addButton = (parentUUID: string | null) => (
-    <div className={style.actions}>
+    <div className="mb-5 flex gap-3">
       <ControlButton title="Add attribute" icon="plus" onClick={() => addAttribute(parentUUID, false)} />
       <ControlButton title="Add nested" icon="nested" onClick={() => addAttribute(parentUUID, true)} />
       <ControlButton title="Add array" icon="array" onClick={() => addArrayAttribute(parentUUID)} />
@@ -170,7 +169,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
 
   return (
     <>
-      <div className={style.topActions}>
+      <div className="mb-5">
         <ControlButton
           title={isImportOpen ? "Close import" : "Import JSON"}
           color="blue"
@@ -183,7 +182,7 @@ export const ResponseConstructor: FC<Props> = ({ bodyRaw, onChange }) => {
         <ImportJson onImport={onImport} />
       ) : (
         <>
-          <div className={style.hint}>
+          <div className="mt-2.5 mb-5">
             <BlockQuote>
               <p>Variables are values that can be obtained from either the request body or the response body.</p>
               <p>

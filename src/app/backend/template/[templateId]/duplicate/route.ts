@@ -4,7 +4,8 @@ import { TemplateService } from "@/app/services"
 
 const templateService = new TemplateService()
 
-export const POST = async (_: Request, query: NextQuery) => await duplicateTemplate(Number((await query.params).templateId))
+export const POST = async (_: Request, query: NextQuery) =>
+  await duplicateTemplate(Number((await query.params).templateId))
 
 const duplicateTemplate = async (templateId: number) => {
   try {

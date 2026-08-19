@@ -5,7 +5,6 @@ import { config } from "@/config"
 
 import { PageSelect } from "./PageSelect"
 import { PerPageSelect } from "./PerPageSelect"
-import style from "./style.module.scss"
 
 import type { FC } from "react"
 
@@ -76,11 +75,11 @@ export const Pagination: FC<Props> = ({ pagination, perPage = config.perPageDefa
     setCurrentPageNumber(currentPage)
   }, [currentPage, perPageValue])
 
-  if (totalPages < 1) return <div className={style.empty} />
+  if (totalPages < 1) return <div className="h-5" />
 
   return (
-    <div className={style.paginatorContainer}>
-      <div className={style.paginatorItemsContainer}>
+    <div className="relative z-[1] flex items-center justify-between">
+      <div className="my-5 mt-6 flex items-center gap-1">
         {!!perPage && !!total && total > perPage[0] && (
           <PerPageSelect
             perPageValues={perPage}

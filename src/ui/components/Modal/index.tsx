@@ -1,13 +1,13 @@
 import {
-  Button,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay
-} from "@chakra-ui/react"
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog"
 
 import type { FC } from "react"
 
@@ -26,24 +26,21 @@ export const ModalWindow: FC<Props> = ({ header, text, onConfirmHandler, isOpen,
   }
 
   return (
-    <>
-      <Modal motionPreset="slideInBottom" size="md" isCentered isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader color="black">{header}</ModalHeader>
-          <ModalCloseButton variant="solid" colorScheme="red" />
-          <ModalBody color="black">{text}</ModalBody>
-
-          <ModalFooter>
-            <Button colorScheme="purple" mr={3} onClick={onClose}>
-              Close
-            </Button>
-            <Button color="white" onClick={onConfirm} variant="solid" colorScheme="cyan">
-              Confirm
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
-    </>
+    <AlertDialog open={isOpen} onOpenChange={open => !open && onClose()}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{header}</AlertDialogTitle>
+          <AlertDialogDescription>{text}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel data-id="modal.close" onClick={onClose}>
+            Close
+          </AlertDialogCancel>
+          <AlertDialogAction data-id="modal.confirm" onClick={onConfirm}>
+            Confirm
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

@@ -1,5 +1,3 @@
-import style from "./style.module.scss"
-
 import type { FC, ReactNode } from "react"
 
 interface Props {
@@ -7,5 +5,5 @@ interface Props {
 }
 
 export const PageLayout: FC<Props> = ({ children }) => {
-  return <div className={style.pageLayout}>{children}</div>
+  return <div className="bg-muted/40 flex min-h-full w-full">{children}</div>
 }

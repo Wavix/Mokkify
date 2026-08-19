@@ -1,14 +1,13 @@
+import { Trash2, X } from "lucide-react"
+import React from "react"
 import { v4 } from "uuid"
 
-import { DeleteIcon } from "@chakra-ui/icons"
 
 import { AttributeRow } from "../AttributeRow"
 import { ControlButton } from "../ControlButton"
 import { FieldOption } from "../types"
 
 import { Input } from "@/ui/components/Form"
-
-import style from "./style.module.scss"
 
 import type { ResponseConstructorItem, ObjectAttribute } from "../types"
 import type { FC, JSX } from "react"
@@ -56,37 +55,49 @@ export const ArrayRow: FC<Props> = ({ uuid, items, buildTree, onSetConstructor, 
 
   const buildArray = () => {
     return children.map(element => (
-      <>
+      <React.Fragment key={element.uuid}>
         {"value" in element ? (
-          <AttributeRow item={element} key={element.uuid} onUpdate={onUpdate} onDelete={onDelete} />
+          <AttributeRow item={element} onUpdate={onUpdate} onDelete={onDelete} />
         ) : (
-          <div key={element.uuid} className={style.arrayObjectItem}>
-            <div className={style.deleteObject} onClick={() => onDelete(element.uuid)}>
-              +
-            </div>
+          <div className="border-primary bg-muted/60 relative mb-2.5 rounded-l-md border-l p-6 pt-5 pb-px">
+            <button
+              type="button"
+              data-id="arrayRow.deleteObject"
+              className="bg-primary text-primary-foreground absolute -top-1 -right-1 flex size-4 cursor-pointer items-center justify-center rounded-full"
+              onClick={() => onDelete(element.uuid)}
+            >
+              <X className="size-3" />
+            </button>
             {buildTree(element.uuid)}
           </div>
         )}
-      </>
+      </React.Fragment>
     ))
   }
 
   return (
-    <div className={style.objectArray}>
-      <div className={style.header}>
-        <div className={style.mark}>A</div>
+    <div className="mb-5">
+      <div className="grid h-[58px] content-center gap-x-[14px] rounded-lg bg-cyan-100 pl-3 [grid-template-columns:auto_auto_1fr_1fr] dark:bg-cyan-500/15">
+        <div className="text-primary flex items-center font-medium dark:text-cyan-200">A</div>
         <Input onChange={value => onUpdate(uuid, "key", value)} value={arrayItem?.key} placeholder="key" />
 
-        <div className={style.info}>items: {children.length}</div>
+        <div className="text-primary flex items-center text-[13px] dark:text-cyan-200">items: {children.length}</div>
 
-        <div className={style.deleteButton}>
-          <DeleteIcon _hover={{ cursor: "pointer" }} fontSize="19px" onClick={() => onDelete(uuid)} />
+        <div className="self-center justify-self-end pr-2">
+          <button
+            type="button"
+            data-id="arrayRow.delete"
+            className="text-primary hover:text-destructive cursor-pointer"
+            onClick={() => onDelete(uuid)}
+          >
+            <Trash2 className="size-[19px]" />
+          </button>
         </div>
       </div>
-      <div className={style.container}>
+      <div className="border-l border-dashed border-cyan-300 pt-[14px] pl-2.5 dark:border-cyan-500/40">
         {buildArray()}
 
-        <div className={style.arrayActions}>
+        <div className="mb-5 flex gap-3">
           <ControlButton title="Add array object" icon="plus" onClick={() => onArrayAddObject()} color="blue" />
           <ControlButton title="Add array item" icon="plus" onClick={() => onArrayAddItem()} color="blue" />
         </div>

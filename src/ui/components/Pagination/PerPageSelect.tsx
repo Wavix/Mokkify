@@ -1,7 +1,6 @@
-import classNames from "classnames"
 import React from "react"
 
-import style from "./style.module.scss"
+import { Button } from "@/components/ui/button"
 
 import type { FC } from "react"
 
@@ -13,19 +12,20 @@ interface Props {
 
 export const PerPageSelect: FC<Props> = ({ perPageValues, currentPerPageValue, onClick }) => {
   return (
-    <>
-      <div className={style.perPageTitle}>Per page:</div>
+    <div className="relative flex items-center gap-1">
+      <div className="text-muted-foreground absolute -top-4 text-[13px] font-medium">Per page:</div>
       {perPageValues.map(perPageValue => (
-        <div
-          className={classNames(style.paginatorItem, {
-            [style.paginatorItemActive]: perPageValue === currentPerPageValue
-          })}
+        <Button
           key={perPageValue}
+          variant={perPageValue === currentPerPageValue ? "secondary" : "ghost"}
+          size="sm"
+          className="h-9"
+          data-id={`pagination.perPage.${perPageValue}`}
           onClick={onClick(perPageValue)}
         >
           {perPageValue}
-        </div>
+        </Button>
       ))}
-    </>
+    </div>
   )
 }

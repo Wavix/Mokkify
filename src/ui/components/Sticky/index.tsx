@@ -1,5 +1,3 @@
-import style from "./style.module.scss"
-
 import type { FC, ReactNode } from "react"
 
 interface Props {
@@ -8,8 +6,8 @@ interface Props {
 
 export const Sticky: FC<Props> = ({ children }) => {
   return (
-    <div className={style.sticky}>
-      <div className={style.container}>{children}</div>
+    <div className="h-full">
+      <div className="sticky top-1">{children}</div>
     </div>
   )
 }

@@ -2,7 +2,8 @@ import { useState } from "react"
 
 import { ControlButton } from "../ControlButton"
 
-import style from "./style.module.scss"
+import { Textarea } from "@/components/ui/textarea"
+
 
 import type { FC } from "react"
 
@@ -39,13 +40,16 @@ export const ImportJson: FC<Props> = ({ onImport }) => {
   }
 
   return (
-    <div className={style.importJSON}>
-      <div>
-        <textarea value={value} onChange={onChange} />
-        {error && <span className={style.error}>{error}</span>}
-        <div className={style.importButton}>
-          {!error && <ControlButton title="Import" icon="plus" onClick={onImporthandler} />}
-        </div>
+    <div>
+      <Textarea
+        value={value}
+        data-id="importJson.textarea"
+        className="bg-background h-[400px] font-mono text-sm"
+        onChange={onChange}
+      />
+      {error && <span className="text-destructive text-sm">{error}</span>}
+      <div className="mt-5 flex justify-end">
+        {!error && <ControlButton title="Import" icon="plus" onClick={onImporthandler} />}
       </div>
     </div>
   )

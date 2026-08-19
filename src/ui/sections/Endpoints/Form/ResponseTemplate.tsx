@@ -5,8 +5,6 @@ import * as endpointsApi from "@/ui/api/endpoints"
 import * as templatesApi from "@/ui/api/templates"
 import { Select, Switch } from "@/ui/components/Form"
 
-import style from "./style.module.scss"
-
 import type { EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { ResponseTemplateAttributes } from "@/app/database/interfaces/response-template.interface"
 import type { FC } from "react"
@@ -55,7 +53,7 @@ export const ResponseTemplate: FC<Props> = ({ formData, isEditing, onChange, onT
   }, [formData.id])
 
   return (
-    <div className={style.templateBehaviorContainer}>
+    <div className="grid grid-cols-[auto_1fr] gap-x-5">
       <div>
         <Switch
           title="Random template"

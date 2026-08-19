@@ -1,8 +1,6 @@
-import { useDisclosure } from "@chakra-ui/react"
+import { useState } from "react"
 
 import { ContextButton, ModalWindow, SideMenu } from "@/ui/components"
-
-import style from "./style.module.scss"
 
 import type { RelayPayloadTemplateAttributes } from "@/app/database/interfaces/relay-payload-template.interface"
 import type { NextPage } from "next"
@@ -14,7 +12,7 @@ interface Props {
 }
 
 export const RelaysTempolateListItem: NextPage<Props> = ({ relay, onDelete, onDuplicate }) => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isOpen, setOpen] = useState(false)
 
   return (
     <>
@@ -23,17 +21,17 @@ export const RelaysTempolateListItem: NextPage<Props> = ({ relay, onDelete, onDu
         text={`Are you sure you want to delete '${relay.title}'`}
         onConfirmHandler={() => onDelete(relay.id)}
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={() => setOpen(false)}
       />
 
-      <div className={style.linkWrapper}>
+      <div className="grid grid-cols-[1fr_auto] items-center gap-x-3">
         <div>
           <SideMenu.LinkText content={relay.title} />
         </div>
         <ContextButton
           menu={[
             { title: "Duplicate", onClick: () => onDuplicate(relay.id) },
-            { title: "Delete", onClick: onOpen }
+            { title: "Delete", onClick: () => setOpen(true) }
           ]}
         />
       </div>

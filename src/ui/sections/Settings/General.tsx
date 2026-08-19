@@ -1,14 +1,12 @@
 import React, { useEffect, useState, type FC } from "react"
 
-import { Button } from "@chakra-ui/react"
-
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import { getSettings, type Settings as SettingsType } from "@/ui/api/settings"
 import { Card, BlockQuote } from "@/ui/components"
 import { SectionWrapper } from "@/ui/components/layout"
-
-import style from "./style.module.scss"
 
 interface Props {
   token: string
@@ -66,14 +64,13 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
   return (
     <SectionWrapper title="Settings" description="General settings">
       {newVersionAvailable && (
-        <div className={style.newVersion}>
+        <div className="mb-[14px]">
           <BlockQuote>
             <p>
               <b>New version available</b>
             </p>
-            Current version: {appVersion}
-            <br />
-            Last version: {settings.last_version}
+            <p>Current version: {appVersion}</p>
+            <p>Last version: {settings.last_version}</p>
           </BlockQuote>
         </div>
       )}
@@ -84,7 +81,7 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
 
         <Card.Actions>
           <a href={`/backend/settings/dump?token=${token}`} target="_blank" rel="noopener noreferrer">
-            <Button type="submit" color="white" colorScheme="purple">
+            <Button type="button" data-id="settings.download">
               Download
             </Button>
           </a>
@@ -93,10 +90,16 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
 
       <Card.Container gutterTop>
         <Card.Header>Restore</Card.Header>
-        <input type="file" onChange={onChangeHandler} accept="text/csv" />
+        <Input
+          type="file"
+          className="max-w-sm"
+          data-id="settings.restoreFile"
+          onChange={onChangeHandler}
+          accept="text/csv"
+        />
 
         <Card.Actions>
-          <Button type="submit" color="white" colorScheme="purple" isDisabled={!file} onClick={uploadDumpHandler}>
+          <Button type="button" data-id="settings.restore" disabled={!file} onClick={uploadDumpHandler}>
             Restore
           </Button>
         </Card.Actions>

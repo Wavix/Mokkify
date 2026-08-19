@@ -1,6 +1,8 @@
-import { Input as ChakraInput } from "@chakra-ui/input"
-
 import { HintLabel } from "../HintLabel"
+
+import { Input as UIInput } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
+
 
 import type { FC } from "react"
 
@@ -30,18 +32,15 @@ export const Input: FC<Props> = ({
   return (
     <div>
       {title && <HintLabel value={title} hint={hint} />}
-      <ChakraInput
+      <UIInput
         onChange={onChange ? e => onChange(e.target.value) : undefined}
         value={value}
-        color="black"
-        backgroundColor={readOnly ? "gray.100" : "white"}
-        focusBorderColor="purple.400"
-        _placeholder={{ color: "grey" }}
+        className={cn("bg-background", readOnly && "bg-muted")}
         type={type || "text"}
         placeholder={placeholder}
         readOnly={readOnly}
         disabled={disabled}
-        isRequired={isRequired}
+        required={isRequired}
       />
     </div>
   )

@@ -1,7 +1,4 @@
-import classNames from "classnames"
-import React from "react"
-
-import style from "./style.module.scss"
+import { cn } from "@/lib/utils"
 
 import type { ReactNode, FC } from "react"
 
@@ -21,15 +18,25 @@ interface ActionsProps {
 
 const Container: FC<ContainerProps> = ({ noPadding, gutterTop, children }) => {
   return (
-    <div className={classNames(style.card, { [style.noPadding]: noPadding, [style.topMargin]: gutterTop })}>
+    <div
+      className={cn(
+        "bg-card text-card-foreground border-border/60 rounded-xl border p-5 shadow-xs",
+        noPadding && "p-0 pb-2.5 [&>h3]:px-5 [&>h3]:pt-5",
+        gutterTop && "mt-[14px]"
+      )}
+    >
       {children}
     </div>
   )
 }
 
-const Header: FC<HeaderProps> = ({ children }) => <h3 className={style.header}>{children}</h3>
+const Header: FC<HeaderProps> = ({ children }) => (
+  <h3 className="text-primary mb-4 text-sm font-semibold tracking-wide uppercase">{children}</h3>
+)
 
-const Actions: FC<ActionsProps> = ({ children }) => <div className={style.actions}>{children}</div>
+const Actions: FC<ActionsProps> = ({ children }) => (
+  <div className="flex justify-end gap-2 pt-3 [&:not(:first-child)]:mt-7">{children}</div>
+)
 
 export const Card = {
   Header,

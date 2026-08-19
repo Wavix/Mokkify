@@ -4,8 +4,6 @@ import { useFailureToast } from "@/hooks/useFailureToast"
 import { getRelaysList } from "@/ui/api/relays"
 import { Select, Switch, Input } from "@/ui/components/Form"
 
-import style from "./style.module.scss"
-
 import type { Method, EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { RelayPayloadTemplateAttributes } from "@/app/database/interfaces/relay-payload-template.interface"
 import type { FC } from "react"
@@ -44,7 +42,7 @@ export const Relay: FC<Props> = ({ formData, onChange }) => {
         onChange={checked => onChange({ ...formData, relay_enabled: checked })}
       />
 
-      <div className={style.relayContainer}>
+      <div className="mt-[14px] grid grid-cols-2 gap-[14px]">
         <Select
           title="Request template"
           hint="Choose a template with the request body that will be sent to the relay target"
@@ -71,7 +69,7 @@ export const Relay: FC<Props> = ({ formData, onChange }) => {
         />
       </div>
 
-      <div className={style.relayTargetContainer}>
+      <div className="mt-[14px]">
         <Input
           title="Target"
           hint="URL or path to the key from which the URL will be taken as the target. To extract the URL from the request body, use nested notation separated by a dot. For example (dlr.callback_url)."

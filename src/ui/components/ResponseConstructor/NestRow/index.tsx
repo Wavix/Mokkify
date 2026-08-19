@@ -1,8 +1,6 @@
-import { DeleteIcon } from "@chakra-ui/icons"
+import { Trash2 } from "lucide-react"
 
 import { Input } from "@/ui/components/Form"
-
-import style from "./style.module.scss"
 
 import type { ResponseConstructorItem, ObjectAttribute } from "../types"
 import type { FC, ReactNode } from "react"
@@ -16,15 +14,22 @@ interface Props {
 
 export const NestRow: FC<Props> = ({ item, children, onDelete, onUpdate }) => {
   return (
-    <div className={style.objectNested}>
-      <div className={style.header}>
+    <div className="border-border mb-5 border-l border-dashed">
+      <div className="bg-muted/60 grid h-[58px] grid-cols-[auto_1fr] content-center rounded-r-lg pl-[30px]">
         <Input onChange={value => onUpdate(item.uuid, "key", value)} value={item.key} placeholder="key" />
 
-        <div className={style.deleteButton}>
-          <DeleteIcon _hover={{ cursor: "pointer" }} fontSize="19px" onClick={() => onDelete(item.uuid)} />
+        <div className="self-center justify-self-end pr-2">
+          <button
+            type="button"
+            data-id="nestRow.delete"
+            className="text-primary hover:text-destructive cursor-pointer"
+            onClick={() => onDelete(item.uuid)}
+          >
+            <Trash2 className="size-[19px]" />
+          </button>
         </div>
       </div>
-      <div className={style.container}>{children}</div>
+      <div className="pt-[14px] pl-[30px]">{children}</div>
     </div>
   )
 }

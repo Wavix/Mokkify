@@ -1,15 +1,9 @@
-import { useToast } from "@chakra-ui/react"
+import { toast } from "sonner"
 
 export const useFailureToast = () => {
-  const toast = useToast({ containerStyle: { marginRight: "12px" } })
-
   return (description: string) =>
-    toast({
+    toast.error("Error", {
       duration: 4500,
-      title: "Error",
-      description: description || "Request failed",
-      status: "error",
-      position: "top-right",
-      isClosable: true
+      description: description || "Request failed"
     })
 }

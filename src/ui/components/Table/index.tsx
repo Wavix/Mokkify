@@ -1,7 +1,6 @@
-import classNames from "classnames"
+import { cn } from "@/lib/utils"
 
 import { TableHeader } from "./Header"
-import style from "./style.module.scss"
 
 import type { Columns } from "./table.interfaces"
 import type { FC, ReactNode } from "react"
@@ -27,23 +26,34 @@ interface ChildrenProps {
 
 const Container: FC<Props> = ({ columns, children }) => {
   return (
-    <table className={style.table}>
+    <table className="w-full border-collapse">
       <TableHeader columns={columns} />
-      <tbody className={style.container}>{children}</tbody>
+      <tbody>{children}</tbody>
     </table>
   )
 }
 
 const Row: FC<RowProps> = ({ isActive, children, onClick }) => (
-  <tr className={classNames(style.row, { [style.pointer]: !!onClick, [style.active]: isActive })} onClick={onClick}>
+  <tr
+    className={cn(
+      "border-border/60 hover:bg-muted/50 border-b transition-colors last:border-0",
+      onClick && "cursor-pointer",
+      isActive && "bg-primary/10 hover:bg-primary/10"
+    )}
+    onClick={onClick}
+  >
     {children}
   </tr>
 )
-const Column: FC<ChildrenProps> = ({ children }) => <td className={style.column}>{children}</td>
+const Column: FC<ChildrenProps> = ({ children }) => (
+  <td className="text-foreground/90 p-4 text-left align-middle text-sm whitespace-nowrap">{children}</td>
+)
 
 const Cap: FC<CapProps> = ({ text }) => (
-  <tr className={style.capWrapper}>
-    <td>{text || "No data to display"}</td>
+  <tr>
+    <td colSpan={99} className="text-muted-foreground h-14 p-4 text-center text-sm">
+      {text || "No data to display"}
+    </td>
   </tr>
 )
 

@@ -1,7 +1,7 @@
 import { SectionWrapper } from "@/ui/components/layout"
 
 import { Robot } from "./Robot"
-import style from "./style.module.scss"
+import style from "./style.module.css"
 
 import type { FC } from "react"
 
