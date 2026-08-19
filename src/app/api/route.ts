@@ -6,6 +6,8 @@ import { EndpointService, LogService, RelayService } from "../services"
 
 import { parseResponseBody } from "@/app/backend/helpers"
 
+import { matchPatternPath, patternSpecificity } from "./matcher"
+
 import type { RelayResponse, ApiResponse } from "../services"
 import type { EndpointAttributes, EndpointFormDataRequestBody } from "@/app/database/interfaces/endpoint.interface"
 
@@ -14,6 +16,7 @@ interface LogWithRelay {
   request: Request
   requestBody: unknown
   apiResponse: ApiResponse
+  pathParams: Record<string, string>
 }
 
 const endpointService = new EndpointService()
@@ -36,12 +39,8 @@ export const HEAD = async (request: Request) => {
   const url = new URL(request.url)
   const endpointPath = url.pathname.split("/api/")[1]
 
-  try {
-    const endpoint = await getEndpoint(endpointPath, "HEAD")
-    if (!(endpoint instanceof Error)) return await response(request)
-  } catch {
-    // no user-defined HEAD mock: HTTP semantics fall back to the GET mock
-  }
+  const resolved = await resolveEndpoint(endpointPath, "HEAD")
+  if (!(resolved instanceof Error)) return await response(request)
 
   return await response(request, "GET")
 }
@@ -52,12 +51,8 @@ export const OPTIONS = async (request: Request) => {
   const url = new URL(request.url)
   const endpointPath = url.pathname.split("/api/")[1]
 
-  try {
-    const endpoint = await getEndpoint(endpointPath, "OPTIONS")
-    if (!(endpoint instanceof Error)) return await response(request)
-  } catch {
-    // no user-defined OPTIONS mock: answer as a CORS preflight
-  }
+  const resolved = await resolveEndpoint(endpointPath, "OPTIONS")
+  if (!(resolved instanceof Error)) return await response(request)
 
   return new NextResponse(null, {
     status: 204,
@@ -94,8 +89,9 @@ const response = async (request: Request, methodOverride?: string) => {
       body: { success: true }
     }
 
-    const endpoint = await getEndpoint(endpointPath, methodOverride || request.method)
-    if (endpoint instanceof Error) return notFound(request)
+    const resolved = await resolveEndpoint(endpointPath, methodOverride || request.method)
+    if (resolved instanceof Error) return notFound(request)
+    const { endpoint, pathParams } = resolved
 
     if (endpoint.max_pending_time) {
       const pendingTime = randomInteger(0, endpoint.max_pending_time * 1000)
@@ -104,7 +100,7 @@ const response = async (request: Request, methodOverride?: string) => {
 
     if (endpoint.response_template_id && !endpoint.is_multiple_templates && endpoint.response) {
       result.status = endpoint.response.code
-      result.body = getJsonResponse(endpoint.response.body, requestBodyWithQueryParams)
+      result.body = getJsonResponse(endpoint.response.body, requestBodyWithQueryParams, pathParams)
       result.templateName = endpoint.response.title
     }
 
@@ -112,11 +108,11 @@ const response = async (request: Request, methodOverride?: string) => {
       const randomIndex = randomInteger(0, endpoint.multiple_responses.length - 1)
       const randomResponse = endpoint.multiple_responses[randomIndex]
       result.status = randomResponse.response.code
-      result.body = getJsonResponse(randomResponse.response.body, requestBodyWithQueryParams)
+      result.body = getJsonResponse(randomResponse.response.body, requestBodyWithQueryParams, pathParams)
       result.templateName = randomResponse.response.title
     }
 
-    logWithRelay({ endpoint, request, requestBody, apiResponse: result })
+    logWithRelay({ endpoint, request, requestBody, apiResponse: result, pathParams })
 
     return NextResponse.json(result.body, { status: result.status, headers: corsHeaders(request) })
   } catch (error) {
@@ -126,25 +122,57 @@ const response = async (request: Request, methodOverride?: string) => {
   }
 }
 
-const getEndpoint = async (endpointPath: string, method: string): Promise<EndpointAttributes | Error> => {
+interface ResolvedEndpoint {
+  endpoint: EndpointAttributes
+  pathParams: Record<string, string>
+}
+
+const resolveEndpoint = async (endpointPath: string, method: string): Promise<ResolvedEndpoint | Error> => {
   const cacheData = await cache.get(endpointPath, method)
-  if (cacheData) return cacheData
+  if (cacheData) return { endpoint: cacheData, pathParams: {} }
 
-  const endpoint = await endpointService.getEndpoint(endpointPath, method)
-  if (!(endpoint instanceof Error)) cache.set(endpointPath, method, endpoint)
+  try {
+    const endpoint = await endpointService.getEndpoint(endpointPath, method)
+    if (!(endpoint instanceof Error)) {
+      cache.set(endpointPath, method, endpoint)
+      return { endpoint, pathParams: {} }
+    }
+  } catch {
+    // no exact match: fall through to pattern matching
+  }
 
-  return endpoint
+  return await resolveByPattern(endpointPath, method)
+}
+
+const resolveByPattern = async (endpointPath: string, method: string): Promise<ResolvedEndpoint | Error> => {
+  let patterns = cache.getPatternList()
+  if (!patterns) {
+    patterns = await endpointService.getPatternEndpoints()
+    cache.setPatternList(patterns)
+  }
+
+  const candidates = patterns
+    .filter(endpoint => endpoint.method === method)
+    .sort((a, b) => patternSpecificity(b.path) - patternSpecificity(a.path))
+
+  for (const endpoint of candidates) {
+    const pathParams = matchPatternPath(endpoint.path, endpointPath)
+    if (pathParams) return { endpoint, pathParams }
+  }
+
+  return new Error("Endpoint not found")
 }
 
 const relay = async (
   requestBody: unknown,
   apiResponse: ApiResponse,
-  endpoint: EndpointAttributes
+  endpoint: EndpointAttributes,
+  pathParams: Record<string, string>
 ): Promise<RelayResponse | null> => {
   if (!endpoint.relay_enabled || !endpoint.relay_target?.trim()) return null
 
   try {
-    const relayResponse = await relayService.relay(requestBody, apiResponse, endpoint)
+    const relayResponse = await relayService.relay(requestBody, apiResponse, endpoint, pathParams)
     if (relayResponse instanceof Error) return null
 
     return relayResponse
@@ -153,8 +181,8 @@ const relay = async (
   }
 }
 
-const logWithRelay = async ({ endpoint, request, requestBody, apiResponse }: LogWithRelay) => {
-  const relayResponse = await relay(requestBody, apiResponse, endpoint)
+const logWithRelay = async ({ endpoint, request, requestBody, apiResponse, pathParams }: LogWithRelay) => {
+  const relayResponse = await relay(requestBody, apiResponse, endpoint, pathParams)
   logService.writeLog({
     endpointId: endpoint.id,
     templateName: apiResponse.templateName,
@@ -213,8 +241,8 @@ const parsedFormData = async (request: Request): Promise<Record<string, unknown>
   return data
 }
 
-const getJsonResponse = (responseBody: string, requestBody: unknown): unknown => {
-  const json = parseResponseBody(responseBody, requestBody)
+const getJsonResponse = (responseBody: string, requestBody: unknown, pathParams: Record<string, string>): unknown => {
+  const json = parseResponseBody(responseBody, requestBody, undefined, pathParams)
   if (!json) return null
 
   try {

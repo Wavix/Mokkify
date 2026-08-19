@@ -156,6 +156,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
                   <div>
                     <Input
                       title="Path"
+                      hint="Supports path parameters and wildcards: /users/:id or /files/*. Access parameters in templates via @path.id (wildcard tail: @path.wildcard)."
                       onChange={value => setFormData({ ...formData, path: value })}
                       value={formData.path}
                       placeholder="/my/end/point"

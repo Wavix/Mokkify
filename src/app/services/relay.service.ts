@@ -86,7 +86,8 @@ class RelayService {
   public async relay(
     requestBody: unknown,
     apiResponse: ApiResponse,
-    endpoint: EndpointAttributes
+    endpoint: EndpointAttributes,
+    pathParams?: Record<string, string>
   ): Promise<RelayResponse | Error> {
     const url = await this.getRelayUrl(String(endpoint.relay_target), requestBody)
     const method = endpoint.relay_method || "GET"
@@ -101,7 +102,7 @@ class RelayService {
     if (!url) return new Error("Relay target not found")
 
     try {
-      const json = parseResponseBody(endpoint.relay_payload?.body, requestBody, apiResponse.body)
+      const json = parseResponseBody(endpoint.relay_payload?.body, requestBody, apiResponse.body, pathParams)
 
       const response = await fetch(url, {
         method,

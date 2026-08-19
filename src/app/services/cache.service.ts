@@ -3,6 +3,7 @@ import { DB } from "../database"
 import type { EndpointAttributes } from "../database/interfaces/endpoint.interface"
 
 const store = new Map<string, EndpointAttributes>()
+let patternList: Array<EndpointAttributes> | null = null
 
 export class CacheService {
   public set(endpointPath: string, method: string, payload: EndpointAttributes) {
@@ -14,6 +15,7 @@ export class CacheService {
   }
 
   public async delete(endpointId: number) {
+    patternList = null
     const endpoint = await DB.models.Endpoint.findOne({ where: { id: endpointId } })
     if (!endpoint?.path) return
 
@@ -22,6 +24,15 @@ export class CacheService {
 
   public async clear() {
     store.clear()
+    patternList = null
+  }
+
+  public getPatternList(): Array<EndpointAttributes> | null {
+    return patternList
+  }
+
+  public setPatternList(list: Array<EndpointAttributes>) {
+    patternList = list
   }
 
   private key(endpointPath: string, method: string): string {

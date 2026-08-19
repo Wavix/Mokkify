@@ -1,3 +1,4 @@
+import { Op } from "sequelize"
 import { v4 } from "uuid"
 
 import { DB } from "../database"
@@ -35,6 +36,36 @@ class EndpointService {
 
     if (!response) throw new Error("Endpoint not found")
     return response.toJSON()
+  }
+
+  public async getPatternEndpoints(): Promise<Array<EndpointAttributes>> {
+    const response = await DB.models.Endpoint.findAll({
+      where: {
+        [Op.or]: [{ path: { [Op.like]: "%:%" } }, { path: { [Op.like]: "%*%" } }]
+      },
+      include: [
+        {
+          model: DB.models.ResponseTemplate,
+          as: "response"
+        },
+        {
+          model: DB.models.RelayPayloadTemplate,
+          as: "relay_payload"
+        },
+        {
+          model: DB.models.EndpointTemplateReference,
+          as: "multiple_responses",
+          include: [
+            {
+              model: DB.models.ResponseTemplate,
+              as: "response"
+            }
+          ]
+        }
+      ]
+    })
+
+    return response.map(item => item.toJSON())
   }
 
   public async getEndpointById(id: number): Promise<EndpointAttributes | Error> {
