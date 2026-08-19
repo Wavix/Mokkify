@@ -15,7 +15,7 @@ export const Cap: FC<Props> = ({ title, description }) => {
     <>
       <title>Endpoints</title>
       <SectionWrapper title={title} description={description}>
-        <div className={style.robotContainer}>
+        <div className={`${style.robotContainer} opacity-45 grayscale dark:opacity-20`}>
           <Robot />
         </div>
       </SectionWrapper>
