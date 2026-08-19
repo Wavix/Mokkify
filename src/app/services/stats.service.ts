@@ -16,7 +16,7 @@ dayjs.extend(utc)
 
 class StatsService {
   public async getEndpointRps(endpointId: number, days = 7): Promise<Array<EndpointStatsItem> | Error> {
-    const dbStats = new Map<String, EndpointStats>()
+    const dbStats = new Map<string, EndpointStats>()
     const result: Array<EndpointStatsItem> = []
 
     const now = dayjs()

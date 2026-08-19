@@ -1,4 +1,3 @@
-import getConfig from "next/config"
 import Head from "next/head"
 import { useState, useContext } from "react"
 
@@ -17,13 +16,12 @@ const Auth: NextPage = () => {
   const isDemo = document.URL.includes("demo.mokkify")
 
   const { onLoginStateChange } = useContext(LoginContext)
-  const { publicRuntimeConfig } = getConfig()
 
   const [login, setLogin] = useState(isDemo ? "admin" : "")
   const [password, setPassword] = useState(isDemo ? "admin" : "")
   const [isLoading, setIsLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const version = publicRuntimeConfig?.version
+  const version = process.env.NEXT_PUBLIC_APP_VERSION
 
   const onFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()

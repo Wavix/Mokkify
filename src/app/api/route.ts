@@ -86,7 +86,7 @@ const getEndpoint = async (endpointPath: string, method: string): Promise<Endpoi
     if (cacheData) return cacheData
 
     return await endpointService.getEndpoint(endpointPath, method)
-  } catch (error) {
+  } catch {
     return await endpointService.getEndpoint(endpointPath, method)
   }
 }

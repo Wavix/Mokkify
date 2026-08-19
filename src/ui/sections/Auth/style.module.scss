@@ -1,4 +1,4 @@
-@import "src/styles/palette.module.scss";
+@use "src/styles/palette.module.scss" as *;
 
 .authPage {
   display: flex;

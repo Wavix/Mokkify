@@ -1,5 +1,5 @@
-@import "src/styles/global.module.scss";
-@import "src/styles/palette.module.scss";
+@use "src/styles/global.module.scss" as *;
+@use "src/styles/palette.module.scss" as *;
 
 $highlight-bg-color: #ebebeb;
 $highlight-color: #000;

@@ -3,6 +3,7 @@ const { version } = require("./package.json")
 
 const nextConfig = {
   reactStrictMode: false,
+  agentRules: false,
   typescript: {
     ignoreBuildErrors: true
   },
@@ -27,11 +28,13 @@ const nextConfig = {
       }
     ]
   },
-  experimental: {
-    serverComponentsExternalPackages: ["sequelize", "sequelize-typescript"]
+  serverExternalPackages: ["sequelize"],
+  sassOptions: {
+    loadPaths: [__dirname],
+    includePaths: [__dirname]
   },
-  publicRuntimeConfig: {
-    version
+  env: {
+    NEXT_PUBLIC_APP_VERSION: version
   },
   async headers() {
     return [
@@ -50,30 +53,23 @@ const nextConfig = {
       }
     ]
   },
-  webpack: config => {
-    // eslint-disable-next-line no-param-reassign
-    config.resolve.fallback = { fs: false }
-
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: [
-        {
-          loader: "@svgr/webpack",
-          options: {
-            svgo: true,
-            svgoConfig: {
-              prefixClassNames: true
+  turbopack: {
+    root: __dirname,
+    rules: {
+      "*.svg": {
+        loaders: [
+          {
+            loader: "@svgr/webpack",
+            options: {
+              svgo: true,
+              svgoConfig: {
+                prefixClassNames: true
+              }
             }
           }
-        }
-      ],
-      issuer: {
-        and: [/\.(ts|tsx|js|jsx)$/]
+        ],
+        as: "*.js"
       }
-    })
-
-    return {
-      ...config
     }
   }
 }

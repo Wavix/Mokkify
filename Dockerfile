@@ -1,21 +1,20 @@
-FROM node:20 AS builder
+FROM node:22 AS builder
 
-RUN npm install -g pnpm@8.6.0
+RUN npm install -g pnpm@10
 
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml ./
 
 RUN pnpm install --frozen-lockfile
-RUN pnpm rebuild bcrypt
 
 COPY . .
 
 RUN pnpm build
 
-FROM node:20-alpine AS runner
+FROM node:22-alpine AS runner
 
-RUN npm install -g pnpm@8.6.0
+RUN npm install -g pnpm@10
 
 WORKDIR /app
 

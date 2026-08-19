@@ -1,4 +1,4 @@
-@import "src/styles/global.module.scss";
+@use "src/styles/global.module.scss" as *;
 
 .filters {
   margin-bottom: $block-padding;

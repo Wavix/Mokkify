@@ -1,6 +1,6 @@
 import style from "./style.module.scss"
 
-import type { FC, ReactNode } from "react"
+import type { FC, JSX, ReactNode } from "react"
 
 interface Props {
   children: ReactNode

@@ -4,7 +4,7 @@ import { RelayService } from "@/app/services"
 
 const relayService = new RelayService()
 
-export const POST = async (_: Request, query: NextQuery) => await duplicateTemplate(Number(query.params.relayId))
+export const POST = async (_: Request, query: NextQuery) => await duplicateTemplate(Number((await query.params).relayId))
 
 const duplicateTemplate = async (relayTemplateId: number) => {
   try {

@@ -9,7 +9,7 @@ import { TemplateService } from "@/app/services"
 const templateService = new TemplateService()
 
 export const GET = async (_: Request, query: NextQuery) => {
-  const templateId = Number(query.params.templateId || 0)
+  const templateId = Number((await query.params).templateId || 0)
   if (templateId) return await getTemplateById(templateId)
 
   return NextResponse.json({ error: "Error while executing request" }, { status: 500 })
@@ -22,13 +22,13 @@ const getTemplateById = async (templateId: number) => {
   try {
     const template = await templateService.getTemplateById(templateId)
     return NextResponse.json({ template })
-  } catch (e) {
+  } catch {
     return NextResponse.json({ error: "Error while executing request" }, { status: 500 })
   }
 }
 
 const updateTemplate = async (request: Request, query: NextQuery) => {
-  const templateId = Number(query.params.templateId || 0)
+  const templateId = Number((await query.params).templateId || 0)
   if (!templateId) return NextResponse.json({ error: "Template id must be a number" }, { status: 500 })
 
   const payload = await getBodyPayload(request)
@@ -49,7 +49,7 @@ const updateTemplate = async (request: Request, query: NextQuery) => {
 }
 
 const deleteTemplate = async (_: Request, query: NextQuery) => {
-  const templateId = Number(query.params.templateId || 0)
+  const templateId = Number((await query.params).templateId || 0)
   if (!templateId) return NextResponse.json({ error: "Template id must be a number" }, { status: 500 })
 
   try {

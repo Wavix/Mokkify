@@ -6,7 +6,7 @@ const logService = new LogService()
 const endpointService = new EndpointService()
 
 export const DELETE = async (_: Request, query: NextQuery) => {
-  const endpointId = Number(query.params.endpointId || 0)
+  const endpointId = Number((await query.params).endpointId || 0)
 
   try {
     const endpoint = await endpointService.getEndpointById(endpointId)

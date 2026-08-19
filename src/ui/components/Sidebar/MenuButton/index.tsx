@@ -3,7 +3,7 @@ import { useRouter } from "next/router"
 
 import style from "./style.module.scss"
 
-import type { FC } from "react"
+import type { FC, JSX } from "react"
 
 interface Props {
   icon: JSX.Element

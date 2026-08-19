@@ -5,7 +5,7 @@ import { config } from "@/config"
 
 const UNAUTHORIZED_PATHS = ["/backend/auth"]
 
-export const middleware = (request: Request) => {
+export const proxy = (request: Request) => {
   return backedAuth(request)
 }
 

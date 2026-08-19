@@ -1,4 +1,4 @@
-@import "src/styles/palette.module.scss";
+@use "src/styles/palette.module.scss" as *;
 
 .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle,
 .react-datepicker-popper[data-placement^="top"] .react-datepicker__triangle,

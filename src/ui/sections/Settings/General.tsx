@@ -1,4 +1,3 @@
-import getConfig from "next/config"
 import React, { useEffect, useState, type FC } from "react"
 
 import { Button } from "@chakra-ui/react"
@@ -19,12 +18,11 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
   const [settings, setSettings] = useState<SettingsType | null>(null)
   const [file, setFile] = useState<File | null>(null)
 
-  const { publicRuntimeConfig } = getConfig()
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION
   const failureToast = useFailureToast()
   const successToast = useSuccessToast()
 
-  const newVersionAvailable =
-    publicRuntimeConfig?.version && settings?.last_version && settings?.last_version !== publicRuntimeConfig?.version
+  const newVersionAvailable = appVersion && settings?.last_version && settings?.last_version !== appVersion
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!event.target.files || !event.target.files.length) return
@@ -73,7 +71,7 @@ export const SettingsGeneral: FC<Props> = ({ token }) => {
             <p>
               <b>New version available</b>
             </p>
-            Current version: {publicRuntimeConfig.version}
+            Current version: {appVersion}
             <br />
             Last version: {settings.last_version}
           </BlockQuote>

@@ -11,7 +11,7 @@ import { Input } from "@/ui/components/Form"
 import style from "./style.module.scss"
 
 import type { ResponseConstructorItem, ObjectAttribute } from "../types"
-import type { FC } from "react"
+import type { FC, JSX } from "react"
 
 interface Props {
   items: Array<ResponseConstructorItem>

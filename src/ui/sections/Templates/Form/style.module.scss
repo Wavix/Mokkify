@@ -1,4 +1,4 @@
-@import "src/styles/global.module.scss";
+@use "src/styles/global.module.scss" as *;
 
 .templateGeneral {
   display: grid;
