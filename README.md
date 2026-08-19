@@ -68,6 +68,18 @@ pnpm start
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Configuration
+
+Environment variables (all optional):
+
+| Variable | Default | Description |
+| --- | --- | --- |
+| `JWT_SECRET` | built-in dev secret | Secret used to sign auth tokens. **Set your own in production.** |
+| `DATABASE_PATH` | `database.sqlite` | Path to the SQLite database file (mount a volume here in Docker). |
+| `LOG_RETENTION_DAYS` | `30` | Request logs older than this are purged hourly. `0` disables the purge. |
+
+A `GET /health` endpoint (no auth) reports service and database status for load balancers and container healthchecks.
+
 ## Nginx config for deployment
 
 Response compression is intentionally disabled in the app server (`compress: false`) - enable gzip in nginx instead.

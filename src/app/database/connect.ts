@@ -9,7 +9,7 @@ import type { Db } from "./interfaces"
 // lifetime, and SQLite allows only one writer anyway
 const sequelize = new Sequelize({
   dialect: "sqlite",
-  storage: "database.sqlite",
+  storage: process.env.DATABASE_PATH || "database.sqlite",
   logging: false,
   pool: { max: 1, idle: 3_600_000 }
 })
