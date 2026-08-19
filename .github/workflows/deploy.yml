@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
 
 jobs:
   build:
@@ -25,8 +27,13 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build --platform linux/amd64 -t ghcr.io/icevl/mokkify:latest .
+          TAGS="-t ghcr.io/icevl/mokkify:latest"
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            VERSION="${GITHUB_REF#refs/tags/v}"
+            TAGS="$TAGS -t ghcr.io/icevl/mokkify:$VERSION"
+          fi
+          docker build --platform linux/amd64 $TAGS .
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/icevl/mokkify:latest
+          docker push --all-tags ghcr.io/icevl/mokkify
