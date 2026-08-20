@@ -21,6 +21,7 @@ export interface LogAttributes {
   request_headers: Record<string, string>
   response_code: number
   request_ip: string
+  correlation: string | null
   created_at: Date
 }
 

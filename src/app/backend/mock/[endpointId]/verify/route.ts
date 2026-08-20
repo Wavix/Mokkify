@@ -7,13 +7,9 @@ import { EndpointService, LogService } from "@/app/services"
 import { schema } from "./validation"
 
 import type { EndpointAttributes } from "@/app/database/interfaces/endpoint.interface"
-import type { LogAttributes } from "@/app/database/interfaces/log.interface"
 
 const endpointService = new EndpointService()
 const logService = new LogService()
-
-const LOG_POLL_ATTEMPTS = 4
-const LOG_POLL_DELAY_MS = 120
 
 interface VerifyRequestBody {
   method?: string
@@ -44,6 +40,9 @@ const verifyMock = async (request: Request, query: NextQuery) => {
 
   try {
     const correlation = v4().toString()
+    // Register the waiter before firing: the mock engine logs fire-and-forget, so the
+    // row can be buffered after fetch() resolves; the waiter settles on the next flush.
+    const logWaiter = logService.awaitLog(correlation)
     const mockUrl = buildMockUrl(endpoint.path, payload.query, correlation)
     const { body, headers } = buildRequestInit(payload)
 
@@ -55,8 +54,7 @@ const verifyMock = async (request: Request, query: NextQuery) => {
     const responseBody = await res.text()
     const responseHeaders = getResponseHeaders(res)
 
-    await logService.flush()
-    const log = await pollCorrelatedLog(endpoint.id, correlation)
+    const log = await logWaiter
 
     return NextResponse.json({
       response: { status: res.status, body: responseBody, headers: responseHeaders },
@@ -97,18 +95,4 @@ const getResponseHeaders = (response: Response): Record<string, string> => {
     headers[key] = value
   })
   return headers
-}
-
-// Poll window must exceed LogService's 300ms flush interval: the mock request's log
-// write is fire-and-forget, so it can land in the buffer after our explicit flush()
-// already ran, and only the periodic flush timer will persist it.
-const pollCorrelatedLog = async (endpointId: number, correlation: string): Promise<LogAttributes | null> => {
-  for (let attempt = 0; attempt < LOG_POLL_ATTEMPTS; attempt += 1) {
-    if (attempt > 0) await new Promise(resolve => setTimeout(resolve, LOG_POLL_DELAY_MS))
-
-    const { items } = await logService.getEndpointLogs(endpointId, { page: 1, limit: 1 }, { correlation })
-    if (items[0]) return items[0]
-  }
-
-  return null
 }

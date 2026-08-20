@@ -57,6 +57,10 @@ const startRetentionSweep = () => {
 const buffer: Array<LogCreationAttributes> = []
 let flushTimer: NodeJS.Timeout | null = null
 
+const VERIFY_WAIT_TIMEOUT_MS = 3000
+// correlation -> resolver, awaited by the verify route so it never scrapes the shared buffer
+const correlationWaiters = new Map<string, (row: LogAttributes | null) => void>()
+
 class LogService {
   public writeLog({ endpointId, request, response, body, relayResponse, templateName }: Log): void {
     startRetentionSweep()
@@ -83,6 +87,7 @@ class LogService {
       search: url.search,
       user_agent: request.headers.get("user-agent") || null,
       method: request.method as Method,
+      correlation: url.searchParams.get("mokkify_verify_id"),
       created_at: new Date()
     })
 
@@ -97,7 +102,23 @@ class LogService {
     }
   }
 
-  public async flush(): Promise<void> {
+  public awaitLog(correlation: string, timeoutMs = VERIFY_WAIT_TIMEOUT_MS): Promise<LogAttributes | null> {
+    return new Promise(resolve => {
+      const timer = setTimeout(() => {
+        correlationWaiters.delete(correlation)
+        resolve(null)
+      }, timeoutMs)
+      timer.unref()
+
+      correlationWaiters.set(correlation, row => {
+        clearTimeout(timer)
+        correlationWaiters.delete(correlation)
+        resolve(row)
+      })
+    })
+  }
+
+  private async flush(): Promise<void> {
     if (flushTimer) {
       clearTimeout(flushTimer)
       flushTimer = null
@@ -107,9 +128,24 @@ class LogService {
     const rows = buffer.splice(0, buffer.length)
     try {
       await DB.models.Log.bulkCreate(rows)
+      await this.resolveWaiters(rows)
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error("Log flush failed:", (error as Error).message)
+    }
+  }
+
+  private async resolveWaiters(rows: Array<LogCreationAttributes>): Promise<void> {
+    if (!correlationWaiters.size) return
+
+    const pending = [...new Set(rows.map(row => row.correlation).filter((c): c is string => !!c))].filter(c =>
+      correlationWaiters.has(c)
+    )
+
+    for (const correlation of pending) {
+      // bulkCreate does not reliably return ids on SQLite; re-read to hand the verify caller a row with its id
+      const persisted = await DB.models.Log.findOne({ where: { correlation }, order: [["id", "DESC"]] })
+      correlationWaiters.get(correlation)?.(persisted ? (persisted.toJSON() as LogAttributes) : null)
     }
   }
 
@@ -139,9 +175,7 @@ class LogService {
             [Op.like]: `%${filters.template}%`
           }
         }),
-        ...(filters.correlation && {
-          url: { [Op.like]: `%mokkify_verify_id=${filters.correlation.replace(/[%_\\]/g, "")}%` }
-        })
+        ...(filters.correlation && { correlation: filters.correlation })
       },
       order: [["id", "DESC"]]
     })
