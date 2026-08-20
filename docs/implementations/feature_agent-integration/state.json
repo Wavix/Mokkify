@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "branch": "feature/agent-integration",
+  "slug": "feature_agent-integration",
+  "jira": null,
+  "created_at": "2026-08-20T06:02:33Z",
+  "updated_at": "2026-08-20T06:02:33Z",
+  "current_step": "design",
+  "advisor_budget_remaining": 10,
+  "completed_tasks": [],
+  "stack_skills": [],
+  "snapshots": {
+    "fixes": null,
+    "step12": null,
+    "simplify_before": null
+  },
+  "verification": null,
+  "flags": {}
+}
