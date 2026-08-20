@@ -97,6 +97,10 @@ export const Log = (sequelize: Sequelize.Sequelize, DataTypes: typeof Sequelize.
         {
           fields: ["created_at"],
           using: "BTREE"
+        },
+        {
+          fields: ["correlation"],
+          using: "BTREE"
         }
       ]
     }
