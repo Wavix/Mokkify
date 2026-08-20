@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react"
 
 import { SideMenu } from "@/ui/components"
 
+import { SettingsApiKeys } from "./ApiKeys"
 import { SettingsGeneral } from "./General"
 
 import type { NextPage } from "next"
@@ -17,6 +18,8 @@ const Settings: NextPage = () => {
     switch (router.query.slug) {
       case "general":
         return <SettingsGeneral token={token} />
+      case "api-keys":
+        return <SettingsApiKeys token={token} />
       default:
         return null
     }
@@ -35,8 +38,17 @@ const Settings: NextPage = () => {
       </Head>
       <SideMenu.Body header="Settings">
         <SideMenu.Nav>
-          <SideMenu.Link onClick={() => router.push("/settings/general", undefined, { shallow: true })} isActive>
+          <SideMenu.Link
+            onClick={() => router.push("/settings/general", undefined, { shallow: true })}
+            isActive={router.query.slug === "general"}
+          >
             <SideMenu.LinkText content="General" />
+          </SideMenu.Link>
+          <SideMenu.Link
+            onClick={() => router.push("/settings/api-keys", undefined, { shallow: true })}
+            isActive={router.query.slug === "api-keys"}
+          >
+            <SideMenu.LinkText content="API Keys" />
           </SideMenu.Link>
         </SideMenu.Nav>
       </SideMenu.Body>
