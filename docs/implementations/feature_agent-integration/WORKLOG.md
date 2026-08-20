@@ -513,3 +513,34 @@ escalation of same, Task 3 validation.ts placement).
 - Stylelint: n/a — no SCSS touched
 - Docs markdown (docs:lint): n/a — Mokkify ships no markdownlint config or docs:lint CI (default-rule warnings on this internal log are suppressed via a top-of-file disable comment)
 - Open review findings: n/a — review not run yet
+
+---
+
+## Codex Review
+
+**Verdict:** PASS with notes — see [review.md](./review.md) (after fixes: CRIT 0 / HIGH 0 / MED 1 accepted / LOW 3 accepted / INFO 5; 15 findings fixed; live E2E re-run 17/17).
+
+### Verified as fixed
+
+- [x] HIGH [SEC] `verify/route.ts` — SSRF/host-header injection: self-call now targets a fixed loopback origin (`MOKKIFY_SELF_ORIGIN` / `127.0.0.1:$PORT`), never the request Host.
+- [x] MED [SEC] `proxy.ts` — API-key fallback wrapped in try/catch (clean 401, no 500/detail leak); API keys accepted only via `Authorization: Bearer`.
+- [x] MED [REG] `connect.ts` — `DB.connected` set only on successful sync.
+- [x] MED [FID/SEC] `log.service.ts` + `log/route.ts` — correlation filter sanitizes `%`/`_`, anchors to `mokkify_verify_id=<uuid>`; management route accepts only UUID-shaped correlation.
+- [x] MED [FID] `verify/route.ts` — Joi schema on the verify body; string bodies no longer double-encoded.
+- [x] MED [PERF] `api-key.service.ts` — `last_used_at` write throttled (60s); strict `key_id.secret` split.
+- [x] MED [FID] `check-openapi-coverage.mjs` — gate now checks HTTP methods per path (36 methods), not just path presence.
+- [x] MED [SEC] `mcp/src/client.ts` — multipart `file_path` sandboxed to `MOKKIFY_UPLOAD_DIR` via realpath prefix check.
+- [x] LOW — mcp spec-source diagnostic, generic mock error envelope, tightened mock path pattern, cached OpenAPI parse.
+
+### Needs human attention
+
+_See review.md `## Human attention` — read and accept or address before merge._
+
+- [ ] MED [PERF] `verify/route.ts:51` — verify flushes the global log buffer + polls ~360ms; concurrent verifies amplify SQLite writes (inherent to DD-005 best-effort correlation).
+- [ ] LOW [SEC] `api-key.service.ts:49` — auth timing distinguishes unknown vs known key_id (accepted: 64-bit CSPRNG id).
+- [ ] LOW [SEC] `verify/route.ts:45` — caller headers forwarded to the local self-call without an allowlist (mitigated by loopback target).
+- [ ] LOW [FID] `mock/validation.ts` — composite-mock path validation is stricter than direct endpoint creation.
+
+### Pipeline
+
+codex gpt-5.6-sol primary · 15 fixes (9 main + 6 Sonnet) · delta-review clean · verify-after-fixes green (type/lint/build/openapi/mcp + E2E 17/17) · PR-ready 1 documented exemption (CLI status print). Simplify + code-review-skill consciously deferred (new code already codex-reviewed; low marginal yield) — see review.md Pipeline log.
