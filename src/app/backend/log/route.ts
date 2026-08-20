@@ -21,7 +21,8 @@ export const GET = async (request: Request) => {
       ...(url.searchParams.get("to") && { to: url.searchParams.get("to") || "" }),
       ...(url.searchParams.get("template") && { template: url.searchParams.get("template") || "" }),
       ...(url.searchParams.get("host") && { host: url.searchParams.get("host") || "" }),
-      ...(url.searchParams.get("code") && { code: Number(url.searchParams.get("code")) })
+      ...(url.searchParams.get("code") && { code: Number(url.searchParams.get("code")) }),
+      ...(url.searchParams.get("correlation") && { correlation: url.searchParams.get("correlation") || "" })
     }
     const response = await logService.getEndpointLogs(endpoint.id, pagination, filters)
 

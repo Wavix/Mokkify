@@ -97,7 +97,7 @@ class LogService {
     }
   }
 
-  private async flush(): Promise<void> {
+  public async flush(): Promise<void> {
     if (flushTimer) {
       clearTimeout(flushTimer)
       flushTimer = null
@@ -138,7 +138,8 @@ class LogService {
           template_name: {
             [Op.like]: `%${filters.template}%`
           }
-        })
+        }),
+        ...(filters.correlation && { url: { [Op.like]: `%${filters.correlation}%` } })
       },
       order: [["id", "DESC"]]
     })
