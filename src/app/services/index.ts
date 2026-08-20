@@ -1,6 +1,7 @@
 export { ApiKeyService } from "./api-key.service"
 export { EndpointService } from "./endpoint.service"
 export { LogService } from "./log.service"
+export { MockService } from "./mock.service"
 export { TemplateService } from "./template.service"
 export { StatsService } from "./stats.service"
 export { RelayService } from "./relay.service"
