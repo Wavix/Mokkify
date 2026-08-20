@@ -139,7 +139,9 @@ class LogService {
             [Op.like]: `%${filters.template}%`
           }
         }),
-        ...(filters.correlation && { url: { [Op.like]: `%${filters.correlation}%` } })
+        ...(filters.correlation && {
+          url: { [Op.like]: `%mokkify_verify_id=${filters.correlation.replace(/[%_\\]/g, "")}%` }
+        })
       },
       order: [["id", "DESC"]]
     })

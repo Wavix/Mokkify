@@ -1,10 +1,11 @@
 import Joi from "joi"
 
 const methodSchema = Joi.string().valid("POST", "GET", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD")
+const PATH_PATTERN = /^\/?[A-Za-z0-9\-_.:*]+(?:\/[A-Za-z0-9\-_.:*]+)*$/
 
 export const schema = Joi.object().keys({
   title: Joi.string().min(1).required(),
-  path: Joi.string().min(1).required(),
+  path: Joi.string().min(1).pattern(PATH_PATTERN).required(),
   method: methodSchema.required(),
   response: Joi.object()
     .keys({

@@ -9,6 +9,7 @@ import type { ApiKeyAttributes } from "@/app/database/interfaces/api-key.interfa
 const KEY_ID_BYTES = 8
 const SECRET_BYTES = 32
 const SALT_ROUNDS = 10
+const LAST_USED_THROTTLE_MS = 60_000
 
 export type ApiKeyPublicAttributes = Omit<ApiKeyAttributes, "secret_hash">
 
@@ -43,7 +44,9 @@ export class ApiKeyService {
   }
 
   public async verify(presented: string): Promise<boolean> {
-    const [key_id, secret] = presented.split(".")
+    const parts = presented.split(".")
+    if (parts.length !== 2) return false
+    const [key_id, secret] = parts
     if (!key_id || !secret) return false
 
     const row = await DB.models.ApiKey.findOne({ where: { key_id, is_active: true } })
@@ -52,7 +55,8 @@ export class ApiKeyService {
     const isMatch = await bcrypt.compare(secret, row.secret_hash)
     if (!isMatch) return false
 
-    await row.update({ last_used_at: new Date() })
+    const last = row.last_used_at ? new Date(row.last_used_at).getTime() : 0
+    if (Date.now() - last > LAST_USED_THROTTLE_MS) await row.update({ last_used_at: new Date() })
     return true
   }
 

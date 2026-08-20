@@ -44,11 +44,11 @@ export const dbConnect = async () => {
     await DB.sequelize.query("PRAGMA journal_mode = WAL;")
     await DB.sequelize.query("PRAGMA synchronous = NORMAL;")
     await DB.sequelize.query("PRAGMA busy_timeout = 5000;")
+    DB.connected = true
     console.log("Database connected")
   } catch (err) {
     console.log("ERROR", err)
   }
-  DB.connected = true
 }
 
 export const dbCreate = async () => {

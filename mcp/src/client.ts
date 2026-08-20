@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises"
+import { readFile, realpath } from "node:fs/promises"
 import path from "node:path"
 
 import type { OpenApiOperation } from "./openapi.js"
@@ -31,6 +31,15 @@ function buildUrl(baseUrl: string, operation: OpenApiOperation, args: Record<str
   return url
 }
 
+async function resolveUploadPath(filePath: string): Promise<string> {
+  const baseDir = path.resolve(process.env.MOKKIFY_UPLOAD_DIR || process.cwd())
+  const resolved = path.resolve(baseDir, filePath)
+  const real = await realpath(resolved)
+  const isInBaseDir = real === baseDir || real.startsWith(`${baseDir}${path.sep}`)
+  if (!isInBaseDir) throw new Error(`file_path must resolve within ${baseDir}`)
+  return real
+}
+
 async function buildBody(
   operation: OpenApiOperation,
   args: Record<string, unknown>
@@ -48,9 +57,10 @@ async function buildBody(
   if (mediaType === "multipart/form-data") {
     const filePath = args.file_path
     if (typeof filePath !== "string") return { headers: {} }
-    const buffer = await readFile(filePath)
+    const resolvedPath = await resolveUploadPath(filePath)
+    const buffer = await readFile(resolvedPath)
     const form = new FormData()
-    form.set("file", new Blob([new Uint8Array(buffer)]), path.basename(filePath))
+    form.set("file", new Blob([new Uint8Array(buffer)]), path.basename(resolvedPath))
     return { body: form, headers: {} }
   }
 

@@ -20,18 +20,26 @@ const backedAuth = async (request: Request) => {
   if (!url.pathname.startsWith("/backend/")) return NextResponse.next()
   if (UNAUTHORIZED_PATHS.includes(url.pathname)) return NextResponse.next()
 
-  const token = request.headers.get("Authorization") || url.searchParams.get("token") || ""
-  const presented = token.split(" ").pop() || ""
+  const authHeader = request.headers.get("Authorization") || ""
+  const bearer = authHeader.startsWith("Bearer ") ? authHeader.slice("Bearer ".length).trim() : ""
+  const jwtCandidate = bearer || url.searchParams.get("token") || ""
 
   try {
-    await jwtVerify(presented, new TextEncoder().encode(appConfig.jwtSecret))
+    await jwtVerify(jwtCandidate, new TextEncoder().encode(appConfig.jwtSecret))
     return NextResponse.next()
   } catch {
-    // not a valid JWT — fall through to API-key check
+    // not a valid JWT — fall through to the API-key check
   }
 
-  if (!DB.connected) await dbConnect()
-  if (await new ApiKeyService().verify(presented)) return NextResponse.next()
+  if (bearer) {
+    try {
+      if (!DB.connected) await dbConnect()
+      if (await new ApiKeyService().verify(bearer)) return NextResponse.next()
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error("API-key verification failed:", (error as Error).message)
+    }
+  }
 
   return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 }

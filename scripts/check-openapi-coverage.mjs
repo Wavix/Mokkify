@@ -10,6 +10,15 @@ const BACKEND_DIR = path.join(ROOT, "src", "app", "backend")
 const SPEC_PATH = path.join(ROOT, "public", "openapi.yaml")
 const NEXT_CONFIG_PATH = path.join(ROOT, "next.config.js")
 
+const HTTP_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "HEAD"]
+const METHOD_EXPORT_PATTERN = new RegExp(`export\\s+(?:const|async function)\\s+(${HTTP_METHODS.join("|")})\\b`, "g")
+
+const extractMethods = content => {
+  const methods = new Set()
+  for (const match of content.matchAll(METHOD_EXPORT_PATTERN)) methods.add(match[1])
+  return methods
+}
+
 const findRouteFiles = async dir => {
   const entries = await readdir(dir, { withFileTypes: true })
   const files = await Promise.all(
@@ -53,21 +62,48 @@ const buildRewriteMap = async () => {
 const main = async () => {
   const routeFiles = await findRouteFiles(BACKEND_DIR)
   const rewriteMap = await buildRewriteMap()
-  const backendPaths = new Set(routeFiles.map(file => rewriteMap.get(toBackendPath(file)) || toBackendPath(file)))
+
+  const methodsByPath = new Map()
+  for (const file of routeFiles) {
+    const publicPath = rewriteMap.get(toBackendPath(file)) || toBackendPath(file)
+    const content = await readFile(file, "utf8")
+    const methods = methodsByPath.get(publicPath) || new Set()
+    for (const method of extractMethods(content)) methods.add(method)
+    methodsByPath.set(publicPath, methods)
+  }
 
   const specContent = await readFile(SPEC_PATH, "utf8")
   const spec = load(specContent)
-  const specPaths = new Set(Object.keys(spec.paths || {}))
+  const specPaths = spec.paths || {}
 
-  const uncovered = [...backendPaths].filter(backendPath => !specPaths.has(backendPath)).sort()
+  const uncoveredPaths = [...methodsByPath.keys()].filter(backendPath => !specPaths[backendPath]).sort()
 
-  if (uncovered.length) {
-    console.error("OpenAPI spec is missing the following /backend/* routes:")
-    for (const uncoveredPath of uncovered) console.error(`  - ${uncoveredPath}`)
+  const uncoveredMethods = []
+  for (const [routePath, methods] of methodsByPath) {
+    const specPathItem = specPaths[routePath]
+    if (!specPathItem) continue
+    for (const method of methods) {
+      if (!specPathItem[method.toLowerCase()]) uncoveredMethods.push(`${routePath} ${method}`)
+    }
+  }
+  uncoveredMethods.sort()
+
+  if (uncoveredPaths.length || uncoveredMethods.length) {
+    if (uncoveredPaths.length) {
+      console.error("OpenAPI spec is missing the following /backend/* routes:")
+      for (const uncoveredPath of uncoveredPaths) console.error(`  - ${uncoveredPath}`)
+    }
+    if (uncoveredMethods.length) {
+      console.error("OpenAPI spec is missing the following path+method combinations:")
+      for (const uncoveredMethod of uncoveredMethods) console.error(`  - ${uncoveredMethod}`)
+    }
     process.exit(1)
   }
 
-  console.log(`OpenAPI coverage OK: ${backendPaths.size} /backend/* routes are all documented in openapi.yaml.`)
+  const methodCount = [...methodsByPath.values()].reduce((count, methods) => count + methods.size, 0)
+  console.log(
+    `OpenAPI coverage OK: ${methodsByPath.size} /backend/* routes (${methodCount} methods) are all documented in openapi.yaml.`
+  )
 }
 
 await main()

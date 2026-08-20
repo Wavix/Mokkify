@@ -23,6 +23,7 @@ const createMock = async (request: Request) => {
     await cache.clear()
     return NextResponse.json({ endpoint })
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 400 })
+    console.error("Failed to create mock:", error)
+    return NextResponse.json({ error: "Failed to create mock" }, { status: 400 })
   }
 }

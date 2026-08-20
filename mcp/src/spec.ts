@@ -22,11 +22,14 @@ async function readLocalSpec(): Promise<OpenApiSpec> {
 
 export async function loadSpec(baseUrl: string): Promise<OpenApiSpec> {
   try {
-    return await fetchRemoteSpec(baseUrl)
+    const spec = await fetchRemoteSpec(baseUrl)
+    console.error(`[mokkify-mcp] using OpenAPI spec source: remote: ${baseUrl}`)
+    return spec
   } catch (error) {
     console.error(
       `[mokkify-mcp] could not fetch ${baseUrl}/openapi (${(error as Error).message}), falling back to local spec`
     )
+    console.error(`[mokkify-mcp] using OpenAPI spec source: local fallback: ${LOCAL_SPEC_PATH}`)
     return readLocalSpec()
   }
 }
