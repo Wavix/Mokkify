@@ -1,0 +1,1384 @@
+openapi: 3.1.0
+info:
+  title: Mokkify Backend API
+  description: >-
+    Management API for Mokkify mock endpoints, response/relay templates,
+    request logs, settings, and agent API keys. Every path under
+    `/backend/*` requires a bearer credential (a user JWT from `POST
+    /backend/auth`, or an API key from `POST /backend/api-key`) except
+    `/backend/auth` itself.
+  version: "2.0.0"
+  license:
+    name: MIT
+    url: https://github.com/wavix/mokkify/blob/main/LICENSE
+servers:
+  - url: /
+security:
+  - bearerAuth: []
+tags:
+  - name: auth
+    description: Login and JWT validation.
+  - name: endpoint
+    description: Mock endpoints and their random-rotation response templates.
+  - name: template
+    description: Response templates rendered by mock endpoints.
+  - name: relay
+    description: Relay payload templates forwarded to a target on match.
+  - name: log
+    description: Recorded requests against mock endpoints.
+  - name: stats
+    description: Per-endpoint request-rate statistics.
+  - name: settings
+    description: App settings, CSV dump import/export, and OpenAPI spec import.
+  - name: api-key
+    description: Revocable agent credentials for the /backend/* API.
+  - name: mock
+    description: Composite mock creation and one-call verification.
+
+paths:
+  /backend/auth:
+    post:
+      tags: [auth]
+      operationId: login
+      summary: Log in with a username and password
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [login, password]
+              properties:
+                login:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/UserWithToken"
+        "403":
+          description: Wrong login or password
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    get:
+      tags: [auth]
+      operationId: checkToken
+      summary: Validate a JWT and return the associated user
+      security: []
+      parameters:
+        - name: token
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Token is valid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        "403":
+          description: Token is missing or invalid
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/endpoint:
+    get:
+      tags: [endpoint]
+      operationId: listEndpoints
+      summary: List every mock endpoint
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoints:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Endpoint"
+    post:
+      tags: [endpoint]
+      operationId: createEndpoint
+      summary: Create a mock endpoint from existing template ids
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EndpointWriteRequest"
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint:
+                    $ref: "#/components/schemas/Endpoint"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/endpoint/{endpointId}:
+    parameters:
+      - $ref: "#/components/parameters/endpointId"
+    get:
+      tags: [endpoint]
+      operationId: getEndpoint
+      summary: Get a mock endpoint by id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint:
+                    $ref: "#/components/schemas/Endpoint"
+        "500":
+          description: Not found or invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags: [endpoint]
+      operationId: updateEndpoint
+      summary: Update a mock endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/EndpointWriteRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint:
+                    $ref: "#/components/schemas/Endpoint"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags: [endpoint]
+      operationId: deleteEndpoint
+      summary: Delete a mock endpoint
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "400":
+          description: Not found or invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/endpoint/{endpointId}/duplicate:
+    parameters:
+      - $ref: "#/components/parameters/endpointId"
+    post:
+      tags: [endpoint]
+      operationId: duplicateEndpoint
+      summary: Duplicate a mock endpoint and its templates
+      responses:
+        "200":
+          description: Duplicated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  endpoint:
+                    $ref: "#/components/schemas/Endpoint"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/endpoint/{endpointId}/logs:
+    parameters:
+      - $ref: "#/components/parameters/endpointId"
+    get:
+      tags: [log]
+      operationId: listEndpointLogs
+      summary: List logs recorded for a mock endpoint
+      description: >-
+        Rewritten by `next.config.js` to the internal `/backend/log` route
+        handler; always call this public path.
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 25
+        - name: from
+          in: query
+          schema:
+            type: string
+        - name: to
+          in: query
+          schema:
+            type: string
+        - name: template
+          in: query
+          schema:
+            type: string
+        - name: host
+          in: query
+          schema:
+            type: string
+        - name: code
+          in: query
+          schema:
+            type: integer
+        - name: correlation
+          in: query
+          description: Substring match against the log's stored request URL.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LogListResponse"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/endpoint/{endpointId}/log:
+    parameters:
+      - $ref: "#/components/parameters/endpointId"
+    delete:
+      tags: [log]
+      operationId: flushEndpointLogs
+      summary: Delete every log recorded for a mock endpoint
+      responses:
+        "200":
+          description: Flushed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "404":
+          description: Endpoint not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/endpoint/{endpointId}/multiple-templates:
+    parameters:
+      - $ref: "#/components/parameters/endpointId"
+    get:
+      tags: [endpoint]
+      operationId: listEndpointTemplates
+      summary: List the random-rotation response templates assigned to an endpoint
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  templates:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EndpointTemplateReference"
+    post:
+      tags: [endpoint]
+      operationId: updateEndpointTemplates
+      summary: Replace the random-rotation response templates assigned to an endpoint
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [templates]
+              properties:
+                templates:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      response_template_id:
+                        type: integer
+                      weight:
+                        type: number
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/template:
+    get:
+      tags: [template]
+      operationId: listTemplates
+      summary: List every response template
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  templates:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ResponseTemplate"
+    post:
+      tags: [template]
+      operationId: createTemplate
+      summary: Create a response template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResponseTemplateWriteRequest"
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  template:
+                    $ref: "#/components/schemas/ResponseTemplate"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/template/{templateId}:
+    parameters:
+      - $ref: "#/components/parameters/templateId"
+    get:
+      tags: [template]
+      operationId: getTemplate
+      summary: Get a response template by id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  template:
+                    $ref: "#/components/schemas/ResponseTemplate"
+        "500":
+          description: Not found or invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags: [template]
+      operationId: updateTemplate
+      summary: Update a response template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ResponseTemplateWriteRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  template:
+                    $ref: "#/components/schemas/ResponseTemplate"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags: [template]
+      operationId: deleteTemplate
+      summary: Delete a response template
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "400":
+          description: Not found or invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/template/{templateId}/duplicate:
+    parameters:
+      - $ref: "#/components/parameters/templateId"
+    post:
+      tags: [template]
+      operationId: duplicateTemplate
+      summary: Duplicate a response template
+      responses:
+        "200":
+          description: Duplicated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/relay:
+    get:
+      tags: [relay]
+      operationId: listRelayTemplates
+      summary: List every relay payload template
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relays:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/RelayPayloadTemplate"
+    post:
+      tags: [relay]
+      operationId: createRelayTemplate
+      summary: Create a relay payload template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelayPayloadTemplateWriteRequest"
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relay:
+                    $ref: "#/components/schemas/RelayPayloadTemplate"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/relay/{relayId}:
+    parameters:
+      - $ref: "#/components/parameters/relayId"
+    get:
+      tags: [relay]
+      operationId: getRelayTemplate
+      summary: Get a relay payload template by id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relay:
+                    $ref: "#/components/schemas/RelayPayloadTemplate"
+        "500":
+          description: Not found or invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    put:
+      tags: [relay]
+      operationId: updateRelayTemplate
+      summary: Update a relay payload template
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RelayPayloadTemplateWriteRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  relay:
+                    $ref: "#/components/schemas/RelayPayloadTemplate"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    delete:
+      tags: [relay]
+      operationId: deleteRelayTemplate
+      summary: Delete a relay payload template
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "400":
+          description: Not found or invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/relay/{relayId}/duplicate:
+    parameters:
+      - $ref: "#/components/parameters/relayId"
+    post:
+      tags: [relay]
+      operationId: duplicateRelayTemplate
+      summary: Duplicate a relay payload template
+      responses:
+        "200":
+          description: Duplicated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/log/{logId}:
+    parameters:
+      - $ref: "#/components/parameters/logId"
+    get:
+      tags: [log]
+      operationId: getLog
+      summary: Get a single log row by id
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  log:
+                    $ref: "#/components/schemas/Log"
+        "500":
+          description: Not found or invalid id
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/stats/{endpointId}:
+    parameters:
+      - $ref: "#/components/parameters/endpointId"
+    get:
+      tags: [stats]
+      operationId: getEndpointStats
+      summary: Get per-minute request-per-second stats for a mock endpoint
+      parameters:
+        - name: days
+          in: query
+          description: Number of trailing days to aggregate.
+          schema:
+            type: integer
+            default: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  rps:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EndpointStatsItem"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/settings:
+    get:
+      tags: [settings]
+      operationId: getSettings
+      summary: Get application settings (currently, the latest published version)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  settings:
+                    type: object
+                    properties:
+                      last_version:
+                        type: [string, "null"]
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/settings/dump:
+    get:
+      tags: [settings]
+      operationId: exportDump
+      summary: Export every endpoint, template, and relay as a CSV dump file
+      responses:
+        "200":
+          description: CSV dump file
+          content:
+            text/plain:
+              schema:
+                type: string
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    post:
+      tags: [settings]
+      operationId: importDump
+      summary: Restore endpoints, templates, and relays from a CSV dump file
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/settings/openapi:
+    post:
+      tags: [settings]
+      operationId: importOpenApiSpec
+      summary: >-
+        Import a third-party OpenAPI specification, creating one mock
+        endpoint per undeclared operation
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          description: Imported
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  created:
+                    type: integer
+                  skipped:
+                    type: array
+                    items:
+                      type: string
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/api-key:
+    get:
+      tags: [api-key]
+      operationId: listApiKeys
+      summary: List every API key (without secrets)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  keys:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/ApiKey"
+    post:
+      tags: [api-key]
+      operationId: createApiKey
+      summary: Create an API key
+      description: >-
+        The plaintext key (`<key_id>.<secret>`) is returned exactly once in
+        this response and is never retrievable again.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  key:
+                    $ref: "#/components/schemas/ApiKey"
+                  plaintext:
+                    type: string
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/api-key/{keyId}:
+    parameters:
+      - $ref: "#/components/parameters/keyId"
+    delete:
+      tags: [api-key]
+      operationId: revokeApiKey
+      summary: Revoke (permanently delete) an API key
+      responses:
+        "200":
+          description: Revoked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+    patch:
+      tags: [api-key]
+      operationId: toggleApiKey
+      summary: Activate or deactivate an API key
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [is_active]
+              properties:
+                is_active:
+                  type: boolean
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Success"
+        "400":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/mock:
+    post:
+      tags: [mock]
+      operationId: createMock
+      summary: Create a complete mock (response template, optional relay template, and endpoint) in one call
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MockCreateRequest"
+      responses:
+        "200":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  endpoint:
+                    $ref: "#/components/schemas/Endpoint"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+  /backend/mock/{endpointId}/verify:
+    parameters:
+      - $ref: "#/components/parameters/endpointId"
+    post:
+      tags: [mock]
+      operationId: verifyMock
+      summary: Fire a mock endpoint and return its response plus the correlated log row
+      description: >-
+        Fires the request against the public `/api/*` mock engine and
+        returns that HTTP response synchronously. The log/relay detail is
+        best-effort: it is read back via a correlation id after a bounded
+        flush-and-poll window, and is `{ "pending": true }` if the buffered
+        write has not landed yet.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VerifyRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VerifyResponse"
+        "404":
+          description: Endpoint not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+        "500":
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        Either a user JWT from `POST /backend/auth` or an API key from
+        `POST /backend/api-key` (format `<key_id>.<secret>`).
+
+  parameters:
+    endpointId:
+      name: endpointId
+      in: path
+      required: true
+      schema:
+        type: integer
+    templateId:
+      name: templateId
+      in: path
+      required: true
+      schema:
+        type: integer
+    relayId:
+      name: relayId
+      in: path
+      required: true
+      schema:
+        type: integer
+    logId:
+      name: logId
+      in: path
+      required: true
+      schema:
+        type: integer
+    keyId:
+      name: keyId
+      in: path
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    Method:
+      type: string
+      enum: [GET, POST, PUT, DELETE, PATCH, OPTIONS, HEAD]
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+
+    UserWithToken:
+      allOf:
+        - $ref: "#/components/schemas/User"
+        - type: object
+          properties:
+            token:
+              type: string
+
+    ResponseTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: [string, "null"]
+        body_parsed:
+          description: JSON-parsed form of `body` when it is valid JSON.
+        code:
+          type: integer
+        content_type:
+          type: string
+        headers:
+          type: [object, "null"]
+          additionalProperties:
+            type: string
+        user_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    ResponseTemplateWriteRequest:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: [string, "null"]
+        code:
+          type: integer
+          default: 200
+        content_type:
+          type: string
+          pattern: "^[\\w.+-]+/[\\w.+-]+$"
+        headers:
+          type: [object, "null"]
+          additionalProperties:
+            type: string
+
+    RelayPayloadTemplate:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        body:
+          type: [string, "null"]
+        user_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    RelayPayloadTemplateWriteRequest:
+      type: object
+      required: [title, body]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        body:
+          type: [string, "null"]
+
+    EndpointTemplateReference:
+      type: object
+      properties:
+        id:
+          type: integer
+        endpoint_id:
+          type: integer
+        response_template_id:
+          type: integer
+        weight:
+          type: number
+        response:
+          $ref: "#/components/schemas/ResponseTemplate"
+
+    Endpoint:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+        title:
+          type: string
+        path:
+          type: string
+        method:
+          $ref: "#/components/schemas/Method"
+        response_template_id:
+          type: [integer, "null"]
+        is_multiple_templates:
+          type: boolean
+        max_pending_time:
+          type: [integer, "null"]
+        relay_enabled:
+          type: boolean
+        relay_target:
+          type: [string, "null"]
+        relay_method:
+          $ref: "#/components/schemas/Method"
+        relay_payload_template_id:
+          type: [integer, "null"]
+        user_id:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+        response:
+          $ref: "#/components/schemas/ResponseTemplate"
+        relay_payload:
+          $ref: "#/components/schemas/RelayPayloadTemplate"
+        multiple_responses:
+          type: array
+          items:
+            $ref: "#/components/schemas/EndpointTemplateReference"
+
+    EndpointWriteRequest:
+      type: object
+      required:
+        - title
+        - path
+        - method
+        - response_template_id
+        - max_pending_time
+        - is_multiple_templates
+        - relay_payload_template_id
+        - relay_enabled
+        - relay_target
+        - relay_method
+      properties:
+        title:
+          type: string
+          minLength: 1
+        path:
+          type: string
+          minLength: 1
+        method:
+          $ref: "#/components/schemas/Method"
+        response_template_id:
+          type: [integer, "null"]
+        max_pending_time:
+          type: [integer, "null"]
+        is_multiple_templates:
+          type: boolean
+        relay_payload_template_id:
+          type: [integer, "null"]
+        relay_enabled:
+          type: boolean
+        relay_target:
+          type: [string, "null"]
+        relay_method:
+          $ref: "#/components/schemas/Method"
+
+    Log:
+      type: object
+      properties:
+        id:
+          type: integer
+        uuid:
+          type: string
+        endpoint_id:
+          type: integer
+        url:
+          type: string
+        pathname:
+          type: string
+        method:
+          $ref: "#/components/schemas/Method"
+        user_agent:
+          type: [string, "null"]
+        search:
+          type: string
+        request_payload: {}
+        response_payload: {}
+        template_name:
+          type: [string, "null"]
+        relay_url:
+          type: [string, "null"]
+        relay_method:
+          anyOf:
+            - $ref: "#/components/schemas/Method"
+            - type: "null"
+        relay_request_body: {}
+        relay_response_body: {}
+        relay_response_code:
+          type: [integer, "null"]
+        request_headers:
+          type: object
+          additionalProperties:
+            type: string
+        response_code:
+          type: integer
+        request_ip:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    Pagination:
+      type: object
+      properties:
+        limit:
+          type: integer
+        total:
+          type: integer
+        current_page:
+          type: integer
+        total_pages:
+          type: integer
+
+    LogListResponse:
+      type: object
+      properties:
+        pagination:
+          $ref: "#/components/schemas/Pagination"
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Log"
+
+    EndpointStatsItem:
+      type: object
+      properties:
+        date:
+          type: string
+        requests:
+          type: integer
+        rps:
+          type: number
+
+    ApiKey:
+      type: object
+      properties:
+        id:
+          type: integer
+        key_id:
+          type: string
+        name:
+          type: string
+        is_active:
+          type: boolean
+        last_used_at:
+          type: [string, "null"]
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    MockCreateRequest:
+      type: object
+      required: [title, path, method, response]
+      properties:
+        title:
+          type: string
+          minLength: 1
+        path:
+          type: string
+          minLength: 1
+        method:
+          $ref: "#/components/schemas/Method"
+        response:
+          type: object
+          required: [code, body]
+          properties:
+            code:
+              type: integer
+            content_type:
+              type: string
+              pattern: "^[\\w.+-]+/[\\w.+-]+$"
+            headers:
+              type: [object, "null"]
+              additionalProperties:
+                type: string
+            body:
+              type: [string, "null"]
+        relay:
+          type: object
+          required: [target, method]
+          properties:
+            target:
+              type: string
+              minLength: 1
+            method:
+              $ref: "#/components/schemas/Method"
+            body:
+              type: string
+        max_pending_time:
+          type: [integer, "null"]
+
+    VerifyRequest:
+      type: object
+      properties:
+        method:
+          $ref: "#/components/schemas/Method"
+        query:
+          type: object
+          additionalProperties:
+            type: string
+        body: {}
+        headers:
+          type: object
+          additionalProperties:
+            type: string
+
+    VerifyResponse:
+      type: object
+      properties:
+        response:
+          type: object
+          properties:
+            status:
+              type: integer
+            body:
+              type: string
+            headers:
+              type: object
+              additionalProperties:
+                type: string
+        log:
+          anyOf:
+            - $ref: "#/components/schemas/Log"
+            - type: object
+              properties:
+                pending:
+                  type: boolean
