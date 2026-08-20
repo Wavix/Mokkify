@@ -135,15 +135,25 @@ depend on the log for its core result:
    unauthenticated) and returns that HTTP response (status, body, headers)
    directly. This alone answers "does my mock respond as expected?"
 2. **Relay/log enrichment (best-effort):** verify injects a unique
-   correlation marker (a header) into the fired request, then calls a
-   newly-**public** `LogService.flush()` and queries the log by that
-   correlation via a new `correlation` filter on `getEndpointLogs`, with
-   bounded retries covering the flush interval. If the row is not yet
-   available, the relay detail is returned as `pending`, never a foreign
-   row.
+   correlation marker (`mokkify_verify_id`) into the fired request and
+   registers a per-correlation waiter (`LogService.awaitLog`) **before**
+   firing. The mock engine persists the log with a dedicated
+   `logs.correlation` column; the next buffer flush resolves the waiter
+   with that exact row (indexed exact-match, not a `LIKE` scan). If no
+   row arrives within the wait timeout, the relay detail is returned as
+   `pending`, never a foreign row.
 
 No new mock-serving or template-rendering logic is added; verify
-orchestrates the existing engine plus a flush + correlated read.
+orchestrates the existing engine plus a correlation-keyed awaitable read.
+
+> **Post-implementation note:** the shipped design replaced the original
+> public-`flush()` + bounded-polling approach with an in-memory
+> per-correlation waiter (`awaitLog`/`resolveWaiters`, `flush()` kept
+> private) plus an indexed `logs.correlation` column. This removes the
+> forced global flush and the ~360ms poll window. Trade-off: coordination
+> is **process-local** — in a clustered/serverless deploy the log may be
+> written by a worker without the waiter, returning a false `pending`.
+> Acceptable under DD-002 (single-process SQLite).
 
 ### DD-006: Searchable key id + hashed secret; plaintext shown once at creation
 
@@ -226,8 +236,11 @@ Response: the created endpoint (same shape as `POST /backend/endpoint`).
   - `src/app/database/models/index.ts`,
     `src/app/database/connect.ts` (register `ApiKey`)
   - `src/app/services/index.ts` (export new services)
-  - `src/app/services/log.service.ts` (promote `flush()` to public; add a
-    `correlation` filter to `getEndpointLogs` for the verify read)
+  - `src/app/services/log.service.ts` (add `awaitLog`/`resolveWaiters` for
+    a per-correlation awaitable read; add an exact `correlation` filter to
+    `getEndpointLogs`)
+  - `src/app/database/models/log.model.ts` (add an indexed nullable
+    `correlation` column)
 - **No changes** to the mock engine's request path (`src/app/api/route.ts`
   stays fire-and-forget on logging), the template/relay services' core
   logic, the response-template variable system, or the existing UI JWT
@@ -301,7 +314,7 @@ credential handling.
 ### EC-004: Verify returns the synchronous response and the correlated (not foreign) log
 
 - **Assertion:** The verify call returns the mock's HTTP response synchronously, and any log/relay detail it returns is the correlated row for that exact request (or `pending`) — never another concurrent request's row.
-- **Evidence target:** `src/app/backend/mock/[endpointId]/verify/route.ts` returns the direct `/api/*` response + calls public `LogService.flush()` and reads by `correlation` filter (`src/app/services/log.service.ts`) + scripted concurrent-fire check shows each verify result carries its own correlated row.
+- **Evidence target:** `src/app/backend/mock/[endpointId]/verify/route.ts` returns the direct `/api/*` response + awaits its correlated row via `LogService.awaitLog` keyed on the indexed `logs.correlation` column (`src/app/services/log.service.ts`) + scripted concurrent-fire check shows each verify result carries its own correlated row.
 - **Realized by:** DD-005
 
 ### EC-005: Existing UI JWT flow is unregressed

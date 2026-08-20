@@ -105,3 +105,37 @@ _Items deliberately not fixed — read and accept or address before merge._
 - Before fixes: CRIT 0 / HIGH 1 / MED 9 / LOW 6 / INFO 5
 - After fixes: CRIT 0 / HIGH 0 / MED 0 / LOW 3 (accepted) / INFO 5
 - Fixed: 1 HIGH + 9 MED + 4 LOW (16 findings); verified via full gate set + live E2E 17/17 (twice)
+
+---
+
+## Iteration 2
+
+**Engine:** codex gpt-5.6-sol (exit 0) · **Diff:** 44 files, +5377 / -82 vs origin/main
+**Focus:** verify correlation refactor (commits `45d6088`, `f148afc`)
+
+### Verdict
+
+**PASS with notes.** 1 HIGH [PERF] actionable; remaining MED/LOW are the
+already-accepted single-process / no-migration / no-test-framework tradeoffs
+plus one doc-drift (design/plan still describe the pre-refactor public-flush
+architecture).
+
+### Findings
+
+- [X] `log.service.ts:145` — [HIGH] [PERF] `resolveWaiters` runs one `findOne` per correlated row; `correlation` was unindexed and the SQLite pool is single-writer → full-table scans under concurrent verify. **Fixed** (commit pending): added a BTREE index on `logs.correlation` in `log.model.ts` — each resolve is now an index seek.
+- [X] `log.service.ts:105` — [MED] [FID] design.md EC-004 + plan Task 6 doc-drift. **Fixed**: design.md DD-005/EC-004/File Map and plan.md Task 6 updated to describe the shipped `awaitLog` + indexed-column architecture with a process-local caveat.
+- [ ] `log.service.ts:62` — [MED] [REG] correlation coordination is process-local (in-memory Map); a clustered/serverless deploy would return false `pending`. Accepted: DD-002 single-process SQLite. Now documented here.
+- [ ] `log.model.ts:63` — [MED] [MIG] `logs.correlation` added via `sync({alter})` with no migration/rollback for a large logs table. Accepted: DD-002 no-migration design.
+- [ ] `log.service.ts:105` — [MED] [FID] design.md EC-004 + plan Task 6 still specify a public `flush()` + polling; implementation replaced it with `awaitLog`/private flush. Doc drift — update design/plan to match.
+- [ ] `log.service.ts:105` — [MED] [REG] no committed automated test for `awaitLog`/`resolveWaiters`. Accepted: no unit framework in repo (per design); E2E is a script.
+- [ ] `log.service.ts:128` — [MED] [REG] buffer `splice` before `bulkCreate` discards the batch on write error (waiters time out to `pending`). Splice-before-await is intentional (avoids dup insert); best-effort per DD-005.
+- [ ] `log.service.ts:107` — [LOW] [PERF] each verify holds a Map entry + timer up to 3s; self-cleans, no permanent leak.
+- [ ] `src/ui/api/api-keys.ts:5` — [LOW] [REG] `getApiKeysList` maps any non-2xx to `[]`, so the UI can't distinguish empty list from auth/server error.
+
+Completeness: all 7 DDs done (DD-005 with process-local caveat). EC-001..003,005 met; EC-004 met same-process, false `pending` cross-process.
+
+### Recommended action
+
+Only the HIGH is a clear net-positive fix (add `correlation` index — cheap,
+low-risk). The MED/LOW items are either previously-accepted design tradeoffs
+or doc-drift; fix design/plan drift if the artifacts must stay canonical.

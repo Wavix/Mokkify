@@ -439,15 +439,23 @@ partial-failure handling from the agent.
 
 ## Task 6: Log correlation filter and public flush
 
+> **Superseded during implementation** (commit `45d6088`): shipped as a
+> per-correlation in-memory waiter (`LogService.awaitLog`/`resolveWaiters`,
+> `flush()` kept **private**) plus an indexed nullable `logs.correlation`
+> column — not a public `flush()` + polling. The exact-match filter reads
+> the `correlation` column, not a `LIKE` on `url`. Steps below reflect the
+> original blueprint; see design.md DD-005 post-implementation note.
+
 **Files:**
 
 - Modify: `src/app/services/log.service.ts:100-146`
 - Modify: `src/types/common.d.ts:50-56`
 - Modify: `src/app/backend/log/route.ts:19-25`
+- Modify: `src/app/database/models/log.model.ts` (indexed `correlation` column)
 
 **Context:** Verification must read the exact log row for its own request.
 Logging is fire-and-forget and buffered (`log.service.ts:26,89-97`), so
-verify needs a public flush and a correlation-scoped read.
+verify needs a correlation-keyed awaitable read.
 
 **Covers:** DD-005
 
