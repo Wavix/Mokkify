@@ -90,7 +90,7 @@ All 5 EC production+test evidence present. Test evidence is the live E2E script 
 
 _Items deliberately not fixed — read and accept or address before merge._
 
-- `src/app/backend/mock/[endpointId]/verify/route.ts:51` — [MED] [PERF] verify flushes the global log buffer + polls up to ~360ms per call; concurrent verifies amplify SQLite writes. Inherent to DD-005's best-effort correlation. A dedicated correlation column + awaitable per-request completion would remove global flushing — a design change, deferred.
+- ~~`verify/route.ts:51` — [MED] [PERF] global flush + polling~~ **RESOLVED** (commit `45d6088`): added a `Log.correlation` column + a per-correlation awaitable in `LogService`; verify now awaits only its own row (no `flush()`, no polling), and the log correlation filter is an exact column match instead of `LIKE` on `url`. Re-verified: live E2E 17/17, correlated log returned with real id.
 - `src/app/services/api-key.service.ts:49` — [LOW] [SEC] auth timing distinguishes unknown vs known-active key_id (bcrypt runs only on a hit). Accepted: key_id is 64-bit CSPRNG. Add a dummy bcrypt on miss if key_ids are later treated as sensitive.
 - `src/app/backend/mock/[endpointId]/verify/route.ts:45` — [LOW] [SEC] caller-supplied headers forwarded to the self-call without an allowlist. Mitigated by the loopback-origin fix (target is always local), but header abuse of the local mock engine remains possible — accept for a trusted-agent tool.
 - `src/app/backend/mock/validation.ts:7` — [LOW] [FID] the new `path` pattern is stricter than `POST /backend/endpoint` (which has no path pattern at all), so a path acceptable via direct endpoint creation could be rejected by the composite `POST /backend/mock`. Deliberate hardening; accept unless a real agent workflow needs an exotic path — then relax both entry points together.
@@ -101,7 +101,7 @@ _Items deliberately not fixed — read and accept or address before merge._
 
 ## Summary
 
-- **Human attention:** 4 items
+- **Human attention:** 3 items (the MED [PERF] verify item was resolved post-review — commit `45d6088`)
 - Before fixes: CRIT 0 / HIGH 1 / MED 9 / LOW 6 / INFO 5
-- After fixes: CRIT 0 / HIGH 0 / MED 1 (accepted) / LOW 3 (accepted) / INFO 5
-- Fixed: 1 HIGH + 8 MED + 4 LOW (15 findings); verified via full gate set + live E2E 17/17
+- After fixes: CRIT 0 / HIGH 0 / MED 0 / LOW 3 (accepted) / INFO 5
+- Fixed: 1 HIGH + 9 MED + 4 LOW (16 findings); verified via full gate set + live E2E 17/17 (twice)
