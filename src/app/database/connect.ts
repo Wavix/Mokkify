@@ -19,6 +19,7 @@ const DB: Db = {
   connected: false,
   models: {
     User: Models.User(sequelize, DataTypes),
+    ApiKey: Models.ApiKey(sequelize, DataTypes),
     Endpoint: Models.Endpoint(sequelize, DataTypes),
     Log: Models.Log(sequelize, DataTypes),
     ResponseTemplate: Models.ResponseTemplate(sequelize, DataTypes),

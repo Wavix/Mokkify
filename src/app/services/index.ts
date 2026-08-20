@@ -1,3 +1,4 @@
+export { ApiKeyService } from "./api-key.service"
 export { EndpointService } from "./endpoint.service"
 export { LogService } from "./log.service"
 export { TemplateService } from "./template.service"
