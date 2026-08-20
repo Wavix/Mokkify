@@ -216,9 +216,9 @@ Response: the created endpoint (same shape as `POST /backend/endpoint`).
   - `src/app/services/api-key.service.ts`, `src/app/services/mock.service.ts`
   - `src/app/backend/api-key/route.ts`,
     `src/app/backend/api-key/[keyId]/route.ts`
-  - `src/app/backend/mock/route.ts` + `validation.ts`
+  - `src/app/backend/mock/route.ts`, `src/app/backend/mock/validation.ts`
   - `src/app/backend/mock/[endpointId]/verify/route.ts`
-  - `src/app/backend/openapi.json/route.ts` (or `public/openapi.yaml`)
+  - `public/openapi.yaml` + `src/app/openapi/route.ts` (served ungated)
   - `mcp/` package (generated-from-spec MCP server)
   - `src/ui/sections/Settings/ApiKeys.tsx` + `src/ui/api/api-keys.ts`
 - **Files modified:**
@@ -295,7 +295,7 @@ credential handling.
 ### EC-003: A published OpenAPI contract drives generated agent tools
 
 - **Assertion:** The app serves a valid OpenAPI 3.1 spec covering every `/backend/*` route (incl. mock + verify), and the MCP server's tools are generated from that spec (not hand-authored).
-- **Evidence target:** `src/app/backend/openapi.json/route.ts` (or `public/openapi.yaml`) passes `pnpm openapi:validate` + a coverage check maps each `src/app/backend/**/route.ts` to a spec path + `mcp/` boots and its tool count equals the spec's operation count.
+- **Evidence target:** `public/openapi.yaml` served by `src/app/openapi/route.ts` passes `pnpm openapi:validate` + a coverage check maps each `src/app/backend/**/route.ts` to a spec path + `mcp/` boots and its tool count equals the spec's operation count.
 - **Realized by:** DD-003, DD-007
 
 ### EC-004: Verify returns the synchronous response and the correlated (not foreign) log
