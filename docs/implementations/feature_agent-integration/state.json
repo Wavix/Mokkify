@@ -4,11 +4,14 @@
   "slug": "feature_agent-integration",
   "jira": null,
   "created_at": "2026-08-20T06:02:33Z",
-  "updated_at": "2026-08-20T06:15:48Z",
-  "current_step": "planned",
-  "advisor_budget_remaining": 10,
-  "completed_tasks": [],
-  "stack_skills": [],
+  "updated_at": "2026-08-20T07:12:50Z",
+  "current_step": "implemented",
+  "advisor_budget_remaining": 7,
+  "completed_tasks": ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"],
+  "stack_skills": [
+    { "id": "nodejs-backend", "path": "/Users/admin/.claude/skills/nodejs-backend/SKILL.md" },
+    { "id": "frontend", "path": "/Users/admin/.claude/skills/frontend/SKILL.md" }
+  ],
   "snapshots": {
     "fixes": null,
     "step12": null,
