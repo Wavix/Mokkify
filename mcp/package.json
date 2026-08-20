@@ -1,0 +1,23 @@
+{
+  "name": "mokkify-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Stdio MCP server generated from Mokkify's OpenAPI spec — one tool per /backend/* operation.",
+  "main": "dist/index.js",
+  "scripts": {
+    "type": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.22.0",
+    "js-yaml": "^5.3.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.18.0",
+    "typescript": "^5.7.3"
+  }
+}
