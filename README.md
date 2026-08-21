@@ -164,25 +164,11 @@ On startup the server logs which spec source it used (`remote:` when Mokkify is 
 
 ### Example: migrate a project's integrations to mocks
 
-The point of the MCP server is to skip wiring webhooks by hand. Once it's registered, ask the agent to replace a project's external integrations with Mokkify mocks. The MCP handles the Mokkify side (`createMock` + `verifyMock`); the agent uses its own file tools for the rest.
+Once the MCP is registered, ask the agent to replace a project's external integrations with mocks — no hand-wired webhooks. A prompt like:
 
-A prompt like:
+> Scan this project for outbound HTTP integrations. For each, use the `mokkify` MCP to create a mock with a realistic response under its own path prefix, then repoint the integration's base URL at Mokkify and run the integration tests.
 
-> Scan this project for outbound HTTP integrations. For each one, use the `mokkify` MCP to create a mock returning a realistic response, giving every integration its own path prefix. Then repoint each integration's base URL at Mokkify and run the integration tests.
-
-drives roughly this flow:
-
-1. **Discover** — the agent reads your code to find outbound calls (URL, method, expected response). _(agent, not MCP)_
-2. **Create mocks** — one `createMock` per integration, namespaced by a path prefix so they don't collide, e.g. Stripe's `POST https://api.stripe.com/v1/charges` becomes a mock at `POST /stripe/v1/charges`. _(MCP)_
-3. **Verify** — `verifyMock` fires each mock and confirms the response + correlated log. _(MCP)_
-4. **Repoint** — the agent edits your config/env so each integration's base URL targets `http://localhost:3000/api/<prefix>` (e.g. Stripe base URL → `http://localhost:3000/api/stripe`). _(agent, not MCP)_
-5. **Run** — the agent runs your integration tests against the mocks. _(agent)_
-
-What to keep in mind:
-
-- Response bodies are only as accurate as what the agent can infer from your code — feed it real examples (captured responses, provider OpenAPI, VCR cassettes) where the shape isn't obvious.
-- Templates resolve request-derived variables (`@request.field`, `@path.param`, `@uuid`), but conditional/stateful behavior needs one mock per branch — the agent should split those out.
-- `verifyMock` proves the mock responds; whether your project works against it is what step 5 checks.
+The agent discovers the calls and repoints your config itself; the MCP does the Mokkify side — `createMock` per integration (namespaced, e.g. `POST https://api.stripe.com/v1/charges` → mock `POST /stripe/v1/charges`, base URL → `http://localhost:3000/api/stripe`) and `verifyMock` to confirm each. Feed it real response examples where the shape isn't obvious in code, and split conditional behavior into one mock per branch.
 
 ## Nginx config for deployment
 
