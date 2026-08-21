@@ -124,7 +124,65 @@ Two operations cover the whole "make a mock, then prove it works" loop:
 
 ### MCP server
 
-`mcp/` is a stdio MCP server that fetches the OpenAPI contract at startup and generates one tool per operation — no hand-written tools. Register it with Claude Desktop / Claude Code and an agent can drive Mokkify directly. See [`mcp/README.md`](mcp/README.md) for setup and examples.
+`mcp/` is a stdio MCP server that fetches the OpenAPI contract at startup and generates one tool per `/backend/*` operation — no hand-written tools. Register it with an MCP client (Claude Desktop / Claude Code) and an agent can drive Mokkify directly.
+
+Build it first (`dist/` and `node_modules/` are gitignored):
+
+```bash
+cd mcp
+pnpm install
+pnpm build          # -> mcp/dist/index.js
+```
+
+Register over stdio, pointing at a running Mokkify and an API key:
+
+```jsonc
+{
+  "mcpServers": {
+    "mokkify": {
+      "command": "node",
+      "args": ["/absolute/path/to/mokkify/mcp/dist/index.js"],
+      "env": {
+        "MOKKIFY_BASE_URL": "http://localhost:3000",
+        "MOKKIFY_API_KEY": "<key_id>.<secret>"
+      }
+    }
+  }
+}
+```
+
+In Claude Code, the one-liner:
+
+```bash
+claude mcp add mokkify \
+  --env MOKKIFY_BASE_URL=http://localhost:3000 \
+  --env MOKKIFY_API_KEY=<key_id>.<secret> \
+  -- node /absolute/path/to/mokkify/mcp/dist/index.js
+```
+
+On startup the server logs which spec source it used (`remote:` when Mokkify is reachable, otherwise a fallback to the bundled `public/openapi.yaml`) and how many tools it registered. Bumped Mokkify to a version with new endpoints? Just restart the MCP server — tools regenerate from the fresh spec. See [`mcp/README.md`](mcp/README.md) for the full reference.
+
+### Example: migrate a project's integrations to mocks
+
+The point of the MCP server is to skip wiring webhooks by hand. Once it's registered, ask the agent to replace a project's external integrations with Mokkify mocks. The MCP handles the Mokkify side (`createMock` + `verifyMock`); the agent uses its own file tools for the rest.
+
+A prompt like:
+
+> Scan this project for outbound HTTP integrations. For each one, use the `mokkify` MCP to create a mock returning a realistic response, giving every integration its own path prefix. Then repoint each integration's base URL at Mokkify and run the integration tests.
+
+drives roughly this flow:
+
+1. **Discover** — the agent reads your code to find outbound calls (URL, method, expected response). _(agent, not MCP)_
+2. **Create mocks** — one `createMock` per integration, namespaced by a path prefix so they don't collide, e.g. Stripe's `POST https://api.stripe.com/v1/charges` becomes a mock at `POST /stripe/v1/charges`. _(MCP)_
+3. **Verify** — `verifyMock` fires each mock and confirms the response + correlated log. _(MCP)_
+4. **Repoint** — the agent edits your config/env so each integration's base URL targets `http://localhost:3000/api/<prefix>` (e.g. Stripe base URL → `http://localhost:3000/api/stripe`). _(agent, not MCP)_
+5. **Run** — the agent runs your integration tests against the mocks. _(agent)_
+
+What to keep in mind:
+
+- Response bodies are only as accurate as what the agent can infer from your code — feed it real examples (captured responses, provider OpenAPI, VCR cassettes) where the shape isn't obvious.
+- Templates resolve request-derived variables (`@request.field`, `@path.param`, `@uuid`), but conditional/stateful behavior needs one mock per branch — the agent should split those out.
+- `verifyMock` proves the mock responds; whether your project works against it is what step 5 checks.
 
 ## Nginx config for deployment
 
