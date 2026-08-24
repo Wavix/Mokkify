@@ -22,7 +22,9 @@ const getEndpointById = async (endpointId: number) => {
   try {
     const endpoint = await endpointService.getEndpointById(endpointId)
     return NextResponse.json({ endpoint })
-  } catch {
+  } catch (error) {
+    if ((error as Error).message === "Endpoint not found")
+      return NextResponse.json({ error: "Endpoint not found" }, { status: 404 })
     return NextResponse.json({ error: "Error while executing request" }, { status: 500 })
   }
 }

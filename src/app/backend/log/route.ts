@@ -16,7 +16,7 @@ export const GET = async (request: Request) => {
 
   try {
     const endpoint = await endpointService.getEndpointById(endpointId)
-    if (endpoint instanceof Error) return
+    if (endpoint instanceof Error) throw endpoint
 
     const pagination = getPaginationQuery(request)
     const filters: Partial<LogListFilters> = {
@@ -31,6 +31,8 @@ export const GET = async (request: Request) => {
 
     return NextResponse.json(response)
   } catch (error) {
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    const message = (error as Error).message
+    const status = message === "Endpoint not found" ? 404 : 500
+    return NextResponse.json({ error: message }, { status })
   }
 }
