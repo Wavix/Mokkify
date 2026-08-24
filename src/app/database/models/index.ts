@@ -1,3 +1,4 @@
+export { ApiKey } from "./api-key.model"
 export { Endpoint } from "./endpoint.model"
 export { Log } from "./log.model"
 export { ResponseTemplate } from "./response-template.model"

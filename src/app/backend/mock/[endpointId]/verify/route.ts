@@ -1,0 +1,98 @@
+import { NextResponse } from "next/server"
+import { v4 } from "uuid"
+
+import { getBodyPayload } from "@/app/backend/helpers"
+import { EndpointService, LogService } from "@/app/services"
+
+import { schema } from "./validation"
+
+import type { EndpointAttributes } from "@/app/database/interfaces/endpoint.interface"
+
+const endpointService = new EndpointService()
+const logService = new LogService()
+
+interface VerifyRequestBody {
+  method?: string
+  query?: Record<string, string>
+  body?: unknown
+  headers?: Record<string, string>
+}
+
+export const POST = async (request: Request, query: NextQuery) => await verifyMock(request, query)
+
+const verifyMock = async (request: Request, query: NextQuery) => {
+  const endpointId = Number((await query.params).endpointId || 0)
+  if (!endpointId) return NextResponse.json({ error: "Endpoint id must be a number" }, { status: 500 })
+
+  let endpoint: EndpointAttributes
+  try {
+    const resolved = await endpointService.getEndpointById(endpointId)
+    if (resolved instanceof Error) throw resolved
+    endpoint = resolved
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 404 })
+  }
+
+  const payload: VerifyRequestBody = (await getBodyPayload(request)) || {}
+  const validation = schema.validate(payload)
+  if (validation.error?.message)
+    return NextResponse.json({ error: validation.error.message.replaceAll('"', "'") }, { status: 400 })
+
+  try {
+    const correlation = v4().toString()
+    // Register the waiter before firing: the mock engine logs fire-and-forget, so the
+    // row can be buffered after fetch() resolves; the waiter settles on the next flush.
+    const logWaiter = logService.awaitLog(correlation)
+    const mockUrl = buildMockUrl(endpoint.path, payload.query, correlation)
+    const { body, headers } = buildRequestInit(payload)
+
+    const res = await fetch(mockUrl, {
+      method: payload.method || endpoint.method,
+      headers,
+      ...(body !== undefined && { body })
+    })
+    const responseBody = await res.text()
+    const responseHeaders = getResponseHeaders(res)
+
+    const log = await logWaiter
+
+    return NextResponse.json({
+      response: { status: res.status, body: responseBody, headers: responseHeaders },
+      log: log ?? { pending: true }
+    })
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+  }
+}
+
+// The self-call target is fixed to loopback, never derived from the request Host
+// header: a spoofable forwarded host would otherwise turn this into an SSRF vector.
+const selfOrigin = (): string => process.env.MOKKIFY_SELF_ORIGIN || `http://127.0.0.1:${process.env.PORT || 3000}`
+
+const buildMockUrl = (path: string, query: Record<string, string> | undefined, correlation: string): string => {
+  const normalizedPath = path.startsWith("/") ? path.slice(1) : path
+  const mockUrl = new URL(`/api/${normalizedPath}`, selfOrigin())
+
+  Object.entries(query || {}).forEach(([key, value]) => mockUrl.searchParams.set(key, value))
+  mockUrl.searchParams.set("mokkify_verify_id", correlation)
+
+  return mockUrl.toString()
+}
+
+const buildRequestInit = (payload: VerifyRequestBody): { body?: string; headers: Record<string, string> } => {
+  const headers: Record<string, string> = { ...payload.headers }
+  if (payload.body === undefined) return { headers }
+  if (typeof payload.body === "string") return { body: payload.body, headers }
+
+  if (!Object.keys(headers).some(key => key.toLowerCase() === "content-type"))
+    headers["Content-Type"] = "application/json"
+  return { body: JSON.stringify(payload.body), headers }
+}
+
+const getResponseHeaders = (response: Response): Record<string, string> => {
+  const headers: Record<string, string> = {}
+  response.headers.forEach((value, key) => {
+    headers[key] = value
+  })
+  return headers
+}

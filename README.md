@@ -2,7 +2,6 @@
 ![GitHub package.json version](https://img.shields.io/github/package-json/v/icevl/mokkify)
 ![GitHub last commit](https://img.shields.io/github/last-commit/icevl/mokkify)
 
-
 # Mokkify
 
 Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.js. Mokkify provides a flexible response builder and templating system for crafting your mocks, as well as support for Relay requests to an external hook to simulate various scenarios, like DLR. We've done our best to make the interface intuitive and easy to use.
@@ -23,6 +22,7 @@ Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.j
 - 🔄 Relay request support with external hooks
 - 🔮 Intuitive interface with light & dark themes
 - 🔐 Authorization
+- 🤖 Agent-ready: API keys, a published OpenAPI contract, and a bundled MCP server
 - 📈 Endpoint RPS graphics
 - 🗄️ Dump and restore configuration
 
@@ -76,27 +76,99 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 Response templates (and relay payloads) support variables that are resolved per request:
 
-| Variable | Value |
-| --- | --- |
-| `@uuid` | Random UUID v4 |
-| `@date` | Current date/time (ISO 8601) |
-| `@dateYYYYMMDD` | Current date as `YYYYMMDD` |
-| `@unix` | Current unix timestamp |
-| `@request.field.nested` | Value from the request body or query string |
-| `@response.field` | Value from the mock response body (relay payloads) |
-| `@path.param` | Path parameter value (`/users/:param`); wildcard tail: `@path.wildcard` |
+| Variable                | Value                                                                   |
+| ----------------------- | ----------------------------------------------------------------------- |
+| `@uuid`                 | Random UUID v4                                                          |
+| `@date`                 | Current date/time (ISO 8601)                                            |
+| `@dateYYYYMMDD`         | Current date as `YYYYMMDD`                                              |
+| `@unix`                 | Current unix timestamp                                                  |
+| `@request.field.nested` | Value from the request body or query string                             |
+| `@response.field`       | Value from the mock response body (relay payloads)                      |
+| `@path.param`           | Path parameter value (`/users/:param`); wildcard tail: `@path.wildcard` |
 
 ## Configuration
 
 Environment variables (all optional):
 
-| Variable | Default | Description |
-| --- | --- | --- |
-| `JWT_SECRET` | built-in dev secret | Secret used to sign auth tokens. **Set your own in production.** |
-| `DATABASE_PATH` | `database.sqlite` | Path to the SQLite database file (mount a volume here in Docker). |
-| `LOG_RETENTION_DAYS` | `30` | Request logs older than this are purged hourly. `0` disables the purge. |
+| Variable              | Default                          | Description                                                                                                                                |
+| --------------------- | -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `JWT_SECRET`          | built-in dev secret              | Secret used to sign auth tokens. **Set your own in production.**                                                                           |
+| `DATABASE_PATH`       | `database.sqlite`                | Path to the SQLite database file (mount a volume here in Docker).                                                                          |
+| `LOG_RETENTION_DAYS`  | `30`                             | Request logs older than this are purged hourly. `0` disables the purge.                                                                    |
+| `MOKKIFY_SELF_ORIGIN` | `http://127.0.0.1:${PORT:-3000}` | Loopback origin the verify endpoint uses for its internal self-call. Override only if the app can't reach its own `/api/*` on the default. |
 
 A `GET /health` endpoint (no auth) reports service and database status for load balancers and container healthchecks.
+
+## Agent & API access
+
+Beyond the browser UI, Mokkify exposes a machine-facing surface so agents (or any client) can configure and test mocks programmatically, without clicking through webhooks by hand.
+
+### API keys
+
+`/backend/*` is protected. In addition to the UI's JWT session, you can mint long-lived **API keys**:
+
+- Create one in the UI (**Settings → API Keys**) or via `POST /backend/api-key` with a JWT.
+- The key is returned **once** as `<key_id>.<secret>` — only a bcrypt hash of the secret is stored, so copy it immediately.
+- Send it as `Authorization: Bearer <key_id>.<secret>` on every request. Revoke or deactivate keys from the same screen.
+
+### OpenAPI contract
+
+`GET /openapi` serves the full OpenAPI 3.1 contract (no auth) describing every `/backend/*` operation. Point Swagger UI, code generators, or an agent's tool loader at it.
+
+### Composite create + verify
+
+Two operations cover the whole "make a mock, then prove it works" loop:
+
+- `POST /backend/mock` — atomically creates the response template and its endpoint in one call.
+- `POST /backend/mock/{endpointId}/verify` — fires the mock server-side and returns its synchronous response **plus the correlated log row** for that exact request.
+
+### MCP server
+
+`mcp/` is a stdio MCP server that fetches the OpenAPI contract at startup and generates one tool per `/backend/*` operation — no hand-written tools. Register it with an MCP client (Claude Desktop / Claude Code) and an agent can drive Mokkify directly.
+
+Build it first (`dist/` and `node_modules/` are gitignored):
+
+```bash
+cd mcp
+pnpm install
+pnpm build          # -> mcp/dist/index.js
+```
+
+Register over stdio, pointing at a running Mokkify and an API key:
+
+```jsonc
+{
+  "mcpServers": {
+    "mokkify": {
+      "command": "node",
+      "args": ["/absolute/path/to/mokkify/mcp/dist/index.js"],
+      "env": {
+        "MOKKIFY_BASE_URL": "http://localhost:3000",
+        "MOKKIFY_API_KEY": "<key_id>.<secret>"
+      }
+    }
+  }
+}
+```
+
+In Claude Code, the one-liner:
+
+```bash
+claude mcp add mokkify \
+  --env MOKKIFY_BASE_URL=http://localhost:3000 \
+  --env MOKKIFY_API_KEY=<key_id>.<secret> \
+  -- node /absolute/path/to/mokkify/mcp/dist/index.js
+```
+
+On startup the server logs which spec source it used (`remote:` when Mokkify is reachable, otherwise a fallback to the bundled `public/openapi.yaml`) and how many tools it registered. Bumped Mokkify to a version with new endpoints? Just restart the MCP server — tools regenerate from the fresh spec. See [`mcp/README.md`](mcp/README.md) for the full reference.
+
+### Example: migrate a project's integrations to mocks
+
+Once the MCP is registered, ask the agent to replace a project's external integrations with mocks — no hand-wired webhooks. A prompt like:
+
+> Scan this project for outbound HTTP integrations. For each, use the `mokkify` MCP to create a mock with a realistic response under its own path prefix, then repoint the integration's base URL at Mokkify and run the integration tests.
+
+The agent discovers the calls and repoints your config itself; the MCP does the Mokkify side — `createMock` per integration (namespaced, e.g. `POST https://api.stripe.com/v1/charges` → mock `POST /stripe/v1/charges`, base URL → `http://localhost:3000/api/stripe`) and `verifyMock` to confirm each. Feed it real response examples where the shape isn't obvious in code, and split conditional behavior into one mock per branch.
 
 ## Nginx config for deployment
 

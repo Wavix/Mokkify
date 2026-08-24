@@ -53,5 +53,6 @@ declare global {
     template: string
     host: string
     code: number
+    correlation: string
   }
 }

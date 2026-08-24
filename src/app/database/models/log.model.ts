@@ -51,6 +51,10 @@ export const Log = (sequelize: Sequelize.Sequelize, DataTypes: typeof Sequelize.
         type: DataTypes.STRING,
         allowNull: true
       },
+      correlation: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
       uuid: {
         type: DataTypes.UUID,
         defaultValue: Sequelize.UUIDV4,
@@ -92,6 +96,10 @@ export const Log = (sequelize: Sequelize.Sequelize, DataTypes: typeof Sequelize.
         },
         {
           fields: ["created_at"],
+          using: "BTREE"
+        },
+        {
+          fields: ["correlation"],
           using: "BTREE"
         }
       ]

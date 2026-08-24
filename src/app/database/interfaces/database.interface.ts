@@ -1,3 +1,4 @@
+import type { ApiKeyModel } from "./api-key.interface"
 import type { EndpointTemplateReferenceModel } from "./endpoint-template-reference.interface"
 import type { EndpointModel } from "./endpoint.interface"
 import type { LogModel } from "./log.interface"
@@ -8,6 +9,7 @@ import type { Sequelize } from "sequelize"
 
 export interface Models {
   User: UserModel
+  ApiKey: ApiKeyModel
   Endpoint: EndpointModel
   Log: LogModel
   ResponseTemplate: ResponseTemplateModel
