@@ -59,8 +59,6 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     setLogs(listInitial)
     getLogs()
     startUpdateInterval()
-    // Without this cleanup a stale interval keeps polling the previous endpoint
-    // (e.g. one that was just deleted) after navigating away.
     return stopUpdateInterval
   }, [endpointId, page, limit, ...filtersList])
 
@@ -105,8 +103,6 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
       limit,
       ...filters
     })
-    // An error payload (endpoint deleted, backend failure) has no items/pagination:
-    // rendering it would crash and polling it further is pointless.
     if (response instanceof Error || !response?.pagination) {
       stopUpdateInterval()
       setIsLogsLoading(false)

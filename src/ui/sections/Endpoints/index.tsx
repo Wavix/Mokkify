@@ -46,8 +46,6 @@ const Endpoints: NextPage = () => {
     try {
       const response = await API.deleteEndpoint(id)
       if (!response.success) return failureToast("Error deleting endpoint")
-      // Compare against the route param, not activeEndpoint state, which can lag
-      // behind navigation and skip the redirect away from the deleted endpoint.
       if (endpointId === id) router.push("/endpoints", undefined, { scroll: false, shallow: true })
       getEndpoints(false)
       successToast("Endpoint deleted")

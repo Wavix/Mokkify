@@ -45,8 +45,6 @@ class TemplateService {
     const exists = await DB.models.ResponseTemplate.findByPk(id)
     if (!exists?.id) throw new Error("Template not found")
 
-    // SQLite does not enforce the ON DELETE SET NULL association here, so clean the
-    // references explicitly — otherwise endpoints keep pointing at a deleted template.
     const transaction = await DB.sequelize.transaction()
 
     try {
