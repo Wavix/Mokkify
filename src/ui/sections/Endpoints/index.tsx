@@ -46,7 +46,7 @@ const Endpoints: NextPage = () => {
     try {
       const response = await API.deleteEndpoint(id)
       if (!response.success) return failureToast("Error deleting endpoint")
-      if (activeEndpoint?.id === id) router.push("/endpoints", undefined, { scroll: false, shallow: true })
+      if (endpointId === id) router.push("/endpoints", undefined, { scroll: false, shallow: true })
       getEndpoints(false)
       successToast("Endpoint deleted")
     } catch (error) {
