@@ -8,7 +8,7 @@ import { config as appConfig } from "@/config"
 const UNAUTHORIZED_PATHS = ["/backend/auth"]
 
 export const config = {
-  matcher: "/backend/:path*"
+  matcher: ["/backend/:path*", "/mcp"]
 }
 
 export const proxy = (request: Request) => {
@@ -17,7 +17,8 @@ export const proxy = (request: Request) => {
 
 const backedAuth = async (request: Request) => {
   const url = new URL(request.url)
-  if (!url.pathname.startsWith("/backend/")) return NextResponse.next()
+  const isGatedPath = url.pathname.startsWith("/backend/") || url.pathname === "/mcp"
+  if (!isGatedPath) return NextResponse.next()
   if (UNAUTHORIZED_PATHS.includes(url.pathname)) return NextResponse.next()
 
   const authHeader = request.headers.get("Authorization") || ""

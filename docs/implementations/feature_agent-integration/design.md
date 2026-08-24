@@ -176,6 +176,13 @@ The MCP server is a self-contained subdirectory (e.g. `mcp/`) with its own
 `package.json`, consuming the served OpenAPI spec and talking to a Mokkify
 base URL with an API key over stdio transport.
 
+**Addendum (2026-08-24, follow-up PR):** the app now also serves the same
+spec-generated tool set over MCP streamable HTTP at `POST /mcp` (stateless,
+`WebStandardStreamableHTTPServerTransport`), reusing `mcp/src/openapi.ts` and
+`mcp/src/client.ts` via the `@mcp/*` alias so tool generation stays
+single-sourced. The stdio package remains for clients without HTTP transport
+and for offline inspection; the HTTP endpoint is the recommended default.
+
 ## Component interfaces and boundaries
 
 ### `src/proxy.ts` — accept API keys alongside JWT

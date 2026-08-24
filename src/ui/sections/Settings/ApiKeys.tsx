@@ -41,9 +41,9 @@ const buildMcpConfig = (apiKey: string, origin: string): string =>
     {
       mcpServers: {
         mokkify: {
-          command: "node",
-          args: ["/absolute/path/to/mokkify/mcp/dist/index.js"],
-          env: { MOKKIFY_BASE_URL: origin, MOKKIFY_API_KEY: apiKey }
+          type: "http",
+          url: `${origin}/mcp`,
+          headers: { Authorization: `Bearer ${apiKey}` }
         }
       }
     },
@@ -172,13 +172,14 @@ export const SettingsApiKeys: FC<Props> = ({ token }) => {
 
           <CollapsibleContent>
             <p className="text-muted-foreground mb-3 text-sm">
-              Build the server (<code>cd mcp && pnpm install && pnpm build</code>), then add this to your MCP client.
-              Set the args path to this repo and replace {KEY_PLACEHOLDER} with a key created above.
+              The MCP server is built into the app at <code>/mcp</code> — add this to your MCP client and replace{" "}
+              {KEY_PLACEHOLDER} with a key created above. For the standalone stdio variant see{" "}
+              <code>mcp/README.md</code>.
             </p>
 
             <Textarea
               readOnly
-              rows={13}
+              rows={11}
               data-id="apiKeys.mcpConfig"
               className="font-mono text-xs"
               value={buildMcpConfig(KEY_PLACEHOLDER, origin)}
@@ -219,7 +220,7 @@ export const SettingsApiKeys: FC<Props> = ({ token }) => {
           <p className="text-muted-foreground text-sm">Ready-to-paste MCP client config:</p>
           <Textarea
             readOnly
-            rows={13}
+            rows={11}
             data-id="apiKeys.plaintextMcpConfig"
             className="font-mono text-xs"
             value={buildMcpConfig(plaintext || KEY_PLACEHOLDER, origin)}

@@ -1,5 +1,10 @@
 # mokkify-mcp
 
+> Prefer zero-install? Mokkify also serves this same generated tool set over
+> streamable HTTP at `POST /mcp` — see the root [README](../README.md#mcp-server).
+> This stdio package remains for MCP clients without HTTP transport and for
+> inspecting the tool set offline.
+
 A thin stdio MCP server for [Mokkify](../README.md). It has no hand-written
 tools: at startup it fetches Mokkify's OpenAPI contract and registers one MCP
 tool per `/backend/*` operation, named after the operation's `operationId`.

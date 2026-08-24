@@ -55,6 +55,11 @@ export default defineConfig([
               pattern: "@/**",
               group: "parent",
               position: "after"
+            },
+            {
+              pattern: "@mcp/**",
+              group: "parent",
+              position: "after"
             }
           ],
           "pathGroupsExcludedImportTypes": ["builtin", "type"],
