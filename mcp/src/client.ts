@@ -14,7 +14,7 @@ export interface ToolCallResult {
   body: string
 }
 
-function buildUrl(baseUrl: string, operation: OpenApiOperation, args: Record<string, unknown>): URL {
+export function buildUrl(baseUrl: string, operation: OpenApiOperation, args: Record<string, unknown>): URL {
   let resolvedPath = operation.path
   for (const param of operation.parameters) {
     if (param.in !== "path") continue

@@ -22,7 +22,7 @@ Welcome to **Mokkify** - a self-hosted RestAPI mocking service built with Next.j
 - 🔄 Relay request support with external hooks
 - 🔮 Intuitive interface with light & dark themes
 - 🔐 Authorization
-- 🤖 Agent-ready: API keys, a published OpenAPI contract, and a bundled MCP server
+- 🤖 Agent-ready: API keys, a published OpenAPI contract, and a built-in MCP server (`/mcp`)
 - 📈 Endpoint RPS graphics
 - 🗄️ Dump and restore configuration
 
@@ -124,9 +124,36 @@ Two operations cover the whole "make a mock, then prove it works" loop:
 
 ### MCP server
 
-`mcp/` is a stdio MCP server that fetches the OpenAPI contract at startup and generates one tool per `/backend/*` operation — no hand-written tools. Register it with an MCP client (Claude Desktop / Claude Code) and an agent can drive Mokkify directly.
+Mokkify speaks MCP natively: one tool per `/backend/*` operation, generated from the OpenAPI contract — no hand-written tools. The same tool set is served over two transports.
 
-Build it first (`dist/` and `node_modules/` are gitignored):
+#### Streamable HTTP (recommended)
+
+The MCP server is built into the app at `POST /mcp` — nothing to install or run. Point an MCP client at a running Mokkify with an API key:
+
+```bash
+claude mcp add --transport http mokkify http://localhost:3000/mcp \
+  --header "Authorization: Bearer <key_id>.<secret>"
+```
+
+or in a JSON client config:
+
+```jsonc
+{
+  "mcpServers": {
+    "mokkify": {
+      "type": "http",
+      "url": "http://localhost:3000/mcp",
+      "headers": { "Authorization": "Bearer <key_id>.<secret>" }
+    }
+  }
+}
+```
+
+The endpoint is stateless (POST-only, no sessions), so any replica can answer. **Settings → API Keys** shows a ready-to-paste config for the current origin. File-upload operations (dump restore, OpenAPI import) take the raw file content inline via `file_content` instead of a local path.
+
+#### stdio (alternative)
+
+For MCP clients without HTTP transport, or to inspect the tool set offline, `mcp/` is a standalone stdio server consuming the same contract. Build it first (`dist/` and `node_modules/` are gitignored):
 
 ```bash
 cd mcp
@@ -151,16 +178,7 @@ Register over stdio, pointing at a running Mokkify and an API key:
 }
 ```
 
-In Claude Code, the one-liner:
-
-```bash
-claude mcp add mokkify \
-  --env MOKKIFY_BASE_URL=http://localhost:3000 \
-  --env MOKKIFY_API_KEY=<key_id>.<secret> \
-  -- node /absolute/path/to/mokkify/mcp/dist/index.js
-```
-
-On startup the server logs which spec source it used (`remote:` when Mokkify is reachable, otherwise a fallback to the bundled `public/openapi.yaml`) and how many tools it registered. Bumped Mokkify to a version with new endpoints? Just restart the MCP server — tools regenerate from the fresh spec. See [`mcp/README.md`](mcp/README.md) for the full reference.
+On startup the stdio server logs which spec source it used (`remote:` when Mokkify is reachable, otherwise a fallback to the bundled `public/openapi.yaml`) and how many tools it registered. Bumped Mokkify to a version with new endpoints? Tools regenerate from the fresh spec — the HTTP endpoint picks it up on deploy, the stdio server on restart. See [`mcp/README.md`](mcp/README.md) for the full stdio reference.
 
 ### Example: migrate a project's integrations to mocks
 

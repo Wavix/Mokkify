@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^22.18.0",
     "@types/react": "^19.2.18",
