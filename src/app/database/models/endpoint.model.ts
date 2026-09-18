@@ -53,6 +53,11 @@ export const Endpoint = (sequelize: Sequelize.Sequelize, DataTypes: typeof Seque
         defaultValue: null,
         allowNull: true
       },
+      relay_headers: {
+        type: DataTypes.JSON,
+        defaultValue: null,
+        allowNull: true
+      },
       relay_payload_template_id: {
         type: DataTypes.INTEGER,
         defaultValue: null,

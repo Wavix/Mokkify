@@ -108,7 +108,8 @@ class RelayService {
         method,
         headers: {
           "Accept": "application/json",
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          ...(endpoint.relay_headers || {})
         },
         signal: AbortSignal.timeout(10_000),
         ...(json && { body: json })

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 
 import { useFailureToast } from "@/hooks/useFailureToast"
 import { getRelaysList } from "@/ui/api/relays"
-import { Select, Switch, Input } from "@/ui/components/Form"
+import { Select, Switch, Input, HeadersEditor, HintLabel, type HeaderRow } from "@/ui/components/Form"
 
 import type { Method, EndpointCreationAttributes } from "@/app/database/interfaces/endpoint.interface"
 import type { RelayPayloadTemplateAttributes } from "@/app/database/interfaces/relay-payload-template.interface"
@@ -11,9 +11,11 @@ import type { FC } from "react"
 interface Props {
   formData: Partial<EndpointCreationAttributes>
   onChange: (data: Partial<EndpointCreationAttributes>) => void
+  headerRows: Array<HeaderRow>
+  onHeadersChange: (rows: Array<HeaderRow>) => void
 }
 
-export const Relay: FC<Props> = ({ formData, onChange }) => {
+export const Relay: FC<Props> = ({ formData, onChange, headerRows, onHeadersChange }) => {
   const failureToast = useFailureToast()
   const [relayTemplates, setRelayTemplates] = useState<Array<RelayPayloadTemplateAttributes>>([])
 
@@ -78,6 +80,14 @@ export const Relay: FC<Props> = ({ formData, onChange }) => {
           disabled={!formData.relay_enabled}
           onChange={value => onChange({ ...formData, relay_target: value })}
         />
+      </div>
+
+      <div className="mt-[14px]">
+        <HintLabel
+          value="Headers"
+          hint="Extra headers sent with the relay request, e.g. an Authorization header when the target requires authentication."
+        />
+        <HeadersEditor rows={headerRows} onChange={onHeadersChange} />
       </div>
     </div>
   )

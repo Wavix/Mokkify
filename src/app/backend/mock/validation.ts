@@ -21,7 +21,8 @@ export const schema = Joi.object().keys({
     .keys({
       target: Joi.string().min(1).required(),
       method: methodSchema.required(),
-      body: Joi.string().optional()
+      body: Joi.string().optional(),
+      headers: Joi.object().pattern(Joi.string(), Joi.string()).optional().allow(null)
     })
     .optional(),
   max_pending_time: Joi.number().optional().allow(null)

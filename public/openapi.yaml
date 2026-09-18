@@ -1175,6 +1175,11 @@ components:
           type: [string, "null"]
         relay_method:
           $ref: "#/components/schemas/Method"
+        relay_headers:
+          type: [object, "null"]
+          additionalProperties:
+            type: string
+          description: Extra headers sent with the relay request (e.g. Authorization)
         relay_payload_template_id:
           type: [integer, "null"]
         user_id:
@@ -1227,6 +1232,11 @@ components:
           type: [string, "null"]
         relay_method:
           $ref: "#/components/schemas/Method"
+        relay_headers:
+          type: [object, "null"]
+          additionalProperties:
+            type: string
+          description: Extra headers sent with the relay request (e.g. Authorization)
 
     Log:
       type: object
@@ -1361,6 +1371,11 @@ components:
               $ref: "#/components/schemas/Method"
             body:
               type: string
+            headers:
+              type: [object, "null"]
+              additionalProperties:
+                type: string
+              description: Extra headers sent with the relay request (e.g. Authorization)
         max_pending_time:
           type: [integer, "null"]
 
