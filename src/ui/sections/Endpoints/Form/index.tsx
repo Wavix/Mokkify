@@ -7,7 +7,7 @@ import { useFailureToast } from "@/hooks/useFailureToast"
 import { useSuccessToast } from "@/hooks/useSuccessToast"
 import * as endpointsApi from "@/ui/api/endpoints"
 import { StyledJSON, Card, Skeleton, CategoryBlock } from "@/ui/components"
-import { Input, Select } from "@/ui/components/Form"
+import { Input, Select, type HeaderRow } from "@/ui/components/Form"
 import { SectionWrapper } from "@/ui/components/layout"
 
 import { Relay } from "./Relay"
@@ -34,7 +34,8 @@ const defaultState: Partial<EndpointCreationAttributes> = {
   multiple_responses_templates: [],
   relay_enabled: false,
   relay_target: null,
-  relay_method: "POST"
+  relay_method: "POST",
+  relay_headers: null
 }
 
 export const EndpointsForm: FC<Props> = ({ id, getList }) => {
@@ -47,6 +48,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
 
   const [isLoading, setIsLoading] = useState(false)
   const [formData, setFormData] = useState<Partial<EndpointCreationAttributes>>(defaultState)
+  const [relayHeaderRows, setRelayHeaderRows] = useState<Array<HeaderRow>>([])
 
   const [templates, setTemplates] = useState<Array<ResponseTemplateAttributes>>([])
   const multipleResponseTemplates = formData.multiple_responses_templates || []
@@ -57,6 +59,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
 
   useEffect(() => {
     setFormData(defaultState)
+    setRelayHeaderRows([])
   }, [router.pathname])
 
   const onSubmitHandler = async (event: FormEvent<HTMLFormElement>) => {
@@ -107,6 +110,7 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
       const response = await endpointsApi.getEndpointById(Number(id))
       if (response.error) return failureToast(response.error)
       setFormData(response)
+      setRelayHeaderRows(Object.entries(response.relay_headers || {}).map(([key, value]) => ({ key, value: String(value) })))
     } catch (error) {
       return failureToast((error as Error).message)
     } finally {
@@ -129,6 +133,9 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
   }
 
   const getPayload = (): Partial<EndpointCreationAttributes> => {
+    const relayHeaders: Record<string, string> = {}
+    relayHeaderRows.filter(row => row.key.trim()).forEach(row => (relayHeaders[row.key.trim()] = row.value))
+
     return {
       title: formData.title,
       method: formData.method,
@@ -139,7 +146,8 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
       relay_payload_template_id: formData.relay_payload_template_id || null,
       relay_enabled: formData.relay_enabled || false,
       relay_target: formData.relay_target || null,
-      relay_method: formData.relay_method || "POST"
+      relay_method: formData.relay_method || "POST",
+      relay_headers: Object.keys(relayHeaders).length ? relayHeaders : null
     }
   }
 
@@ -218,7 +226,12 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
               </CategoryBlock>
 
               <CategoryBlock title="Relay webhook">
-                <Relay formData={formData} onChange={data => setFormData(data)} />
+                <Relay
+                  formData={formData}
+                  onChange={data => setFormData(data)}
+                  headerRows={relayHeaderRows}
+                  onHeadersChange={setRelayHeaderRows}
+                />
               </CategoryBlock>
 
               <Card.Actions>
