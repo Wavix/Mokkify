@@ -22,7 +22,8 @@ export const schema = Joi.object().keys({
       target: Joi.string().min(1).required(),
       method: methodSchema.required(),
       body: Joi.string().optional(),
-      headers: Joi.object().pattern(Joi.string(), Joi.string()).optional().allow(null)
+      headers: Joi.object().pattern(Joi.string(), Joi.string()).optional().allow(null),
+      delay: Joi.number().integer().min(0).max(60_000).optional().allow(null)
     })
     .optional(),
   max_pending_time: Joi.number().optional().allow(null)

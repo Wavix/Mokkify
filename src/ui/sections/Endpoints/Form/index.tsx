@@ -35,7 +35,8 @@ const defaultState: Partial<EndpointCreationAttributes> = {
   relay_enabled: false,
   relay_target: null,
   relay_method: "POST",
-  relay_headers: null
+  relay_headers: null,
+  relay_delay: null
 }
 
 export const EndpointsForm: FC<Props> = ({ id, getList }) => {
@@ -147,7 +148,8 @@ export const EndpointsForm: FC<Props> = ({ id, getList }) => {
       relay_enabled: formData.relay_enabled || false,
       relay_target: formData.relay_target || null,
       relay_method: formData.relay_method || "POST",
-      relay_headers: Object.keys(relayHeaders).length ? relayHeaders : null
+      relay_headers: Object.keys(relayHeaders).length ? relayHeaders : null,
+      relay_delay: formData.relay_delay || null
     }
   }
 

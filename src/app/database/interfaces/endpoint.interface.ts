@@ -18,6 +18,7 @@ export interface EndpointAttributes {
   relay_target: string | null // request field or url
   relay_method: Method
   relay_headers: Record<string, string> | null // extra headers sent with the relay request (e.g. Authorization)
+  relay_delay: number | null // delay in milliseconds before firing the relay request
   relay_payload_template_id: number | null
   user_id: number
   created_at: Date
@@ -28,7 +29,7 @@ export interface EndpointAttributes {
 
 export interface EndpointCreationAttributes extends Optional<
   EndpointAttributes,
-  "id" | "uuid" | "user_id" | "created_at" | "relay_headers"
+  "id" | "uuid" | "user_id" | "created_at" | "relay_headers" | "relay_delay"
 > {
   multiple_responses_templates?: Array<number>
 }

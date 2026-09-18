@@ -11,5 +11,6 @@ export const schema = Joi.object().keys({
   relay_enabled: Joi.boolean().required(),
   relay_target: Joi.string().allow(null).required(),
   relay_method: Joi.string().valid("POST", "GET", "PATCH", "PUT", "DELETE", "OPTIONS", "HEAD").required(),
-  relay_headers: Joi.object().pattern(Joi.string(), Joi.string()).optional().allow(null)
+  relay_headers: Joi.object().pattern(Joi.string(), Joi.string()).optional().allow(null),
+  relay_delay: Joi.number().integer().min(0).max(60_000).optional().allow(null)
 })

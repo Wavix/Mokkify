@@ -16,6 +16,7 @@ export interface MockRelayPayload {
   method: Method
   body?: string
   headers?: Record<string, string> | null
+  delay?: number | null
 }
 
 export interface MockCreationPayload {
@@ -72,6 +73,7 @@ class MockService {
           relay_target: payload.relay?.target ?? null,
           relay_method: payload.relay?.method ?? "GET",
           relay_headers: payload.relay?.headers ?? null,
+          relay_delay: payload.relay?.delay ?? null,
           relay_payload_template_id: relayPayloadTemplateId,
           user_id: 1
         },
