@@ -33,7 +33,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/wavix/mokkify
+          images: ghcr.io/icevl/mokkify
           tags: |
             type=raw,value=latest
             type=match,pattern=v(.*),group=1
