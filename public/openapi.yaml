@@ -159,8 +159,14 @@ paths:
                 properties:
                   endpoint:
                     $ref: "#/components/schemas/Endpoint"
+        "404":
+          description: Endpoint not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
-          description: Not found or invalid id
+          description: Invalid id or server error
           content:
             application/json:
               schema:
@@ -288,6 +294,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/LogListResponse"
+        "404":
+          description: Endpoint not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
           description: Error
           content:
@@ -431,8 +443,14 @@ paths:
                 properties:
                   template:
                     $ref: "#/components/schemas/ResponseTemplate"
+        "404":
+          description: Template not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
-          description: Not found or invalid id
+          description: Invalid id or server error
           content:
             application/json:
               schema:

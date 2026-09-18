@@ -22,7 +22,9 @@ const getTemplateById = async (templateId: number) => {
   try {
     const template = await templateService.getTemplateById(templateId)
     return NextResponse.json({ template })
-  } catch {
+  } catch (error) {
+    if ((error as Error).message === "Template not found")
+      return NextResponse.json({ error: "Template not found" }, { status: 404 })
     return NextResponse.json({ error: "Error while executing request" }, { status: 500 })
   }
 }

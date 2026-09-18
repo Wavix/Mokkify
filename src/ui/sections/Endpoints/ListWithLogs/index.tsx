@@ -59,6 +59,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
     setLogs(listInitial)
     getLogs()
     startUpdateInterval()
+    return stopUpdateInterval
   }, [endpointId, page, limit, ...filtersList])
 
   useEffect(() => {
@@ -102,7 +103,11 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
       limit,
       ...filters
     })
-    if (response instanceof Error) return setIsLogsLoading(false)
+    if (response instanceof Error || !response?.pagination) {
+      stopUpdateInterval()
+      setIsLogsLoading(false)
+      return
+    }
     setLogs(response)
     setIsLogsLoading(false)
   }
@@ -125,8 +130,12 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
   }
 
   const startUpdateInterval = () => {
-    if (updateInterval.current) clearInterval(updateInterval.current)
+    stopUpdateInterval()
     if (page === 1) updateInterval.current = setInterval(() => getLogs(false), REFRESH_LOGS_INTERVAL)
+  }
+
+  const stopUpdateInterval = () => {
+    if (updateInterval.current) clearInterval(updateInterval.current)
   }
 
   if (!activeEndpoint) return <Cap title="Endpoints requests" description="Select endpoint to see the request logs" />
@@ -171,9 +180,7 @@ export const ListWithLogs: FC<Props> = ({ activeEndpoint }) => {
               </Card.Container>
             )}
 
-            <div>
-              <Pagination pagination={logs.pagination} />
-            </div>
+            <div>{logs?.pagination && <Pagination pagination={logs.pagination} />}</div>
           </div>
           <div>
             {activeLog && (
