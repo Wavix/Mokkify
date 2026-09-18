@@ -104,6 +104,8 @@ class RelayService {
     try {
       const json = parseResponseBody(endpoint.relay_payload?.body, requestBody, apiResponse.body, pathParams)
 
+      if (endpoint.relay_delay) await new Promise(resolve => setTimeout(resolve, endpoint.relay_delay ?? 0))
+
       const response = await fetch(url, {
         method,
         headers: {

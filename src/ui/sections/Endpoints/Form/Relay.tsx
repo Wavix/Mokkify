@@ -71,7 +71,7 @@ export const Relay: FC<Props> = ({ formData, onChange, headerRows, onHeadersChan
         />
       </div>
 
-      <div className="mt-[14px]">
+      <div className="mt-[14px] grid grid-cols-2 gap-[14px]">
         <Input
           title="Target"
           hint="URL or path to the key from which the URL will be taken as the target. To extract the URL from the request body, use nested notation separated by a dot. For example (dlr.callback_url)."
@@ -79,6 +79,15 @@ export const Relay: FC<Props> = ({ formData, onChange, headerRows, onHeadersChan
           value={formData.relay_target || ""}
           disabled={!formData.relay_enabled}
           onChange={value => onChange({ ...formData, relay_target: value })}
+        />
+
+        <Input
+          title="Delay (ms)"
+          hint="Delay in milliseconds before firing the relay request. Useful when the relay target needs time to process the original response first."
+          placeholder="0"
+          value={formData.relay_delay || ""}
+          disabled={!formData.relay_enabled}
+          onChange={value => onChange({ ...formData, relay_delay: Number(value) || null })}
         />
       </div>
 

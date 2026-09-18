@@ -1180,6 +1180,9 @@ components:
           additionalProperties:
             type: string
           description: Extra headers sent with the relay request (e.g. Authorization)
+        relay_delay:
+          type: [integer, "null"]
+          description: Delay in milliseconds before firing the relay request
         relay_payload_template_id:
           type: [integer, "null"]
         user_id:
@@ -1237,6 +1240,11 @@ components:
           additionalProperties:
             type: string
           description: Extra headers sent with the relay request (e.g. Authorization)
+        relay_delay:
+          type: [integer, "null"]
+          minimum: 0
+          maximum: 60000
+          description: Delay in milliseconds before firing the relay request
 
     Log:
       type: object
@@ -1376,6 +1384,11 @@ components:
               additionalProperties:
                 type: string
               description: Extra headers sent with the relay request (e.g. Authorization)
+            delay:
+              type: [integer, "null"]
+              minimum: 0
+              maximum: 60000
+              description: Delay in milliseconds before firing the relay request
         max_pending_time:
           type: [integer, "null"]
 
