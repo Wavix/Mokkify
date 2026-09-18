@@ -7,6 +7,42 @@ info:
     `/backend/*` requires a bearer credential (a user JWT from `POST
     /backend/auth`, or an API key from `POST /backend/api-key`) except
     `/backend/auth` itself.
+
+
+    ## Template variables
+
+    Response and relay bodies are plain text with `@`-prefixed variables
+    (NOT handlebars/`{{...}}`):
+
+    - `@request.<key>` — value from the incoming request body, merged with
+      query-string parameters. Nested keys use dots, array elements use
+      brackets: `@request.messages[0].messageId`.
+
+    - `@response.<key>` — value from the rendered mock response
+      (**relay payload templates only**; resolves to `null` in response
+      templates).
+
+    - `@path.<name>` — path parameter captured by the endpoint path
+      (`/users/:id` → `@path.id`; a `*` wildcard tail is `@path.wildcard`).
+
+    - Builtins: `@uuid` (random v4), `@unix` (epoch seconds), `@date`
+      (ISO 8601), `@dateYYYYMMDD`.
+
+    Quoting: `"key": @request.x` inserts the raw JSON value and preserves
+    its type; `"key": "@request.x"` always yields a string. Unknown `@`
+    sources (e.g. e-mail addresses) are left untouched.
+
+
+    ## Relay semantics
+
+    When an endpoint has a relay, the mock responds to the caller first and
+    fires the relay request asynchronously (fire-and-forget, 10 s timeout).
+    `relay_delay` (ms) defers the relay — use it when the relay target must
+    not outrun the caller's processing of the mock response. `relay_headers`
+    adds custom headers (e.g. `Authorization`) on top of the default
+    `Accept`/`Content-Type: application/json`. `relay_target` is either an
+    absolute URL or a dot-notation field path resolved against the incoming
+    request body (e.g. `dlr.callback_url`).
   version: "2.0.0"
   license:
     name: MIT
@@ -403,6 +439,13 @@ paths:
       tags: [template]
       operationId: createTemplate
       summary: Create a response template
+      description: >-
+        The template `body` supports `@`-prefixed variables (not handlebars):
+        `@request.<key>` (dots for nesting, brackets for arrays), `@path.<name>`,
+        and builtins `@uuid` / `@unix` / `@date` / `@dateYYYYMMDD`.
+        `"key": @request.x` preserves the JSON type; `"key": "@request.x"`
+        forces a string. `@response.*` is NOT available here (relay payload
+        templates only).
       requestBody:
         required: true
         content:
@@ -541,6 +584,14 @@ paths:
       tags: [relay]
       operationId: createRelayTemplate
       summary: Create a relay payload template
+      description: >-
+        The relay `body` supports the same `@`-prefixed variables as response
+        templates (`@request.<key>`, `@path.<name>`, `@uuid`, `@unix`,
+        `@date`, `@dateYYYYMMDD`) plus `@response.<key>` — the mock response
+        as rendered for the caller. The relay itself fires asynchronously
+        after the response is returned; the endpoint's `relay_delay` (ms)
+        defers it and `relay_headers` adds custom headers (e.g.
+        `Authorization`).
       requestBody:
         required: true
         content:
@@ -931,6 +982,35 @@ paths:
       tags: [mock]
       operationId: createMock
       summary: Create a complete mock (response template, optional relay template, and endpoint) in one call
+      description: >-
+        Creates a response template, an optional relay payload template, and
+        the endpoint wired to them in a single call. The mock is then served
+        at `/api/<path>` (no auth).
+
+
+        `response.body` and `relay.body` are text templates with `@`-prefixed
+        variables — NOT handlebars. Available everywhere: `@request.<key>`
+        (incoming request body merged with query params; nested keys via
+        dots, arrays via brackets — `@request.messages[0].messageId`),
+        `@path.<name>` (path params: `/users/:id` → `@path.id`, wildcard
+        tail → `@path.wildcard`), and builtins `@uuid`, `@unix`, `@date`
+        (ISO 8601), `@dateYYYYMMDD`. Additionally in `relay.body` only:
+        `@response.<key>` — the rendered mock response. Type handling:
+        `"key": @request.x` preserves the JSON type, `"key": "@request.x"`
+        forces a string.
+
+
+        The relay fires asynchronously after the response is returned
+        (fire-and-forget, 10 s timeout). `relay.delay` (ms) defers it —
+        set a delay when the relay target must not receive the callback
+        before the caller has processed the mock response. `relay.headers`
+        adds custom headers such as `Authorization`. `relay.target` is an
+        absolute URL, or a dot-notation field path resolved against the
+        incoming request body.
+
+
+        Use `verifyMock` afterwards to fire the endpoint and inspect the
+        rendered response plus the relay result in one call.
       requestBody:
         required: true
         content:
@@ -1351,6 +1431,10 @@ components:
         path:
           type: string
           minLength: 1
+          description: >-
+            Served at /api/<path>. Supports path parameters and wildcards
+            (/users/:id, /files/*) accessible in templates as @path.id /
+            @path.wildcard.
         method:
           $ref: "#/components/schemas/Method"
         response:
@@ -1368,6 +1452,11 @@ components:
                 type: string
             body:
               type: [string, "null"]
+              description: >-
+                Template with @-variables — @request.<key> (dots/brackets
+                for nesting), @path.<name>, @uuid, @unix, @date,
+                @dateYYYYMMDD. Not handlebars; @response.* is unavailable
+                here.
         relay:
           type: object
           required: [target, method]
@@ -1375,10 +1464,16 @@ components:
             target:
               type: string
               minLength: 1
+              description: >-
+                Absolute URL, or a dot-notation field path resolved against
+                the incoming request body (e.g. dlr.callback_url).
             method:
               $ref: "#/components/schemas/Method"
             body:
               type: string
+              description: >-
+                Relay payload template. Same @-variables as response bodies
+                plus @response.<key> (the rendered mock response).
             headers:
               type: [object, "null"]
               additionalProperties:
