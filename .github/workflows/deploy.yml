@@ -7,6 +7,10 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,17 +27,21 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build Docker image
-        run: |
-          TAGS="-t ghcr.io/icevl/mokkify:latest"
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            VERSION="${GITHUB_REF#refs/tags/v}"
-            TAGS="$TAGS -t ghcr.io/icevl/mokkify:$VERSION"
-          fi
-          docker build --platform linux/amd64 $TAGS .
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/wavix/mokkify
+          tags: |
+            type=raw,value=latest
+            type=match,pattern=v(.*),group=1
 
-      - name: Push Docker image
-        run: |
-          docker push --all-tags ghcr.io/icevl/mokkify
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
